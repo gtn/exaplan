@@ -211,6 +211,7 @@ function block_exaplan_update_moduleset($modulesetid, $title = null, $descriptio
     return $DB->update_record(BLOCK_EXAPLAN_DB_MODULESETS, $moduleset);
 }
 
+//nur der admin im centermoodle
 function block_exaplan_delete_moduleset($modulesetid)
 {
     global $DB;
@@ -225,6 +226,7 @@ function block_exaplan_delete_moduleset($modulesetid)
 }
 
 
+// bleibt auch im centermoodle
 /**
  * @param $title
  * @param $description
@@ -292,7 +294,7 @@ function block_exaplan_delete_modulepart($modulepartid)
     $DB->delete_records(BLOCK_EXAPLAN_DB_MODULEPARTS, array('id' => $modulepartid));
 }
 
-
+// sollte sowohl der admin vorschlagen könne, als auch die teilnehmer wünschen, right?
 function block_exaplan_create_date($modulepartid, $date, $timeslot, $state, $location = null, $trainerpuserid = null, $creatorpuserid, $creatortimestamp, $modifieduserid = null, $modifiedtimestamp = null)
 {
     global $DB;
@@ -353,7 +355,7 @@ function block_exaplan_create_date($modulepartid, $date, $timeslot, $state, $loc
 //}
 //
 
-
+// das passiert im centermoodle
 function block_exaplan_confirm_date($dateid)
 {
     global $DB;

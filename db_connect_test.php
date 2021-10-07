@@ -19,3 +19,15 @@ foreach ($modulesets as $moduleset){
 }
 
 echo "done";
+
+
+
+//https://riptutorial.com/pdo/example/15346/installation-or-setup
+//
+//https://www.php.net/manual/en/pdo.installation.php
+//
+//https://www.php-einfach.de/mysql-tutorial/crashkurs-pdo/
+//
+//
+//in /moodle einfach ordner /moodle2 anlegen, und irgendwohin moodledata dafür
+//dann hab ich den selben Server, aber mit einer anderen DB
