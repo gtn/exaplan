@@ -25,17 +25,63 @@ defined('MOODLE_INTERNAL') || die();
 const BLOCK_EXAPLAN_DB_MODULESETS = 'block_exaplanmodulesets';
 
 /**
+ *
+ * @param courseid or context $context
+ */
+function block_exaplan_is_admin($context = null) {
+    $context = block_exaplan_get_context_from_courseid($context);
+    return has_capability('block/exaplan:admin', $context);
+}
+
+/**
+ *
+ * @param courseid or context $context
+ * @param userid $userid
+ */
+function block_exaplan_is_teacher($context = null, $userid = null) {
+    $context = block_exaplan_get_context_from_courseid($context);
+    return has_capability('block/exaplan:teacher', $context, $userid);
+}
+
+function block_exaplan_get_context_from_courseid($courseid) {
+    global $COURSE;
+
+    if ($courseid instanceof context) {
+        // already context
+        return $courseid;
+    } else if (is_numeric($courseid)) { // don't use is_int, because eg. moodle $COURSE->id is a string!
+        return context_course::instance($courseid);
+    } else if ($courseid === null) {
+        return context_course::instance($COURSE->id);
+    } else {
+        throw new \moodle_exception('wrong courseid type '.gettype($courseid));
+    }
+}
+
+class block_exaplan_permission_exception extends moodle_exception {
+    function __construct($errorcode = 'Not allowed', $module = '', $link = '', $a = null, $debuginfo = null) {
+        return parent::__construct($errorcode, $module, $link, $a, $debuginfo);
+    }
+}
+
+
+/**
  * @param $title
  * @param $description
- * @param $trainerpuserid
- * @param $location
- * @param $courseidnumber
+ * @param null $trainerpuserid
+ * @param null $location
+ * @param null $courseidnumber
  * @return bool|int
  * @throws dml_exception
  */
 function block_exaplan_create_moduleset($title, $description, $trainerpuserid = null, $location = null, $courseidnumber = null)
 {
     global $DB;
+
+    // Only the admin can create modulesets
+    if(!block_exaplan_is_admin()){
+        throw new block_exaplan_permission_exception("User must be admin or teacher!");
+    }
 
     $date = new stdClass();
     $date->title = $title;
@@ -49,17 +95,22 @@ function block_exaplan_create_moduleset($title, $description, $trainerpuserid = 
 
 /**
  * @param $modulesetid
- * @param $title
- * @param $description
- * @param $trainerpuserid
- * @param $location
- * @param $courseidnumber
+ * @param null $title
+ * @param null $description
+ * @param null $trainerpuserid
+ * @param null $location
+ * @param null $courseidnumber
  * @return bool
  * @throws dml_exception
  */
 function block_exaplan_update_moduleset($modulesetid, $title = null, $description = null, $trainerpuserid = null, $location = null, $courseidnumber = null)
 {
     global $DB;
+
+    // Only the admin can create modulesets
+    if(!block_exaplan_is_admin()){
+        throw new block_exaplan_permission_exception("User must be admin or teacher!");
+    }
 
     $moduleset = $DB->get_record(BLOCK_EXAPLAN_DB_MODULESETS, array('id' => $modulesetid));
     if ($title) $moduleset->title = $title;
@@ -73,48 +124,20 @@ function block_exaplan_update_moduleset($modulesetid, $title = null, $descriptio
 
 
 /**
- * update title, description or subjectid of crosssubject
- * @param unknown $crosssubjid
- * @param unknown $title
- * @param unknown $description
- * @param unknown $subjectid
- */
-function block_exacomp_edit_crosssub($crosssubjid, $title, $description, $subjectid, $groupcategory = "")
-{
-    global $DB;
-
-    $crosssubj = $DB->get_record(BLOCK_EXACOMP_DB_CROSSSUBJECTS, array('id' => $crosssubjid));
-    $crosssubj->title = $title;
-    $crosssubj->description = $description;
-    $crosssubj->subjectid = $subjectid;
-    $crosssubj->groupcategory = $groupcategory;
-
-    return $DB->update_record(BLOCK_EXACOMP_DB_CROSSSUBJECTS, $crosssubj);
-}
-
-/**
  * remove given crosssubject
  * @param unknown $crosssubjid
  */
-function block_exacomp_delete_crosssub($crosssubjid)
+function block_exaplan_delete_moduleset($modulesetid)
 {
     global $DB;
-    //delete examples that were created specifically only for this cross_subject
-    block_exacomp_delete_examples_for_crosssubject($crosssubjid);
 
-    // TODO: pruefen ob mein crosssubj?
+    // Only the admin can create modulesets
+    if(!block_exaplan_is_admin()){
+        throw new block_exaplan_permission_exception("User must be admin or teacher!");
+    }
 
-    //delete student-crosssubject association
-    $DB->delete_records(BLOCK_EXACOMP_DB_CROSSSTUD, array('crosssubjid' => $crosssubjid));
-
-    //delete descriptor-crosssubject association
-    $DB->delete_records(BLOCK_EXACOMP_DB_DESCCROSS, array('crosssubjid' => $crosssubjid));
-
-    //delete crosssubject overall evaluations
-    $DB->delete_records(BLOCK_EXACOMP_DB_COMPETENCES, array('compid' => $crosssubjid, 'comptype' => BLOCK_EXACOMP_TYPE_CROSSSUB));
-
-    //delete crosssubject
-    $DB->delete_records(BLOCK_EXACOMP_DB_CROSSSUBJECTS, array('id' => $crosssubjid));
+    //delete moduleset
+    $DB->delete_records(BLOCK_EXAPLAN_DB_MODULESETS, array('id' => $modulesetid));
 }
 
 
