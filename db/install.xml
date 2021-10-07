@@ -72,11 +72,13 @@
                        COMMENT="Userid from the origin moodle"/>
                 <FIELD NAME="moodleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"
                        COMMENT="Id of the moodle, since there are multiple moodles with this block"/>
-                <FIELD NAME="companyid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="firstname" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="lastname" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="email" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="companyid" TYPE="foreign" FIELDS="companyid" REFTABLE="block_exaplacompanies"
+                <KEY NAME="moodleid" TYPE="foreign" FIELDS="moodleid" REFTABLE="block_exaplanmoodles"
                      REFFIELDS="moodleid"/>
             </KEYS>
         </TABLE>
@@ -94,12 +96,12 @@
                 <KEY NAME="puserid" TYPE="foreign" FIELDS="puserid" REFTABLE="block_exaplanpusers" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
-        <TABLE NAME="block_exaplancompanies"
+        <TABLE NAME="block_exaplanmoodles"
                COMMENT="Companies that use exaplan have to be registered here.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="name" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
-                <FIELD  NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="companyname" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD  NAME="moodleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

@@ -168,9 +168,9 @@ function block_exaplan_create_moduleset($title, $description, $trainerpuserid = 
     global $DB;
 
     // Only the admin can create modulesets
-    if (!block_exaplan_is_admin()) {
-        throw new block_exaplan_permission_exception("User must be admin!");
-    }
+//    if (!block_exaplan_is_admin()) {
+//        throw new block_exaplan_permission_exception("User must be admin!");
+//    }
 
     $moduleset = new stdClass();
     $moduleset->title = $title;
