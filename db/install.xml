@@ -44,8 +44,8 @@
                COMMENT="Dates can be desired dates or fixed once the admin decided on a date. Every date refers to a modulepart.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="modulepartid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="date" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="modulepartid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="date" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="1=proposed, 2=confirmed"/>
                 <FIELD NAME="timeslot" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
                        COMMENT="1=Both are okay, 2=AM, 3=PM"/>
                 <FIELD NAME="state" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
@@ -77,7 +77,7 @@
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
                 <KEY NAME="companyid" TYPE="foreign" FIELDS="companyid" REFTABLE="block_exaplacompanies"
-                     REFFIELDS="id"/>
+                     REFFIELDS="moodleid"/>
             </KEYS>
         </TABLE>
         <TABLE NAME="block_exaplanpuser_date_mm"
@@ -99,6 +99,7 @@
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="name" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD  NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
