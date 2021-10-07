@@ -5,13 +5,15 @@ class block_exaplan extends block_base {
     }
 
     public function get_content() {
+
+        global $CFG;
         if ($this->content !== null) {
             return $this->content;
         }
 
         $this->content         =  new stdClass;
-        $this->content->text   = 'The content of our planning tool block!';
-        $this->content->footer = 'Footer here...';
+        $this->content->items = array();
+        $this->content->text = '<a title="dashboard" href="'.$CFG->wwwroot.'/blocks/exaplan/dashboard.php">Dashboard</a>';
 
         return $this->content;
     }
