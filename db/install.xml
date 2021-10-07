@@ -10,7 +10,7 @@
                 <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="title" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"
                        COMMENT="Title of the moduleset"/>
-                <FIELD NAME="description" TYPE="char" LENGTH="3000" NOTNULL="false" SEQUENCE="false"
+                <FIELD NAME="description" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false"
                        COMMENT="Description of the moduleset"/>
                 <FIELD NAME="trainerpuserid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="location" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false"
@@ -44,8 +44,7 @@
                COMMENT="Dates can be desired dates or fixed once the admin decided on a date. Every date refers to a modulepart.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="modulepartid" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"
-                       COMMENT="Title of the modulepart"/>
+                <FIELD NAME="modulepartid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="date" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="timeslot" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
                        COMMENT="1=Both are okay, 2=AM, 3=PM"/>
@@ -77,7 +76,8 @@
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="companyid" TYPE="foreign" FIELDS="companyid" REFTABLE="block_exaplacompanies" REFFIELDS="id"/>
+                <KEY NAME="companyid" TYPE="foreign" FIELDS="companyid" REFTABLE="block_exaplacompanies"
+                     REFFIELDS="id"/>
             </KEYS>
         </TABLE>
         <TABLE NAME="block_exaplanpuser_date_mm"
@@ -94,7 +94,7 @@
                 <KEY NAME="puserid" TYPE="foreign" FIELDS="puserid" REFTABLE="block_exaplanpusers" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
-        <TABLE NAME="block_exaplacompanies"
+        <TABLE NAME="block_exaplancompanies"
                COMMENT="Companies that use exaplan have to be registered here.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
