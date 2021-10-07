@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/exaplan/db" VERSION="20201003" COMMENT="XMLDB file for Moodle blocks/exaplan"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+    <TABLES>
+        <TABLE NAME="block_exaplanmodulesets"
+               COMMENT="The 'courses' are called modulesets. Moduelsets consist of multiple moduleparts and are sometimes linked to moodlecourses">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="title" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="Title of the moduleset"/>
+                <FIELD NAME="description" TYPE="char" LENGTH="3000" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="Description of the moduleset"/>
+                <FIELD NAME="trainerpuserid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="location" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="Name of the location"/>
+                <FIELD NAME="courseidnumber" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="mdl_course.idnumber of the referenced moodlecourse"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="courseidnumber" TYPE="foreign" FIELDS="courseidnumber" REFTABLE="course" REFFIELDS="idnumber"
+                     COMMENT="Foreign key to the moodle course table"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="block_exaplanmoduleparts" COMMENT="The moduleparts which make up one moduleset.">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="modulesetid" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="Id of the moduleset this modulepart is part of"/>
+                <FIELD NAME="title" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="Title of the modulepart"/>
+                <FIELD NAME="duration" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="Full day = 1 or half day = 2"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="modulesetid" TYPE="foreign" FIELDS="modulesetid" REFTABLE="block_exaplanmodulesets"
+                     REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="block_exaplandates"
+               COMMENT="Dates can be desired dates or fixed once the admin decided on a date. Every date refers to a modulepart.">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="modulepartid" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="Title of the modulepart"/>
+                <FIELD NAME="date" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="timeslot" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="1=Both are okay, 2=AM, 3=PM"/>
+                <FIELD NAME="state" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="1=open, 2=desired date, 3=fixed"/>
+                <FIELD NAME="location" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="Name of the location"/>
+                <FIELD NAME="trainerpuserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="creatorpuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="creatortimestamp" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="modifiedpuserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="modifiedtimestamp" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="modulepartid" TYPE="foreign" FIELDS="modulepartid" REFTABLE="block_exaplanmoduleparts"
+                     REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="block_exaplanpusers"
+               COMMENT="The puserid is used in this block, to have a distinct id for every user. Userid from moodle does not work, since there are multiple moodles.">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="userid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="Userid from the origin moodle"/>
+                <FIELD NAME="moodleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="Id of the moodle, since there are multiple moodles with this block"/>
+                <FIELD NAME="companyid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="companyid" TYPE="foreign" FIELDS="companyid" REFTABLE="block_exaplacompanies" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="block_exaplanpuser_date_mm"
+               COMMENT="Users can have many dates, dates can have many users. This table is the mm table.">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="dateid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="puserid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="creatorpuserid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="dateid" TYPE="foreign" FIELDS="dateid" REFTABLE="block_exaplandates" REFFIELDS="id"/>
+                <KEY NAME="puserid" TYPE="foreign" FIELDS="puserid" REFTABLE="block_exaplanpusers" REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="block_exaplacompanies"
+               COMMENT="Companies that use exaplan have to be registered here.">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="name" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+    </TABLES>
+</XMLDB>
+

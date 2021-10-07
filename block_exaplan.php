@@ -10,7 +10,7 @@ class block_exaplan extends block_base {
         }
 
         $this->content         =  new stdClass;
-        $this->content->text   = 'The content of our planningtool block!';
+        $this->content->text   = 'The content of our planning tool block!';
         $this->content->footer = 'Footer here...';
 
         return $this->content;
