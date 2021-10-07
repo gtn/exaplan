@@ -15,7 +15,7 @@ $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmodulesets");
 $statement->execute(array());
 $modulesets = $statement->fetchAll();
 foreach ($modulesets as $moduleset){
-    echo $moduleset["title"].'\n';
+    echo $moduleset["title"].'<br>';
 }
 
 echo "done";
