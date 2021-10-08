@@ -17,6 +17,8 @@ class block_exaplan extends block_base {
 
         return $this->content;
     }
+
+    function has_config() {return true;}
     // The PHP tag and the curly bracket for the class definition
     // will only be closed after there is another function added in the next section.
 }

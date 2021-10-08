@@ -2,15 +2,23 @@
 
 require __DIR__.'/inc.php';
 
-global $CFG, $PAGE, $OUTPUT;
+global $CFG, $PAGE, $OUTPUT, $USER;
 
 
+
+$PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title("Übersicht");
 $PAGE->set_heading("Übersicht");
 $PAGE->set_url($CFG->wwwroot.'/blocks/exaplan/dashboard.php');
 
+require_login();
+
+
+
 echo $OUTPUT->header();
+
+var_dump(getOrCreatePuser($USER->id));
 
 echo '<div id="exaplan">';
 echo '<table>';

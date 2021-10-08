@@ -19,4 +19,33 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$pdo = new PDO('mysql:host=localhost;dbname=moodle2', 'root', ''); // TODO: constant, global?
+
+
+function getOrCreatePuser(){
+    global $USER;
+
+
+    $pdo = new PDO('mysql:host=localhost;dbname=moodle2', 'root', ''); // TODO: constant, global?
+    $params = array(
+        ':userid' => $USER->id,
+    );
+
+    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid");
+    $statement->execute($params);
+    $user = $statement->fetchAll();
+    if($user == null){
+        $params = array(
+            ':userid' => $USER->id,
+            ':moodleid' => get_config('exaplan', 'moodle_id'),
+            ':firstname' => $USER->firstname,
+            ':lastname' => $USER->lastname,
+            ':email' => $USER->email,
+        );
+
+        $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpusers (userid, moodleid, firstname, lastname, email) VALUES (:userid, :moodleid, :firstname,:lastname, :email);");
+        $statement->execute($params);
+        return true;
+    }else {
+        return $user[0]['id'];
+    }
+}
