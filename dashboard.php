@@ -19,6 +19,8 @@ require_login();
 echo $OUTPUT->header();
 
 var_dump(getOrCreatePuser($USER->id));
+$modulesets = getModulesOfUser(11);
+
 
 echo '<div id="exaplan">';
 echo '<table>';
@@ -29,7 +31,33 @@ echo '<th>Termine</th>';
 echo '</tr>';
 echo '</thead>';
 echo '<tbody>';
-    echo '<tr> <td>Module2</td> <td>26.05.2021</td></tr>';
+foreach($modulesets as $moduleset){
+    echo '<tr> <td>'.$moduleset->set["title"].'</td>';
+    echo '<td>';
+    echo '<table>';
+    echo '<thead>';
+    echo '<tr>';
+    foreach($moduleset->parts as $part) {
+        echo '<th>'.$part["title"].'</th>';
+    }
+    echo '</tr>';
+    echo '</thead>';
+    echo '<tbody>';
+    foreach($moduleset->parts as $part) {
+        echo '<td>';
+        echo '<ul>';
+        foreach($part['dates'] as $date){
+            echo '<li>'.$date['date'].'</li>';
+        }
+        echo '</ul>';
+        echo '</td>';
+    }
+    echo '</tbody>';
+    echo '</table>';
+    echo '</td>';
+    echo '</tr>';
+}
+
 echo '</tbody>';
 echo '</table>';
 echo '</div>';

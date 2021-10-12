@@ -30,6 +30,7 @@ function getOrCreatePuser(){
         ':userid' => $USER->id,
     );
 
+
     $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid");
     $statement->execute($params);
     $user = $statement->fetchAll();
@@ -48,4 +49,52 @@ function getOrCreatePuser(){
     }else {
         return $user[0]['id'];
     }
+}
+
+function getModulesOfUser($userid){
+    global $DB, $COURSE;
+
+    $context = context_course::instance($COURSE->id);
+    $modulesets = array();
+    $pdo = new PDO('mysql:host=localhost;dbname=moodle2', 'root', ''); // TODO: constant, global?
+
+    $courses = $DB->get_records('course');
+    foreach($courses as $course){
+        if($course->idnumber > 0){
+            if(is_enrolled($context, $userid, '', true)){
+                $moduleset = new \stdClass;
+                $params = array(
+                    ':courseidnumber' => $course->idnumber,
+                );
+                $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmodulesets WHERE courseidnumber = :courseidnumber");
+                $statement->execute($params);
+                $moduleset->set = $statement->fetchAll()[0];
+
+                $params = array(
+                    ':modulesetid' => $moduleset->set['id'],
+                );
+                $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmoduleparts WHERE modulesetid = :modulesetid");
+                $statement->execute($params);
+                $moduleset->parts = $statement->fetchAll();
+
+                $dates = array();
+                foreach($moduleset->parts as $key=>$part){
+                    $params = array(
+                        ':modulepartid' => $part['id'],
+                    );
+                    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplandates WHERE modulepartid = :modulepartid");
+                    $statement->execute($params);
+                    $dates = $statement->fetchAll();
+                    $moduleset->parts[$key]['dates'] = $dates;
+                }
+                $modulesets[] = $moduleset;
+
+            }
+        }
+    }
+        return $modulesets;
+}
+
+function getDatesOfUser($userid){
+
 }
