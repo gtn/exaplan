@@ -18,12 +18,15 @@
 // This copyright notice MUST APPEAR in all copies of the script!
 
 defined('MOODLE_INTERNAL') || die();
-require __DIR__.'/inc.php';
 
-$pdo = new PDO('mysql:host=localhost;dbname=moodle2', $dbusername, $dbpassword); // TODO: constant, global?
+require_once "config.php";
+
+global $dbname, $dbusername, $dbpassword;
+
+$pdo = new PDO('mysql:host=localhost;dbname='.$dbname, $dbusername, $dbpassword); // TODO: constant, global?
 
 function getPuser($userid){
-     // TODO: constant, global?
+     global $pdo;
     $params = array(
         ':userid' => $userid,
     );
@@ -36,7 +39,7 @@ function getPuser($userid){
 }
 
 function getOrCreatePuser(){
-    global $USER;
+    global $USER, $pdo;
 
 
 
@@ -66,7 +69,7 @@ function getOrCreatePuser(){
 }
 
 function getModulesOfUser($userid){
-    global $DB, $COURSE;
+    global $DB, $COURSE, $pdo;
 
     $context = context_course::instance($COURSE->id);
     $modulesets = array();
@@ -96,7 +99,7 @@ function getModulesOfUser($userid){
                         ':modulepartid' => $part['id'],
                         ':puserid' => getPuser($userid)['id'],
                     );
-                    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplandates JOIN block_exaplanpuser_date_mm ON mdl_block_exaplandates.id=block_exaplanpuser_date_mm.dateid WHERE modulepartid = :modulepartid AND puserid = :puserid");
+                    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplandates JOIN mdl_block_exaplanpuser_date_mm ON mdl_block_exaplandates.id=mdl_block_exaplanpuser_date_mm.dateid WHERE modulepartid = :modulepartid AND puserid = :puserid AND state=2");
                     $statement->execute($params);
                     $dates = $statement->fetchAll();
                     $moduleset->parts[$key]['dates'] = $dates;
