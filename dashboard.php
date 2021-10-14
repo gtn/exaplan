@@ -18,11 +18,13 @@ require_login();
 
 echo $OUTPUT->header();
 
-var_dump(getOrCreatePuser($USER->id));
+//var_dump(getOrCreatePuser($USER->id));
 $modulesets = getModulesOfUser(11);
 
 
 echo '<div id="exaplan">';
+
+echo '<b>'.$USER->firstname.' '.$USER->lastname.'</b>';
 echo '<table>';
 echo '<thead>';
 echo '<tr>';

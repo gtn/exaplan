@@ -20,6 +20,18 @@
 defined('MOODLE_INTERNAL') || die();
 
 
+function getPuser($userid){
+    $pdo = new PDO('mysql:host=localhost;dbname=moodle2', 'root', ''); // TODO: constant, global?
+    $params = array(
+        ':userid' => $userid,
+    );
+
+
+    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid");
+    $statement->execute($params);
+    $user = $statement->fetchAll();
+    return $user[0];
+}
 
 function getOrCreatePuser(){
     global $USER;
@@ -81,8 +93,9 @@ function getModulesOfUser($userid){
                 foreach($moduleset->parts as $key=>$part){
                     $params = array(
                         ':modulepartid' => $part['id'],
+                        ':puserid' => getPuser($userid)['id'],
                     );
-                    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplandates WHERE modulepartid = :modulepartid");
+                    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplandates JOIN block_exaplanpuser_date_mm ON mdl_block_exaplandates.id=block_exaplanpuser_date_mm.dateid WHERE modulepartid = :modulepartid AND puserid = :puserid");
                     $statement->execute($params);
                     $dates = $statement->fetchAll();
                     $moduleset->parts[$key]['dates'] = $dates;
