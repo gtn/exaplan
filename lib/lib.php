@@ -73,6 +73,25 @@ function block_exaplan_is_teacher_in_any_course()
     return false;
 }
 
+function block_exaplan_get_courses_where_isteacher()
+{
+    global $USER;
+
+    $courses = block_exaplan_get_courses($USER->id);
+
+    foreach ($courses as $course) {
+        $context = context_course::instance($course["courseid"]);
+
+        $isTeacher = block_exaplan_is_teacher($context);
+
+        if ($isTeacher) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 //function block_exaplan_get_courses($userid = null)
 //{
 //    global $CFG, $DB, $USER;

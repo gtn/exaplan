@@ -2,6 +2,7 @@
 
 require __DIR__.'/inc.php';
 
+
 global $CFG, $PAGE, $OUTPUT, $USER;
 
 
@@ -11,6 +12,7 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_title("Übersicht");
 $PAGE->set_heading("Übersicht");
 $PAGE->set_url($CFG->wwwroot.'/blocks/exaplan/dashboard.php');
+$PAGE->requires->css('/blocks/exaplan/css/dashboard.css');
 
 require_login();
 
@@ -27,8 +29,13 @@ echo '<div id="exaplan">';
 function printUser($userid){
     $modulesets = getModulesOfUser($userid);
     $user = getPuser($userid);
+    echo '<div class="UserBlock">';
+    echo '<div class="BlockHeader">';
     echo '<b>'.$user["firstname"].' '.$user["lastname"].'</b>';
-    echo '<table>';
+    echo '<button type="button" class="btn btn-outline-danger"> Planung Präsenztermine </button>';
+    echo '</div>';
+    echo '<div class="BlockBody">';
+    echo '<table class="ModuleTable">';
     echo '<thead>';
     echo '<tr>';
     echo '<th>Meine gebuchten Module</th>';
@@ -49,13 +56,13 @@ function printUser($userid){
         echo '</thead>';
         echo '<tbody>';
         foreach($moduleset->parts as $part) {
-            echo '<td>';
-            echo '<ul>';
-            foreach($part['dates'] as $date){
-                echo '<li>'.$date['date'].'</li>';
+            if($part['date'] == null || $part['date'][0]['state'] != 2){
+                echo '<button type="button" class="btn btn-danger"> offen </button>';
+            } else {
+                echo '<td>';
+                    echo $part['date'][0]['date'];
+                echo '</td>';
             }
-            echo '</ul>';
-            echo '</td>';
         }
         echo '</tbody>';
         echo '</table>';
@@ -65,7 +72,11 @@ function printUser($userid){
 
     echo '</tbody>';
     echo '</table>';
+    echo '</div>';
+    echo '</div>';
     echo'<br>';
+
+
 }
 
 printUser(11);

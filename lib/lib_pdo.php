@@ -101,8 +101,8 @@ function getModulesOfUser($userid){
                     );
                     $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplandates JOIN mdl_block_exaplanpuser_date_mm ON mdl_block_exaplandates.id=mdl_block_exaplanpuser_date_mm.dateid WHERE modulepartid = :modulepartid AND puserid = :puserid AND state=2");
                     $statement->execute($params);
-                    $dates = $statement->fetchAll();
-                    $moduleset->parts[$key]['dates'] = $dates;
+                    $date = $statement->fetchAll();
+                    $moduleset->parts[$key]['date'] = $date;
                 }
                 $modulesets[] = $moduleset;
 
@@ -110,8 +110,4 @@ function getModulesOfUser($userid){
         }
     }
         return $modulesets;
-}
-
-function getDatesOfUser($userid){
-
 }
