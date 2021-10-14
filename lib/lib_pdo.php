@@ -18,10 +18,12 @@
 // This copyright notice MUST APPEAR in all copies of the script!
 
 defined('MOODLE_INTERNAL') || die();
+require __DIR__.'/inc.php';
 
+$pdo = new PDO('mysql:host=localhost;dbname=moodle2', $dbusername, $dbpassword); // TODO: constant, global?
 
 function getPuser($userid){
-    $pdo = new PDO('mysql:host=localhost;dbname=moodle2', 'root', ''); // TODO: constant, global?
+     // TODO: constant, global?
     $params = array(
         ':userid' => $userid,
     );
@@ -37,7 +39,7 @@ function getOrCreatePuser(){
     global $USER;
 
 
-    $pdo = new PDO('mysql:host=localhost;dbname=moodle2', 'root', ''); // TODO: constant, global?
+
     $params = array(
         ':userid' => $USER->id,
     );
@@ -68,7 +70,6 @@ function getModulesOfUser($userid){
 
     $context = context_course::instance($COURSE->id);
     $modulesets = array();
-    $pdo = new PDO('mysql:host=localhost;dbname=moodle2', 'root', ''); // TODO: constant, global?
 
     $courses = $DB->get_records('course');
     foreach($courses as $course){
