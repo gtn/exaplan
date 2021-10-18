@@ -22,4 +22,8 @@
 require_once __DIR__ . "/../../config.php";
 require_once __DIR__ . "/lib/lib.php";
 require_once __DIR__ . "/lib/lib_pdo.php";
+require_once __DIR__ . "/lib/lib_render.php";
+
+block_exaplan_init_js_css(0);
+
 

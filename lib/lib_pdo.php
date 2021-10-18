@@ -20,8 +20,18 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once "config.php";
-
 global $dbname, $dbusername, $dbpassword;
+
+function getPdoConnect() {
+    global $CFG, $dbname, $dbusername, $dbpassword;
+    try {
+        $pdo = new PDO('mysql:host=localhost;dbname='.$dbname, $dbusername, $dbpassword); // TODO: constant, global?
+    } catch (Exception $e) {
+        // use global parameters
+        $pdo = new PDO('mysql:host=localhost;dbname='.$CFG->dbname, $CFG->dbuser, $CFG->dbpass);
+    }
+    return $pdo;
+}
 
 $pdo = new PDO('mysql:host=localhost;dbname='.$dbname, $dbusername, $dbpassword); // TODO: constant, global?
 
@@ -39,9 +49,9 @@ function getPuser($userid){
 }
 
 function getOrCreatePuser(){
-    global $USER, $pdo;
+    global $USER;
 
-
+    $pdo = getPdoConnect();
 
     $params = array(
         ':userid' => $USER->id,
@@ -69,10 +79,11 @@ function getOrCreatePuser(){
 }
 
 function getModulesOfUser($userid){
-    global $DB, $COURSE, $pdo;
+    global $DB, $COURSE;
 
     $context = context_course::instance($COURSE->id);
     $modulesets = array();
+    $pdo = getPdoConnect();
 
     $courses = $DB->get_records('course');
     foreach($courses as $course){

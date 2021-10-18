@@ -2,7 +2,6 @@
 
 require __DIR__.'/inc.php';
 
-
 global $CFG, $PAGE, $OUTPUT, $USER;
 
 
@@ -12,17 +11,12 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_title("Übersicht");
 $PAGE->set_heading("Übersicht");
 $PAGE->set_url($CFG->wwwroot.'/blocks/exaplan/dashboard.php');
-$PAGE->requires->css('/blocks/exaplan/css/dashboard.css');
 
 require_login();
 
 
 
 echo $OUTPUT->header();
-
-//var_dump(getOrCreatePuser($USER->id));
-
-
 
 echo '<div id="exaplan">';
 
@@ -40,10 +34,11 @@ function printUser($userid){
     echo '<tr>';
     echo '<th>Meine gebuchten Module</th>';
     echo '<th>Termine</th>';
+    echo '<th> !!! CALENDARS HEAD !!!</th>';
     echo '</tr>';
     echo '</thead>';
     echo '<tbody>';
-    foreach($modulesets as $moduleset){
+    foreach($modulesets as $moduleKey => $moduleset){
         echo '<tr> <td>'.$moduleset->set["title"].'</td>';
         echo '<td>';
         echo '<table>';
@@ -67,6 +62,9 @@ function printUser($userid){
         echo '</tbody>';
         echo '</table>';
         echo '</td>';
+        if ($moduleKey == 0) {
+            echo '<td rowspan="' . count($modulesets) . '">' . block_exaplan_select_period_view() . '</td>';
+        }
         echo '</tr>';
     }
 
@@ -79,9 +77,15 @@ function printUser($userid){
 
 }
 
-printUser(11);
-printUser(11);
-printUser(11);
+// just for developing on different servers!!!
+if ($USER->id == 11) {
+    printUser(11);
+    printUser(11);
+    printUser(11);
+} else {
+    printUser($USER->id);
+    printUser($USER->id);
+}
 echo '</div>';
 
 echo $OUTPUT->footer();

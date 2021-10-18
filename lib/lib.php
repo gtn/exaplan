@@ -428,6 +428,39 @@ function block_exaplan_get_modulesets_by_puserid($puserid = null)
 
 }
 
+/**
+ *
+ * Includes all neccessary JavaScript files
+ */
+function block_exaplan_init_js_css($courseid = 0) {
+    global $PAGE, $CFG;
+
+    // only allowed to be called once
+    static $js_inited = false;
+    if ($js_inited) {
+        return;
+    }
+    $js_inited = true;
+
+//    $PAGE->requires->jquery();
+//    $PAGE->requires->jquery_plugin('ui');
+//    $PAGE->requires->jquery_plugin('ui-css');
+    $PAGE->requires->js("/blocks/exaplan/javascript/moment.js", true);
+    $PAGE->requires->js("/blocks/exaplan/javascript/TavoCalendar.js", true);
+    $PAGE->requires->css('/blocks/exaplan/css/tavo-calendar.css');
+//    $PAGE->requires->css('/blocks/exaplan/css/styles.css');
+
+    // page specific js/css
+    $scriptName = preg_replace('!\.[^\.]+$!', '', basename($_SERVER['PHP_SELF']));
+    if (file_exists($CFG->dirroot.'/blocks/exaplan/css/'.$scriptName.'.css')) {
+        $PAGE->requires->css('/blocks/exaplan/css/'.$scriptName.'.css');
+    }
+    if (file_exists($CFG->dirroot.'/blocks/exaplan/javascript/'.$scriptName.'.js')) {
+        $PAGE->requires->js('/blocks/exaplan/javascript/'.$scriptName.'.js', false);
+    }
+}
+
+
 
 // TODO: mysql e
 
