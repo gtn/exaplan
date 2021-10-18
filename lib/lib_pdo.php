@@ -33,14 +33,13 @@ function getPdoConnect() {
     return $pdo;
 }
 
-$pdo = new PDO('mysql:host=localhost;dbname='.$dbname, $dbusername, $dbpassword); // TODO: constant, global?
-
 function getPuser($userid){
-     global $pdo;
+
+    $pdo = getPdoConnect();
+
     $params = array(
         ':userid' => $userid,
     );
-
 
     $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid");
     $statement->execute($params);
@@ -95,7 +94,11 @@ function getModulesOfUser($userid){
                 );
                 $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmodulesets WHERE courseidnumber = :courseidnumber");
                 $statement->execute($params);
-                $moduleset->set = $statement->fetchAll()[0];
+                $modules = $statement->fetchAll();
+                if (!(is_array($modules) && count($modules) > 0)) {
+                    continue;
+                }
+                $moduleset->set = $modules[0];
 
                 $params = array(
                     ':modulesetid' => $moduleset->set['id'],

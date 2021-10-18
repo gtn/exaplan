@@ -78,7 +78,7 @@ function printUser($userid){
 }
 
 // just for developing on different servers!!!
-if ($USER->id == 11) {
+if ($USER->id == 11) { // @Fabio - or use own rule for your userid: 11 :-)
     printUser(11);
     printUser(11);
     printUser(11);
