@@ -66,9 +66,9 @@ function printUser($userid){
         $content .= '</tbody>';
         $content .= '</table>';
         $content .= '</td>';
-//        if ($moduleKey == 0) {
-//            $content .= '<td rowspan="' . count($modulesets) . '">' . block_exaplan_select_period_view() . '</td>';
-//        }
+        if ($moduleKey == 0) {
+            $content .= '<td valign="top" rowspan="' . count($modulesets) . '">' . block_exaplan_select_period_view() . '</td>';
+        }
         $content .= '</tr>';
     }
 

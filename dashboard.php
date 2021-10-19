@@ -37,8 +37,8 @@ if (false) { // @Fabio - or use own rule for your userid: 11 :-)
 
 
 } else {
-    printUser($USER->id);
-    printUser($USER->id);
+    echo printUser($USER->id);
+//    echo printUser($USER->id);
 }
 echo '</div>';
 

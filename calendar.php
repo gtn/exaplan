@@ -21,7 +21,9 @@ echo $OUTPUT->header();
 echo '<div id="exaplan">';
 
 echo '<div class="UserCalendarCard">';
-echo printUser(11);
+//echo printUser(11);
+echo printUser($USER->id);
+echo printUser($USER->id);
 echo block_exaplan_select_period_view();
 echo '</div>';
 

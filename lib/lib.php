@@ -454,7 +454,7 @@ function block_exaplan_init_js_css($courseid = 0) {
 //    $PAGE->requires->jquery_plugin('ui-css');
 
     $PAGE->requires->js("/blocks/exaplan/javascript/moment.js", true);
-//    $PAGE->requires->js("/blocks/exaplan/javascript/locale/moment/de.js", true);
+    $PAGE->requires->js("/blocks/exaplan/javascript/locale/moment/de.js", true);
 
     // TavoCalendar
     $PAGE->requires->js("/blocks/exaplan/javascript/TavoCalendar.js", true);
@@ -466,7 +466,11 @@ function block_exaplan_init_js_css($courseid = 0) {
 //    $PAGE->requires->js("/blocks/exaplan/javascript/jsCalendar.js", true);
 //    $PAGE->requires->js("/blocks/exaplan/javascript/locale/jsCalendar/jsCalendar.lang.de.js", true);
 
-//    $PAGE->requires->css('/blocks/exaplan/css/styles.css');
+    // main plugin JS
+    $PAGE->requires->js("/blocks/exaplan/javascript/block_exaplan.js", true);
+
+    // main pludin CSS
+    $PAGE->requires->css('/blocks/exaplan/css/block_exaplan.css');
 
     // page specific js/css
     $scriptName = preg_replace('!\.[^\.]+$!', '', basename($_SERVER['PHP_SELF']));
