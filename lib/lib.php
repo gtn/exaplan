@@ -454,7 +454,7 @@ function block_exaplan_init_js_css($courseid = 0) {
 //    $PAGE->requires->jquery_plugin('ui-css');
 
     $PAGE->requires->js("/blocks/exaplan/javascript/moment.js", true);
-    $PAGE->requires->js("/blocks/exaplan/javascript/locale/moment/de.js", true);
+//    $PAGE->requires->js("/blocks/exaplan/javascript/locale/moment/de.js", true);
 
     // TavoCalendar
     $PAGE->requires->js("/blocks/exaplan/javascript/TavoCalendar.js", true);
