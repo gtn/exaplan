@@ -15,23 +15,27 @@
  * Creats the overview of dates for a User
  * @return string
  */
-function printUser($userid){
+function printUser($userid, $mode = 0){
     global $CFG;
-    $ajaxAddUserDateUrl = new moodle_url('/blocks/exaplan/ajax.php',
-        array('action' => 'addUserDate',
-            'sesskey' => sesskey(),
-        )
-    );
 
 
-    $modulesets = getModulesOfUser($userid);
-    $user = getPuser($userid);
-    $content = '<script>var ajaxAddUserDateUrl = "'.html_entity_decode($ajaxAddUserDateUrl).'";</script>';
-    $content .= '<script>var calendarData = '.block_exaplan_get_calendar_data(getPuser($userid)).';</script>';
-    $content .= '<div class="UserBlock">';
+    if($mode == 1) {
+        $modulesets = getAllModules();
+    } else{
+        $modulesets = getModulesOfUser($userid);
+        $user = getPuser($userid);
+    }
+
+
+
+    $content = '<div class="UserBlock">';
     $content .= '<div class="BlockHeader">';
-    $content .= '<b>'.$user["firstname"].' '.$user["lastname"].'</b>';
-    $content .= '<button type="button" class="btn btn-outline-danger"> Planung Präsenztermine </button>';
+    if($mode == 1){
+
+    } else {
+        $content .= '<b>'.$user["firstname"].' '.$user["lastname"].'</b>';
+        $content .= '<button type="button" class="btn btn-outline-danger"> Planung Präsenztermine </button>';
+    }
     $content .= '</div>';
     $content .= '<div class="BlockBody">';
     $content .= '<table class="ModuleTable">';
@@ -56,11 +60,16 @@ function printUser($userid){
         $content .= '<tbody>';
         foreach($moduleset->parts as $part) {
             $content .= '<td>';
-            if ($part['date'] == null || $part['date'][0]['state'] != 2){
-                $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" role="button" class="btn btn-danger"> offen </a>';
+            if($mode == 1){
+                $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php" role="button" class="btn btn-danger"> Anfragen </a>';
             } else {
-                $content .= '<span class="exaplan-selectable-date" data-dateId="'.$part['date'][0]['id'].'">'.date('d.m.Y', strtotime($part['date'][0]['date'])).'</span>';
+                if ($part['date'] == null || $part['date'][0]['state'] != 2){
+                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" role="button" class="btn btn-danger"> offen </a>';
+                } else {
+                    $content .= '<span class="exaplan-selectable-date" data-dateId="'.$part['date'][0]['id'].'">'.date('d.m.Y', strtotime($part['date'][0]['date'])).'</span>';
+                }
             }
+
             $content .= '</td>';
         }
         $content .= '</tbody>';

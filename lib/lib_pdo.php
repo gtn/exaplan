@@ -77,6 +77,35 @@ function getOrCreatePuser(){
     }
 }
 
+function getAllModules(){
+
+    $modulesets = array();
+
+    $modules = array();
+
+    $pdo = getPdoConnect();
+    $params = array();
+
+    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmodulesets");
+    $statement->execute($params);
+    $modules = $statement->fetchAll();
+
+    foreach($modules as $module){
+        $moduleset = new \stdClass;
+        $moduleset->set = $module;
+        $params = array(
+            ':modulesetid' => $moduleset->set['id'],
+        );
+        $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmoduleparts WHERE modulesetid = :modulesetid");
+        $statement->execute($params);
+        $moduleset->parts = $statement->fetchAll();
+        $modulesets[] = $moduleset;
+    }
+
+    return $modulesets;
+
+}
+
 function getModulesOfUser($userid){
     global $DB, $COURSE;
 

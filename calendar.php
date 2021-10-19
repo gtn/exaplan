@@ -31,12 +31,24 @@ if($action == "save"){
     setPrefferedDate(1, getPuser($userid)['id'], '2021-10-25', 1);
 }
 
+$ajaxAddUserDateUrl = new moodle_url('/blocks/exaplan/ajax.php',
+    array('action' => 'addUserDate',
+        'sesskey' => sesskey(),
+    )
+);
+
+
+
 echo $OUTPUT->header();
+
+echo '<script>var ajaxAddUserDateUrl = "'.html_entity_decode($ajaxAddUserDateUrl).'";</script>';
+echo '<script>var calendarData = '.block_exaplan_get_calendar_data(getPuser($userid)).';</script>';
+
 
 echo '<div id="exaplan">';
 
 echo '<div class="UserCalendarCard">';
-echo printUser($userid);
+echo printUser($userid, 1);
 echo block_exaplan_select_period_view();
 
 echo '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" role="button" class="btn btn-danger"> offen </a>';
