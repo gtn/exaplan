@@ -466,10 +466,10 @@ function block_exaplan_init_js_css($courseid = 0) {
 //    $PAGE->requires->js("/blocks/exaplan/javascript/jsCalendar.js", true);
 //    $PAGE->requires->js("/blocks/exaplan/javascript/locale/jsCalendar/jsCalendar.lang.de.js", true);
 
-    // main plugin JS
+    // main block JS
     $PAGE->requires->js("/blocks/exaplan/javascript/block_exaplan.js", true);
 
-    // main pludin CSS
+    // main block CSS
     $PAGE->requires->css('/blocks/exaplan/css/block_exaplan.css');
 
     // page specific js/css
@@ -508,7 +508,7 @@ function block_exaplan_get_calendar_data($userid) {
     // add random dates
     $dateFrom = time();
     $dateTo = time() + (30 * 24 * 60 * 60); // simple + month
-    for ($i = 1; $i <= 2; $i++) {
+    for ($i = 1; $i <= 15; $i++) {
         $newDate = [
             'date' => date('d.m.Y', random_int($dateFrom, $dateTo)),
             'type' => block_exaplan_get_middate_string_key(random_int(BLOCK_EXAPLAN_MIDDATE_ALL, BLOCK_EXAPLAN_MIDDATE_AFTER)),
