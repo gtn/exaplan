@@ -16,18 +16,22 @@
     margin-top: 5px;
 }
 
+#block_exaplan_dashboard_calendar .tavo-calendar span.tavo-calendar__day-inner {
+    position: relative;
+}
+
 /* todays marker */
 #block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day.tavo-calendar__day_abs-today {
     background-color: transparent;
 }
-#block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day.tavo-calendar__day_abs-today span {
+#block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day.tavo-calendar__day_abs-today span.tavo-calendar__day-inner {
     border-radius: 50%;
     background-color: #e1e4e6;
     /*color: white;*/
 }
 
 /* single day marker */
-#block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day span {
+#block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day span.tavo-calendar__day-inner {
     width: 36px;
     height: 36px;
     border-radius: 50%;
@@ -37,14 +41,28 @@
     background-color: #f2f6fa;
 }
 
-#block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day_select span {
+#block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day_select span.tavo-calendar__day-inner {
     background-color: #008000 !important;
     color: white;
 }
 
-#block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day span:hover {
+#block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day span.tavo-calendar__day-inner:hover {
     background-color: #008000;
     color: white;
+}
+
+#block_exaplan_dashboard_calendar .tavo-calendar span.exaplan-usedItems {
+    font-size: 10px;
+    line-height: 14px;
+    color: #008000;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #008000;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: -3px;
+    left: -3px;
 }
 
 

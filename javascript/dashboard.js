@@ -113,6 +113,19 @@ $(function () {
                 });
             });
         }
+        // add metadata
+        // because it is recreated after every changing!
+        // TODO: move to function. needed to call after every calendar changed!
+        if (calendarData.selectedDates.length) {
+            calendarData.selectedDates.forEach((date) => {
+                allCalendars.forEach((calendarInstance) => {
+                    var metaData = {
+                        usedItems: date.usedItems
+                    }
+                    calendarInstance.addMetaData(date.date, metaData);
+                });
+            });
+        }
     }
     
     // select date on "module part" instance

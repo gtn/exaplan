@@ -458,6 +458,7 @@ function block_exaplan_init_js_css($courseid = 0) {
 
     // TavoCalendar
     $PAGE->requires->js("/blocks/exaplan/javascript/TavoCalendar.js", true);
+    $PAGE->requires->js("/blocks/exaplan/javascript/gtnTavoCalendar.js", true);
     $PAGE->requires->css('/blocks/exaplan/css/tavo-calendar.css');
 
     // jsCalendar
@@ -503,7 +504,7 @@ function block_exaplan_get_calendar_data($userid) {
     // add random dates
     $dateFrom = time();
     $dateTo = time() + (30 * 24 * 60 * 60); // simple + month
-    for ($i = 1; $i <= 15; $i++) {
+    for ($i = 1; $i <= 2; $i++) {
         $newDate = [
             'date' => date('d.m.Y', random_int($dateFrom, $dateTo)),
             'type' => block_exaplan_get_middate_string_key(random_int(BLOCK_EXAPLAN_MIDDATE_ALL, BLOCK_EXAPLAN_MIDDATE_AFTER)),
