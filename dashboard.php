@@ -21,8 +21,17 @@ echo $OUTPUT->header();
 echo '<div id="exaplan">';
 
 function printUser($userid){
+    $ajaxAddUserDateUrl = new moodle_url('/blocks/exaplan/ajax.php',
+        array('action' => 'addUserDate',
+            'sesskey' => sesskey(),
+        )
+    );
+
+
     $modulesets = getModulesOfUser($userid);
     $user = getPuser($userid);
+    echo '<script>var ajaxAddUserDateUrl = "'.html_entity_decode($ajaxAddUserDateUrl).'";</script>';
+    echo '<script>var calendarData = '.block_exaplan_get_calendar_data(getPuser($userid)).';</script>';
     echo '<div class="UserBlock">';
     echo '<div class="BlockHeader">';
     echo '<b>'.$user["firstname"].' '.$user["lastname"].'</b>';
@@ -39,8 +48,8 @@ function printUser($userid){
     echo '</thead>';
     echo '<tbody>';
     foreach($modulesets as $moduleKey => $moduleset){
-        echo '<tr> <td>'.$moduleset->set["title"].'</td>';
-        echo '<td>';
+        echo '<tr> <td valign="top">'.$moduleset->set["title"].'</td>';
+        echo '<td valign="top">';
         echo '<table>';
         echo '<thead>';
         echo '<tr>';
@@ -51,13 +60,13 @@ function printUser($userid){
         echo '</thead>';
         echo '<tbody>';
         foreach($moduleset->parts as $part) {
-            if($part['date'] == null || $part['date'][0]['state'] != 2){
+            echo '<td>';
+            if ($part['date'] == null || $part['date'][0]['state'] != 2){
                 echo '<button type="button" class="btn btn-danger"> offen </button>';
             } else {
-                echo '<td>';
-                    echo $part['date'][0]['date'];
-                echo '</td>';
+                echo '<span class="exaplan-selectable-date" data-dateId="'.$part['date'][0]['id'].'">'.date('d.m.Y', $part['date'][0]['date']).'</span>';
             }
+            echo '</td>';
         }
         echo '</tbody>';
         echo '</table>';
@@ -84,7 +93,7 @@ if ($USER->id == 11) { // @Fabio - or use own rule for your userid: 11 :-)
     printUser(11);
 } else {
     printUser($USER->id);
-    printUser($USER->id);
+//    printUser($USER->id);
 }
 echo '</div>';
 

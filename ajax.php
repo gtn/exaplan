@@ -12,21 +12,21 @@
 //
 // This copyright notice MUST APPEAR in all copies of the script!
 
-/**
- * Just template of calendars
- * @return string
- */
-function block_exaplan_select_period_view() {
-    $content = '<div id="block_exaplan_dashboard_calendar">';
-    $content .= '<table>';
-    $content .= '<tr>';
-    $content .= '<td width="350" valign="top"><div id="month1"></div></td>';
-    $content .= '<td width="350" valign="top"><div id="month2"></div></td>';
-    $content .= '</tr>';
-    $content .= '</table>';
-//    $content .= '<div id="month3"></div>';
-    $content .= '</div>';
+require __DIR__.'/inc.php';
 
-    return $content;
+$action = required_param('action', PARAM_TEXT);
+
+//require_login($course); // TODO: needed?
+$isAdmin = block_exaplan_is_admin();
+
+require_sesskey();
+
+switch($action) {
+    case 'addUserDate':
+        $dateId = required_param('dateId', PARAM_INT);
+        $date = optional_param('date', '', PARAM_TEXT);
+        $result = [$dateId, $date];
+        echo json_encode($result);
+        exit;
+        break;
 }
-

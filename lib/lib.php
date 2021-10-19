@@ -32,6 +32,13 @@ const BLOCK_EXAPLAN_DB_DATES = 'block_exaplandates';
 const BLOCK_EXAPLAN_DATE_PROPOSED = 1;
 const BLOCK_EXAPLAN_DATE_CONFIRMED = 2;
 
+/**
+ * MIDDATE TYPES
+ */
+const BLOCK_EXAPLAN_MIDDATE_ALL = 0; // all day
+const BLOCK_EXAPLAN_MIDDATE_BEFORE = 1; // before midday
+const BLOCK_EXAPLAN_MIDDATE_AFTER = 2; // after midday
+
 
 /**
  *
@@ -442,12 +449,22 @@ function block_exaplan_init_js_css($courseid = 0) {
     }
     $js_inited = true;
 
-//    $PAGE->requires->jquery();
+    $PAGE->requires->jquery();
 //    $PAGE->requires->jquery_plugin('ui');
 //    $PAGE->requires->jquery_plugin('ui-css');
+
     $PAGE->requires->js("/blocks/exaplan/javascript/moment.js", true);
+    $PAGE->requires->js("/blocks/exaplan/javascript/locale/moment/de.js", true);
+
+    // TavoCalendar
     $PAGE->requires->js("/blocks/exaplan/javascript/TavoCalendar.js", true);
     $PAGE->requires->css('/blocks/exaplan/css/tavo-calendar.css');
+
+    // jsCalendar
+//    $PAGE->requires->css('/blocks/exaplan/css/jsCalendar.css');
+//    $PAGE->requires->js("/blocks/exaplan/javascript/jsCalendar.js", true);
+//    $PAGE->requires->js("/blocks/exaplan/javascript/locale/jsCalendar/jsCalendar.lang.de.js", true);
+
 //    $PAGE->requires->css('/blocks/exaplan/css/styles.css');
 
     // page specific js/css
@@ -460,7 +477,43 @@ function block_exaplan_init_js_css($courseid = 0) {
     }
 }
 
+function block_exaplan_get_middate_string_key($keyIndex) {
+    switch ($keyIndex) {
+        case BLOCK_EXAPLAN_MIDDATE_AFTER:
+            return 'after';
+        case BLOCK_EXAPLAN_MIDDATE_BEFORE:
+            return 'before';
+        case BLOCK_EXAPLAN_MIDDATE_ALL:
+        default:
+            return 'all';
+            break;
+    }
+}
 
+/**
+ * gwt JSON calendar data for single user (pUser!)
+ * @param $userid
+ */
+function block_exaplan_get_calendar_data($userid) {
+    $data = [
+        'selectedDates' => []
+    ];
+
+    // EXAMPLE DATA!!
+    // add random dates
+    $dateFrom = time();
+    $dateTo = time() + (30 * 24 * 60 * 60); // simple + month
+    for ($i = 1; $i <= 15; $i++) {
+        $newDate = [
+            'date' => date('d.m.Y', random_int($dateFrom, $dateTo)),
+            'type' => block_exaplan_get_middate_string_key(random_int(BLOCK_EXAPLAN_MIDDATE_ALL, BLOCK_EXAPLAN_MIDDATE_AFTER)),
+            'usedItems' => random_int(0, 15),
+        ];
+        $data['selectedDates'][] = $newDate;
+    }
+
+    return json_encode($data);
+}
 
 // TODO: mysql e
 
