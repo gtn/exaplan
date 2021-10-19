@@ -125,3 +125,41 @@ function getModulesOfUser($userid){
     }
         return $modulesets;
 }
+
+function setPrefferedDate($modulepartid, $puserid, $date, $timeslot){
+
+
+    $pdo = getPdoConnect();
+    $timestamp = new DateTime();
+    $timestamp = $timestamp->getTimestamp();
+
+    $params = array(
+        ':modulepartid' => $modulepartid,
+        ':date' => $date,
+        ':timeslot' => $timeslot,
+        ':state' => 1,
+        ':creatorpuserid' => $puserid,
+        ':creatortimestamp' => $timestamp,
+        ':modifiedpuserid' => $puserid,
+        ':modifiedtimestamp' => $timestamp,
+
+    );
+
+
+    $statement = $pdo->prepare("INSERT INTO mdl_block_exaplandates (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp) VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp);");
+    $statement->execute($params);
+    $dateid = $pdo->lastInsertId();
+
+    $params = array(
+        ':dateid' => $dateid,
+        ':puserid' => $puserid,
+        'creatorpuserid' => $puserid,
+
+    );
+
+
+    $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpuser_date_mm (dateid, puserid, creatorpuserid) VALUES (:dateid, :puserid, :creatorpuserid);");
+    $statement->execute($params);
+
+
+}
