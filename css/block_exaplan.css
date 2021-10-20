@@ -65,6 +65,12 @@
     left: -3px;
 }
 
+#block_exaplan_dashboard_calendar .calendar_options {
+    font-size: 12px;
+}
 
+#block_exaplan_dashboard_calendar .calendar_options .midday-type-radio {
+    margin-right: 20px;
+}
 
 

@@ -28,7 +28,12 @@ if (false) { // @Fabio - or use own rule for your userid: 11 :-)
 }
 
 if($action == "save"){
-    setPrefferedDate(1, getPuser($userid)['id'], '2021-10-25', 1);
+    $middayType = optional_param("calMidday", 3, PARAM_INT);
+    $calSelectedDates = optional_param("calSelectedDates", '', PARAM_TEXT);
+    $calSelectedDates = json_decode($calSelectedDates);
+    foreach ($calSelectedDates as $calDate) {
+        setPrefferedDate(1, getPuser($userid)['id'], $calDate, $middayType);
+    }
 }
 
 $ajaxAddUserDateUrl = new moodle_url('/blocks/exaplan/ajax.php',
@@ -54,7 +59,7 @@ echo block_exaplan_select_period_view();
 echo '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" role="button" class="btn btn-danger"> offen </a>';
 echo '<form action="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" method="post">';
 echo '<input name="action" value="save" />';
-echo '<button type="submit" >Klicken</button>';
+echo '<button type="submit" class="save_calendar-data">Klicken</button>';
 echo '</form>';
 
 echo '</div>';

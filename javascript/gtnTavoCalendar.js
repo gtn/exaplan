@@ -1,6 +1,7 @@
 TavoCalendar.prototype.addMetaData = function(date, metaData) {
 
-    var format = 'DD.MM.YYYY';
+    // var format = 'DD.MM.YYYY';
+    var format = 'YYYY-MM-DD';
     var calendar_moment = moment(date, format);
     var days_in_month = calendar_moment.daysInMonth();
 
@@ -13,17 +14,17 @@ TavoCalendar.prototype.addMetaData = function(date, metaData) {
         elementIndex = elementIndex + monthOffset - 1;
     }
 
-    var year = moment_copy.year();
-    var month = moment_copy.month();
+    var year = calendar_moment.year();
+    var month = calendar_moment.month() + 1; // why????
     var calendarElement = this.elements.wrapper;
 
     if (typeof this.state.date === 'undefined') {
         return false;
     }
 
-    var calendarStateMoment = moment(this.state.date, format);
-    var calendarStateYear = calendarStateMoment.year();
-    var calendarStateMonth = calendarStateMoment.month();
+    // var calendarStateMoment = moment(this.state.date, format);
+    var calendarStateYear = this.getFocusYear();
+    var calendarStateMonth = this.getFocusMonth();
     if (calendarStateYear != year || calendarStateMonth != month) {
         return false;
     }
@@ -34,7 +35,7 @@ TavoCalendar.prototype.addMetaData = function(date, metaData) {
         if (stepDate == date) {
             var dayWrapper = $(calendarElement).find('.tavo-calendar__day').eq(elementIndex);
             if (typeof metaData !== 'undefined') {
-                if (metaData.usedItems) {
+                if (metaData.usedItems > 0) {
                     dayWrapper.attr('data-itemsUsed', metaData.usedItems);
                     dayWrapper.find('span.tavo-calendar__day-inner').append('<span class="exaplan-usedItems">' + metaData.usedItems + '</span>');
                 }

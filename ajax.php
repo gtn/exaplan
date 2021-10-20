@@ -23,10 +23,13 @@ require_sesskey();
 
 switch($action) {
     case 'addUserDate':
-        $dateId = required_param('dateId', PARAM_INT);
+//        $dateId = required_param('dateId', PARAM_INT);
+        $dateId = 1;
         $date = optional_param('date', '', PARAM_TEXT);
-        $result = [$dateId, $date];
-        echo json_encode($result);
+        $middayType = optional_param('middayType', BLOCK_EXAPLAN_MIDDATE_ALL, PARAM_INT);
+        setPrefferedDate($dateId, getPuser($USER->id)['id'], $date, $middayType);
+        $allUserData = block_exaplan_get_calendar_data(getPuser($USER->id)['id']);
+        echo json_encode($allUserData);
         exit;
         break;
 }

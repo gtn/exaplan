@@ -95,14 +95,34 @@ function printUser($userid, $mode = 0){
  * @return string
  */
 function block_exaplan_select_period_view() {
+    $monthsCount = 2;
     $content = '<div id="block_exaplan_dashboard_calendar">';
     $content .= '<table>';
     $content .= '<tr>';
-    $content .= '<td width="350" valign="top"><div id="month1"></div></td>';
-    $content .= '<td width="350" valign="top"><div id="month2"></div></td>';
+    $content .= '<td colspan="'.$monthsCount.'">';
+    $content .= '<div class="calendar_options">';
+    $content .= '<h4>Sie planen: MODULENAME | PARTNAME</h4>';
+    $content .= '<div class="midday-type">
+                    <label class="midday-type-radio">
+                        <input type="radio" name="midday_type" value="'.BLOCK_EXAPLAN_MIDDATE_BEFORE.'"> vormittags (8-12 Uhr)
+                    </label>
+                    <label class="midday-type-radio">
+                        <input type="radio" name="midday_type" value="'.BLOCK_EXAPLAN_MIDDATE_AFTER.'"> nachmittags (13-17 Uhr)
+                    </label>
+                    <label class="midday-type-radio">
+                        <input type="radio" name="midday_type" value="'.BLOCK_EXAPLAN_MIDDATE_ALL.'"> ganztags möglich
+                    </label>  
+                </div>';
+    $content .= '<p>Bitte markieren Sie im Kalender jeweils Ihren Wunschzeitraum</p>';
+    $content .= '</div>';
+    $content .= '</td>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    for ($i = 1; $i <= $monthsCount; $i++) {
+        $content .= '<td width="350" valign="top"><div class="calendar-month-item" id="month' . $i . '"></div></td>';
+    }
     $content .= '</tr>';
     $content .= '</table>';
-//    $content .= '<div id="month3"></div>';
     $content .= '</div>';
 
     return $content;

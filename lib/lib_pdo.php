@@ -106,7 +106,7 @@ function getAllModules(){
 
 }
 
-function getModulesOfUser($userid){
+function getModulesOfUser($userid, $state = 2){
     global $DB, $COURSE;
 
     $context = context_course::instance($COURSE->id);
@@ -141,8 +141,9 @@ function getModulesOfUser($userid){
                     $params = array(
                         ':modulepartid' => $part['id'],
                         ':puserid' => getPuser($userid)['id'],
+                        ':state' => $state,
                     );
-                    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplandates JOIN mdl_block_exaplanpuser_date_mm ON mdl_block_exaplandates.id=mdl_block_exaplanpuser_date_mm.dateid WHERE modulepartid = :modulepartid AND puserid = :puserid AND state=2");
+                    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplandates JOIN mdl_block_exaplanpuser_date_mm ON mdl_block_exaplandates.id=mdl_block_exaplanpuser_date_mm.dateid WHERE modulepartid = :modulepartid AND puserid = :puserid AND state = :state");
                     $statement->execute($params);
                     $date = $statement->fetchAll();
                     $moduleset->parts[$key]['date'] = $date;

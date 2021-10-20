@@ -35,9 +35,9 @@ const BLOCK_EXAPLAN_DATE_CONFIRMED = 2;
 /**
  * MIDDATE TYPES
  */
-const BLOCK_EXAPLAN_MIDDATE_ALL = 0; // all day
 const BLOCK_EXAPLAN_MIDDATE_BEFORE = 1; // before midday
 const BLOCK_EXAPLAN_MIDDATE_AFTER = 2; // after midday
+const BLOCK_EXAPLAN_MIDDATE_ALL = 3; // all day
 
 
 /**
@@ -500,22 +500,45 @@ function block_exaplan_get_middate_string_key($keyIndex) {
  * @param $userid
  */
 function block_exaplan_get_calendar_data($userid) {
+    global $USER;
     $data = [
         'selectedDates' => []
     ];
 
     // EXAMPLE DATA!!
     // add random dates
-    $dateFrom = time();
+/*    $dateFrom = time();
     $dateTo = time() + (30 * 24 * 60 * 60); // simple + month
     for ($i = 1; $i <= 15; $i++) {
         $newDate = [
             'date' => date('d.m.Y', random_int($dateFrom, $dateTo)),
-            'type' => block_exaplan_get_middate_string_key(random_int(BLOCK_EXAPLAN_MIDDATE_ALL, BLOCK_EXAPLAN_MIDDATE_AFTER)),
+            'type' => block_exaplan_get_middate_string_key(random_int(BLOCK_EXAPLAN_MIDDATE_BEFORE, BLOCK_EXAPLAN_MIDDATE_ALL)),
             'usedItems' => random_int(0, 15),
         ];
         $data['selectedDates'][] = $newDate;
+    }*/
+
+    $userModules = getModulesOfUser($USER->id, 1);
+    $dateCounts = [];
+    $selectedDates = [];
+    foreach ($userModules as $module) {
+        foreach ($module->parts as $part) {
+            foreach ($part['date'] as $date) {
+                $dateIndex = $date['date'];
+                if (!array_key_exists($dateIndex, $selectedDates)) {
+                    $selectedDates[$dateIndex] = [
+                        'date' => $date['date'],
+                        'type' => BLOCK_EXAPLAN_MIDDATE_ALL, // TODO: midday is needed????? they can be different for different module parts
+                        'usedItems' => 0,
+                    ];
+                }
+                $selectedDates[$dateIndex]['usedItems'] += 1;
+            }
+        }
     }
+    $selectedDates = array_values($selectedDates); // clean keys. needed for correct JS function later
+
+    $data['selectedDates'] = $selectedDates;
 
     return json_encode($data);
 }
