@@ -3,7 +3,7 @@
 //
 // (c) 2016 GTN - Global Training Network GmbH <office@gtn-solutions.com>
 //
-// Exabis Competence Grid is free software: you can redistribute it and/or modify
+// Exabis Planning Tool is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -22,18 +22,20 @@ defined('MOODLE_INTERNAL') || die();
 require_once "config.php";
 global $dbname, $dbusername, $dbpassword;
 
-function getPdoConnect() {
+function getPdoConnect()
+{
     global $CFG, $dbname, $dbusername, $dbpassword;
     try {
-        $pdo = new PDO('mysql:host=localhost;dbname='.$dbname, $dbusername, $dbpassword); // TODO: constant, global?
+        $pdo = new PDO('mysql:host=localhost;dbname=' . $dbname, $dbusername, $dbpassword); // TODO: constant, global?
     } catch (Exception $e) {
         // use global parameters
-        $pdo = new PDO('mysql:host=localhost;dbname='.$CFG->dbname, $CFG->dbuser, $CFG->dbpass);
+        $pdo = new PDO('mysql:host=localhost;dbname=' . $CFG->dbname, $CFG->dbuser, $CFG->dbpass);
     }
     return $pdo;
 }
 
-function getPuser($userid){
+function getPuser($userid)
+{
 
     $pdo = getPdoConnect();
 
@@ -47,7 +49,8 @@ function getPuser($userid){
     return $user[0];
 }
 
-function getOrCreatePuser(){
+function getOrCreatePuser()
+{
     global $USER;
 
     $pdo = getPdoConnect();
@@ -60,7 +63,7 @@ function getOrCreatePuser(){
     $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid");
     $statement->execute($params);
     $user = $statement->fetchAll();
-    if($user == null){
+    if ($user == null) {
         $params = array(
             ':userid' => $USER->id,
             ':moodleid' => get_config('exaplan', 'moodle_id'),
@@ -72,12 +75,13 @@ function getOrCreatePuser(){
         $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpusers (userid, moodleid, firstname, lastname, email) VALUES (:userid, :moodleid, :firstname,:lastname, :email);");
         $statement->execute($params);
         return true;
-    }else {
+    } else {
         return $user[0]['id'];
     }
 }
 
-function getAllModules(){
+function getAllModules()
+{
 
     $modulesets = array();
 
@@ -90,7 +94,7 @@ function getAllModules(){
     $statement->execute($params);
     $modules = $statement->fetchAll();
 
-    foreach($modules as $module){
+    foreach ($modules as $module) {
         $moduleset = new \stdClass;
         $moduleset->set = $module;
         $params = array(
@@ -106,7 +110,8 @@ function getAllModules(){
 
 }
 
-function getModulesOfUser($userid, $state = 2){
+function getModulesOfUser($userid, $state = 2)
+{
     global $DB, $COURSE;
 
     $context = context_course::instance($COURSE->id);
@@ -114,9 +119,9 @@ function getModulesOfUser($userid, $state = 2){
     $pdo = getPdoConnect();
 
     $courses = $DB->get_records('course');
-    foreach($courses as $course){
-        if($course->idnumber > 0){
-            if(is_enrolled($context, $userid, '', true)){
+    foreach ($courses as $course) {
+        if ($course->idnumber > 0) {
+            if (is_enrolled($context, $userid, '', true)) {
                 $moduleset = new \stdClass;
                 $params = array(
                     ':courseidnumber' => $course->idnumber,
@@ -137,7 +142,7 @@ function getModulesOfUser($userid, $state = 2){
                 $moduleset->parts = $statement->fetchAll();
 
                 $dates = array();
-                foreach($moduleset->parts as $key=>$part){
+                foreach ($moduleset->parts as $key => $part) {
                     $params = array(
                         ':modulepartid' => $part['id'],
                         ':puserid' => getPuser($userid)['id'],
@@ -153,10 +158,11 @@ function getModulesOfUser($userid, $state = 2){
             }
         }
     }
-        return $modulesets;
+    return $modulesets;
 }
 
-function setPrefferedDate($modulepartid, $puserid, $date, $timeslot){
+function setPrefferedDate($modulepartid, $puserid, $date, $timeslot)
+{
 
 
     $pdo = getPdoConnect();
@@ -183,13 +189,29 @@ function setPrefferedDate($modulepartid, $puserid, $date, $timeslot){
     $params = array(
         ':dateid' => $dateid,
         ':puserid' => $puserid,
-        'creatorpuserid' => $puserid,
+        ':creatorpuserid' => $puserid,
 
     );
-
 
     $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpuser_date_mm (dateid, puserid, creatorpuserid) VALUES (:dateid, :puserid, :creatorpuserid);");
     $statement->execute($params);
 
+
+}
+
+
+function updateNotifications()
+{
+    $pdo = getPdoConnect();
+    $params = array();
+
+    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplannotifications WHERE moodlenotificationcreated = false");
+    $statement->execute($params);
+
+    $plannotifications = $statement->fetchAll();
+
+    foreach ($plannotifications as $plannotification) {
+        var_dump($plannotification);
+    }
 
 }

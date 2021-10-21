@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Exabis Planning Tool
 //
 // (c) 2016 GTN - Global Training Network GmbH <office@gtn-solutions.com>
@@ -18,12 +17,20 @@
 //
 // This copyright notice MUST APPEAR in all copies of the script!
 
+// https://docs.moodle.org/dev/Task_API
 
-require_once __DIR__ . "/../../config.php";
-require_once __DIR__ . "/lib/lib.php";
-require_once __DIR__ . "/lib/lib_pdo.php";
-require_once __DIR__ . "/lib/lib_render.php";
+namespace block_exaplan\task;
 
-block_exaplan_init_js_css(0);
+defined('MOODLE_INTERNAL') || die();
 
+require_once __DIR__.'/../../inc.php';
 
+class plannotifications extends \core\task\scheduled_task {
+    public function get_name() {
+        return "plannnotifications";
+    }
+
+    public function execute() {
+        updateNotifications();
+    }
+}
