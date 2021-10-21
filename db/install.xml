@@ -113,12 +113,15 @@
                 <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="puseridfrom" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false" COMMENT="sender"/>
                 <FIELD NAME="puseridto" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false" COMMENT="receiver"/>
-                <FIELD NAME="notificationtext" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false" COMMENT="The actual notification content that should be created."/>
-                <FIELD NAME="moodlenotificationcreated" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="0=no, 1=yes If it is 1, then the notification has been created already."/>
+                <FIELD NAME="notificationtext" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="The actual notification content that should be created."/>
+                <FIELD NAME="moodlenotificationcreated" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="0=no, 1=yes If it is 1, then the notification has been created already."/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="puseridfrom" TYPE="foreign" FIELDS="puseridfrom" REFTABLE="block_exaplanpusers" REFFIELDS="id"/>
+                <KEY NAME="puseridfrom" TYPE="foreign" FIELDS="puseridfrom" REFTABLE="block_exaplanpusers"
+                     REFFIELDS="id"/>
                 <KEY NAME="puseridto" TYPE="foreign" FIELDS="puseridto" REFTABLE="block_exaplanpusers" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
