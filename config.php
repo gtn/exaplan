@@ -2,4 +2,4 @@
 
 $dbusername = 'root';
 $dbpassword = '';
-$dbname = 'moodle2';
+$dbname = 'moodle';

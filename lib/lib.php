@@ -543,5 +543,31 @@ function block_exaplan_get_calendar_data($userid) {
     return json_encode($data);
 }
 
+function block_exaplan_send_notification($notificationtype, $userfrom, $userto, $subject, $message, $context, $contexturl = null, $dakoramessage = false, $courseid = 0, $customdata = null) {
+    global $CFG, $DB;
+
+    require_once($CFG->dirroot.'/message/lib.php');
+
+    $eventdata = new core\message\message();
+
+    $eventdata->modulename = 'block_exaplan';
+    $eventdata->userfrom = $userfrom;
+    $eventdata->userto = $userto;
+    $eventdata->fullmessage = $message;
+    $eventdata->name = $notificationtype;
+    $eventdata->subject = $subject;
+    $eventdata->fullmessageformat = FORMAT_HTML;
+    $eventdata->fullmessagehtml = $message;
+    $eventdata->smallmessage = $subject;
+    $eventdata->component = 'block_exaport';
+    $eventdata->notification = 1;
+    $eventdata->contexturl = $contexturl;
+    $eventdata->contexturlname = $context;
+    $eventdata->courseid = $courseid;
+    $eventdata->customdata = $customdata;    // version must be 3.7 or higher, otherwise this field does not yet exist
+
+    @message_send($eventdata);
+}
+
 // TODO: mysql e
 

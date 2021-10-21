@@ -19,8 +19,15 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once __DIR__.'\..\config.php';
-global $dbname, $dbusername, $dbpassword;
+require_once __DIR__ . '\..\config.php';
+
+//global $dbname, $dbusername, $dbpassword;
+
+global $CFG;
+$CFG->dbname = $dbname; // RW: it works like this, but why?
+$CFG->dbusername = $dbusername;
+$CFG->dbpassword = $dbpassword;
+
 
 function getPdoConnect()
 {
@@ -203,15 +210,24 @@ function setPrefferedDate($modulepartid, $puserid, $date, $timeslot)
 function updateNotifications()
 {
     $pdo = getPdoConnect();
-    $params = array();
+    $params = array(
+        ':moodleid' => get_config('exaplan', 'moodle_id')
+    );
 
-    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplannotifications WHERE moodlenotificationcreated = false");
+    $statement = $pdo->prepare("
+        SELECT pu.userid as userto, n.notificationtext
+        FROM mdl_block_exaplannotifications as n
+        JOIN mdl_block_exaplanpusers as pu ON pu.userid = n.puseridto
+        WHERE n.moodlenotificationcreated = false
+        AND pu.moodleid = :moodleid
+     ");
     $statement->execute($params);
 
     $plannotifications = $statement->fetchAll();
 
-    foreach ($plannotifications as $plannotification) {
-        var_dump($plannotification);
+    // iterate over all notifications that have not been used for creating moodle notifications and create them
+    foreach ($plannotifications as $pn) {
+        // userfrom = 2 because 2 is always admin
+        block_exaplan_send_notification("date_fixed", 2, $pn["userto"], "Termin fixiert", $pn["notificationtext"], "Termin");
     }
-
 }
