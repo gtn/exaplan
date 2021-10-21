@@ -19,7 +19,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once __DIR__ . '\..\config.php';
+require_once __DIR__ . '/../config.php';
+
 
 //global $dbname, $dbusername, $dbpassword;
 
@@ -64,10 +65,11 @@ function getOrCreatePuser()
 
     $params = array(
         ':userid' => $USER->id,
+        ':moodleid' =>  get_config('exaplan', 'moodle_id'),
     );
 
 
-    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid");
+    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid AND moodleid=:moodleid");
     $statement->execute($params);
     $user = $statement->fetchAll();
     if ($user == null) {
@@ -81,7 +83,7 @@ function getOrCreatePuser()
 
         $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpusers (userid, moodleid, firstname, lastname, email) VALUES (:userid, :moodleid, :firstname,:lastname, :email);");
         $statement->execute($params);
-        return true;
+        return $pdo->lastInsertId();
     } else {
         return $user[0]['id'];
     }

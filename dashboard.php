@@ -20,6 +20,8 @@ echo $OUTPUT->header();
 
 echo '<div id="exaplan">';
 
+getOrCreatePuser();
+
 
 // just for developing on different servers!!!
 if (false) { // @Fabio - or use own rule for your userid: 11 :-)
