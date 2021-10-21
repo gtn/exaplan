@@ -45,7 +45,7 @@
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="modulepartid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-                <FIELD NAME="date" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="1=proposed, 2=confirmed"/>
+                <FIELD NAME="date" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="timestamp"/>
                 <FIELD NAME="timeslot" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
                        COMMENT="1=Both are okay, 2=AM, 3=PM"/>
                 <FIELD NAME="state" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
@@ -101,10 +101,25 @@
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="companyname" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
-                <FIELD  NAME="moodleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="moodleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="block_exaplannotifications"
+               COMMENT="Notifications from the central moodle to the part moodles are stored here. They will be converted to moodle-notifications in the cronjob of the part moodles">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="puseridfrom" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false" COMMENT="sender"/>
+                <FIELD NAME="puseridto" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false" COMMENT="receiver"/>
+                <FIELD NAME="notificationtext" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false" COMMENT="The actual notification content that should be created."/>
+                <FIELD NAME="moodlenotificationcreated" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="0=no, 1=yes If it is 1, then the notification has been created already."/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="puseridfrom" TYPE="foreign" FIELDS="puseridfrom" REFTABLE="block_exaplanpusers" REFFIELDS="id"/>
+                <KEY NAME="puseridto" TYPE="foreign" FIELDS="puseridto" REFTABLE="block_exaplanpusers" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
     </TABLES>
