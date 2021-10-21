@@ -121,13 +121,14 @@ function getModulesOfUser($userid, $state = 2)
 {
     global $DB, $COURSE;
 
-    $context = context_course::instance($COURSE->id);
+    
     $modulesets = array();
     $pdo = getPdoConnect();
 
     $courses = $DB->get_records('course');
     foreach ($courses as $course) {
         if ($course->idnumber > 0) {
+        	$context = context_course::instance($course->id);
             if (is_enrolled($context, $userid, '', true)) {
                 $moduleset = new \stdClass;
                 $params = array(
