@@ -19,7 +19,7 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once "config.php";
+require_once __DIR__.'\..\config.php';
 global $dbname, $dbusername, $dbpassword;
 
 function getPdoConnect()

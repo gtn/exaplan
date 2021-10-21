@@ -27,7 +27,7 @@ require_once __DIR__.'/../../inc.php';
 
 class plannotifications extends \core\task\scheduled_task {
     public function get_name() {
-        return "plannnotifications";
+        return "Create notifications from Exaplan";
     }
 
     public function execute() {

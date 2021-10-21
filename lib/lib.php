@@ -3,7 +3,7 @@
 //
 // (c) 2016 GTN - Global Training Network GmbH <office@gtn-solutions.com>
 //
-// Exabis Planning Tool is free software: you can redistribute it and/or modify
+// Exabis Competence Grid is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
 // the Free Software Foundation, either version 3 of the License, or
 // (at your option) any later version.
@@ -459,7 +459,7 @@ function block_exaplan_init_js_css($courseid = 0) {
     // TavoCalendar
     $PAGE->requires->js("/blocks/exaplan/javascript/TavoCalendar.js", true);
     $PAGE->requires->js("/blocks/exaplan/javascript/gtnTavoCalendar.js", true);
-    $PAGE->requires->css('/blocks/exaplan/css/tavo-calendar.css');
+    $PAGE->requires->css('/blocks/exaplan/css/tavo-calendar.css'); // TODO: this throws an error when upgrading "Cannot require a CSS file after &lt;head&gt; has been printed" RW
 
     // jsCalendar
 //    $PAGE->requires->css('/blocks/exaplan/css/jsCalendar.css');
