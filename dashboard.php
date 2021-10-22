@@ -12,6 +12,9 @@ $PAGE->set_title("Übersicht");
 $PAGE->set_heading("Übersicht");
 $PAGE->set_url($CFG->wwwroot.'/blocks/exaplan/dashboard.php');
 $isadmin = block_exaplan_is_admin();
+
+block_exaplan_init_js_css();
+
 require_login();
 
 
@@ -22,26 +25,8 @@ echo '<div id="exaplan">';
 
 getOrCreatePuser();
 
+echo printUser($USER->id, $isadmin, true);
 
-// just for developing on different servers!!!
-if (false) { // @Fabio - or use own rule for your userid: 11 :-)
-    echo '<div>';
-    echo printUser(11);
-    echo '</div>';
-    echo '<br>';
-    echo '<div>';
-    echo printUser(11);
-    echo '</div>';
-    echo '<br>';
-    echo '<div>';
-    echo printUser(11);
-    echo '</div>';
-
-
-} else {
-    echo printUser($USER->id,$isadmin);
-//    echo printUser($USER->id);
-}
 echo '</div>';
 
 echo $OUTPUT->footer();

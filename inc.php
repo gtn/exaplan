@@ -23,7 +23,8 @@ require_once __DIR__ . "/../../config.php";
 require_once __DIR__ . "/lib/lib.php";
 require_once __DIR__ . "/lib/lib_pdo.php";
 require_once __DIR__ . "/lib/lib_render.php";
-block_exaplan_init_js_css(0);
+
+// block_exaplan_init_js_css(0); // call functions on the pages where you need, but not from here, because inc.php can be used also in non-renderable services (with ERROR)
 
 
 

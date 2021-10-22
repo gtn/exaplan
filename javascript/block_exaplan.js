@@ -93,12 +93,18 @@ function selectedDateEvent(calEvent, monthCalendar) {
 
 function selectedDateSendAjax(calEvent, monthCalendar) {
     calEvent.preventDefault();
-    // var selectedDateEl = $('.exaplan-selectable-date[data-dateselected="1"]');
-    // if (selectedDateEl.length) {
+    // send request only if modulepart (or existing date) is selected
+    var selectedDateEl = $('.exaplan-selectable-date[data-dateselected="1"]');
+    var selectedModulepart = $('.exaplan-selectable-modulepart[data-modulepartselected="1"]');
+    if (selectedDateEl.length || selectedModulepart.length) {
         if ($('input[name="midday_type"]:checked').length) {
             var middayType = $('input[name="midday_type"]:checked').val();
         } else {
             var middayType = 3; // all day
+        }
+        var selectedModulepartId = selectedModulepart.attr('data-modulepartId');
+        if (!selectedModulepartId) {
+            selectedModulepartId = selectedDateEl.attr('data-modulepartId');
         }
         // var selectedDateId = selectedDateEl.attr('data-dateId');
         // var selectedDate = monthCalendar.getSelected(); // get ALL selected days
@@ -111,6 +117,7 @@ function selectedDateSendAjax(calEvent, monthCalendar) {
         // send request
         var ajaxUrl = ajaxAddUserDateUrl;
         var data = {
+            modulepartId: selectedModulepartId,
             // dateId: selectedDateId,
             date: selectedDate,
             middayType: middayType
@@ -130,7 +137,12 @@ function selectedDateSendAjax(calEvent, monthCalendar) {
             updateAllCalendarMetadata();
             console.log('Something wrong in Ajax!! 1634564740109')
         });
-    // }
+    } else {
+        $(calEvent.explicitOriginalTarget).trigger('click');
+        // TODO: return metadata
+        // updateCalendarSelectedDates();
+        // updateAllCalendarMetadata();
+    }
 }
 
 
@@ -228,6 +240,17 @@ $(function () {
         // select if non-selected (if it was selected - nothing to do)
         if (!currentState || typeof currentState === 'undefined') {
             $(this).attr('data-dateSelected', 1);
+        }
+    })
+    // select modulepart on "module part" instance
+    $('.exaplan-selectable-modulepart').on('click', function (e) {
+        e.preventDefault();
+        var currentState = $(this).attr('data-modulepartselected');
+        // unselect all prev selected parts:
+        $('.exaplan-selectable-modulepart').removeAttr('data-modulepartselected');
+        // select if non-selected (if it was selected - nothing to do)
+        if (!currentState || typeof currentState === 'undefined') {
+            $(this).attr('data-modulepartselected', 1);
         }
     })
 });

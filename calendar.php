@@ -12,6 +12,8 @@ $PAGE->set_title("Terminplaner");
 $PAGE->set_heading("Terminplaner");
 $PAGE->set_url($CFG->wwwroot.'/blocks/exaplan/calendar.php');
 
+block_exaplan_init_js_css();
+
 require_login();
 
 $action = optional_param("action", "", PARAM_TEXT);
@@ -28,6 +30,7 @@ if (false) { // @Fabio - or use own rule for your userid: 11 :-)
 }
 
 if($action == "save"){
+    // DO NOT WORK
     $middayType = optional_param("calMidday", 3, PARAM_INT);
     $calSelectedDates = optional_param("calSelectedDates", '', PARAM_TEXT);
     $calSelectedDates = json_decode($calSelectedDates);
@@ -37,32 +40,23 @@ if($action == "save"){
     }
 }
 
-$ajaxAddUserDateUrl = new moodle_url('/blocks/exaplan/ajax.php',
-    array('action' => 'addUserDate',
-        'sesskey' => sesskey(),
-    )
-);
-
-
 
 echo $OUTPUT->header();
-
-echo '<script>var ajaxAddUserDateUrl = "'.html_entity_decode($ajaxAddUserDateUrl).'";</script>';
-echo '<script>var calendarData = '.block_exaplan_get_calendar_data(getPuser($userid)).';</script>';
-
 
 echo '<div id="exaplan">';
 
 echo '<div class="UserCalendarCard">';
+echo printUser($userid, $isadmin, true);
+//echo block_exaplan_select_period_view();
 
 echo printUser($userid, $isadmin);
 echo block_exaplan_select_period_view();
 
 echo '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" role="button" class="btn btn-danger"> offen </a>';
-echo '<form action="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" method="post">';
+/*echo '<form action="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" method="post">';
 echo '<input name="action" value="save" />';
 echo '<button type="submit" class="save_calendar-data">Klicken</button>';
-echo '</form>';
+echo '</form>';*/
 
 echo '</div>';
 

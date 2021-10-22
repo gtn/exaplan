@@ -23,12 +23,29 @@ require_sesskey();
 
 switch($action) {
     case 'addUserDate':
+        $pUserId = getPuser($USER->id)['id'];
 //        $dateId = required_param('dateId', PARAM_INT);
-        $dateId = 1;
-        $date = optional_param('date', '', PARAM_TEXT);
-        $dateTS = DateTime::createFromFormat('Y-m-d', $date)->getTimestamp();
+//        $dateId = 1;
+        $date = optional_param('date', date('Y-m.-d'), PARAM_TEXT);
+        $modulepartId = required_param('modulepartId', PARAM_INT);
+        $dateTS = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
+        if ($dateTS < strtotime("today", time())) {
+            // selected date must be not in past
+            echo 'ERROR';
+            exit;
+        }
         $middayType = optional_param('middayType', BLOCK_EXAPLAN_MIDDATE_ALL, PARAM_INT);
-        setPrefferedDate($dateId, getPuser($USER->id)['id'], $dateTS, $middayType);
+        $newDateId = setPrefferedDate($modulepartId, $pUserId, $dateTS, $middayType);
+        if ($newDateId != '_NEW' && $newDateId > 0) {
+            // add a new relation to existing date
+            $newRelation = addPUserToDate($newDateId, $pUserId);
+            if ($newRelation != '_NEW' && $newRelation > 0) {
+                // delete existing relation. If the user clicked again on the date
+                removePUserFromDate($newDateId, $pUserId);
+                // if the "date" is empty (no related users) - delete it:
+                removeDateIfNoUsers($newDateId);
+            }
+        }
         $allUserData = block_exaplan_get_calendar_data(getPuser($USER->id)['id']);
         echo json_encode($allUserData);
         exit;

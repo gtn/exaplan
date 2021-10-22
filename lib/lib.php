@@ -459,7 +459,8 @@ function block_exaplan_init_js_css($courseid = 0) {
     // TavoCalendar
     $PAGE->requires->js("/blocks/exaplan/javascript/TavoCalendar.js", true);
     $PAGE->requires->js("/blocks/exaplan/javascript/gtnTavoCalendar.js", true);
-    $PAGE->requires->css('/blocks/exaplan/css/tavo-calendar.css'); // TODO: this throws an error when upgrading "Cannot require a CSS file after &lt;head&gt; has been printed" RW
+    $PAGE->requires->css('/blocks/exaplan/css/tavo-calendar.css');
+
 
     // jsCalendar
 //    $PAGE->requires->css('/blocks/exaplan/css/jsCalendar.css');
@@ -530,7 +531,7 @@ function block_exaplan_get_calendar_data($userid) {
                     $selectedDates[$dateIndex] = [
                         'date' => $dateIndex,
                         'type' => BLOCK_EXAPLAN_MIDDATE_ALL, // TODO: midday is needed????? they can be different for different module parts
-                        'usedItems' => 0,
+                        'usedItems' => 0,   // TODO: possible different counters: dates/moduleparts
                     ];
                 }
                 $selectedDates[$dateIndex]['usedItems'] += 1;

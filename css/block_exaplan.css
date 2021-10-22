@@ -7,6 +7,14 @@
     background-color: #c6c6c7;
 }
 
+.exaplan-selectable-modulepart:hover {
+    background-color: rgba(0, 83, 0, 0.50);
+}
+.exaplan-selectable-modulepart[data-modulepartselected="1"] {
+    background-color: #005300;
+    border-color: #005300;
+}
+
 #block_exaplan_dashboard_calendar .tavo-calendar {
     /*font-size: 14px;*/
     /*line-height: 1.7;*/
@@ -66,11 +74,11 @@
     z-index: 10000;
 }
 
-#block_exaplan_dashboard_calendar .calendar_options {
+.calendar_options {
     font-size: 12px;
 }
 
-#block_exaplan_dashboard_calendar .calendar_options .midday-type-radio {
+.calendar_options .midday-type-radio {
     margin-right: 20px;
 }
 

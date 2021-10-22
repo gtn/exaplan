@@ -25,9 +25,13 @@ require_once __DIR__ . '/../config.php';
 //global $dbname, $dbusername, $dbpassword;
 
 global $CFG;
-$CFG->dbname = $dbname; // RW: it works like this, but why?
-$CFG->dbusername = $dbusername;
-$CFG->dbpassword = $dbpassword;
+// RW: it works like this, but why?
+// SZ: in function getPdoConnect(): dbname/dbuser/dbpassword from config.php will be used. If they are not working - will be used global moodle $CFG values
+// it is useful for development on the single Moodle installation.
+// if you have correct Moodle installtions and exaplan/config.php - all must work ok
+//$CFG->dbname = $dbname;
+//$CFG->dbusername = $dbusername;
+//$CFG->dbpassword = $dbpassword;
 
 
 function getPdoConnect()
@@ -190,12 +194,30 @@ function setPrefferedDate($modulepartid, $puserid, $date, $timeslot)
         ':modulepartid' => $modulepartid,
         ':date' => $date,
         ':timeslot' => $timeslot,
-        ':state' => 1,
-        ':creatorpuserid' => $puserid,
-        ':creatortimestamp' => $timestamp,
-        ':modifiedpuserid' => $puserid,
-        ':modifiedtimestamp' => $timestamp,
+        ':state' => 1
+    );
 
+    // get existing data for this modulepartid, date, timeslot
+    $sql = "SELECT *
+              FROM mdl_block_exaplandates              
+              WHERE modulepartid = :modulepartid           
+                AND timeslot = :timeslot 
+                AND date = :date 
+                AND state = :state";
+    $statement = $pdo->prepare($sql);
+    $statement->execute($params);
+    $dates = $statement->fetchAll();
+    if ($dates) {
+        // return existing dateId. We do not need to create it
+        return $dates[0]['id'];
+    }
+
+    $params = array_merge($params, [
+            ':creatorpuserid' => $puserid,
+            ':creatortimestamp' => $timestamp,
+            ':modifiedpuserid' => $puserid,
+            ':modifiedtimestamp' => $timestamp,
+        ]
     );
 
     $sql = "INSERT INTO mdl_block_exaplandates (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp) VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp);";
@@ -204,19 +226,71 @@ function setPrefferedDate($modulepartid, $puserid, $date, $timeslot)
     $statement->execute($params);
     $dateid = $pdo->lastInsertId();
 
-    $params = array(
-        ':dateid' => $dateid,
-        ':puserid' => $puserid,
-        ':creatorpuserid' => $puserid,
+    addPUserToDate($dateid, $puserid);
 
-    );
-
-    $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpuser_date_mm (dateid, puserid, creatorpuserid) VALUES (:dateid, :puserid, :creatorpuserid);");
-    $statement->execute($params);
-
+    return '_NEW'; // flag that was created NEW record
 
 }
 
+function addPUserToDate($dateid, $puserid) {
+
+    $pdo = getPdoConnect();
+
+    $params = array(
+        ':dateid' => $dateid,
+        ':puserid' => $puserid,
+    );
+
+    // get existing data for this modulepartid, date, timeslot
+    $sql = "SELECT *
+              FROM mdl_block_exaplanpuser_date_mm              
+              WHERE dateid = :dateid           
+                AND puserid = :puserid 
+                ";
+    $statement = $pdo->prepare($sql);
+    $statement->execute($params);
+    $existing = $statement->fetchAll();
+    if ($existing) {
+        // relation is already existing!
+        return $existing[0]['id'];
+    }
+
+    // create a new relation
+    $params = array_merge($params, [
+            ':creatorpuserid' => $puserid,
+        ]
+    );
+    $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpuser_date_mm (dateid, puserid, creatorpuserid) VALUES (:dateid, :puserid, :creatorpuserid);");
+    $statement->execute($params);
+
+    return '_NEW';
+}
+
+function removePUserFromDate($dateid, $puserid) {
+    $pdo = getPdoConnect();
+    $params = [
+        ':dateid' => $dateid,
+        ':puserid' => $puserid,
+//            ':creatorpuserid' => $puserid, // TODO: what if this relation was not self created?
+    ];
+    $statement = $pdo->prepare("DELETE FROM mdl_block_exaplanpuser_date_mm WHERE dateid = :dateid AND puserid = :puserid;");
+    $statement->execute($params);
+}
+
+function removeDateIfNoUsers($dateid) {
+    $pdo = getPdoConnect();
+    // get related to 'date' users
+    $params = [':dateid' => $dateid];
+    $sql = "SELECT * FROM mdl_block_exaplanpuser_date_mm WHERE dateid = :dateid";
+    $statement = $pdo->prepare($sql);
+    $statement->execute($params);
+    $existing = $statement->fetchAll();
+    if (!$existing) {
+        // no related users - delete this dateid
+        $statement = $pdo->prepare("DELETE FROM mdl_block_exaplandates WHERE id = :dateid;");
+        $statement->execute($params);
+    }
+}
 
 function updateNotifications()
 {

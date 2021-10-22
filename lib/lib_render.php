@@ -15,11 +15,11 @@
  * Creats the overview of dates for a User
  * @return string
  */
-function printUser($userid, $mode = 0){
+function printUser($userid, $mode = 0, $withCalendar = false){
     global $CFG;
 
 
-    if($mode == 1) {
+    if ($mode == 1) {
         $modulesets = getAllModules();
     } else{
         $modulesets = getModulesOfUser($userid);
@@ -27,10 +27,9 @@ function printUser($userid, $mode = 0){
     }
 
 
-
     $content = '<div class="UserBlock">';
     $content .= '<div class="BlockHeader">';
-    if($mode == 1){
+    if ($mode == 1){
 
     } else {
         $content .= '<b>'.$user["firstname"].' '.$user["lastname"].'</b>';
@@ -43,6 +42,9 @@ function printUser($userid, $mode = 0){
     $content .= '<tr>';
     $content .= '<th>Meine gebuchten Module</th>';
     $content .= '<th>Termine</th>';
+    if ($withCalendar) {
+        $content .= '<th>' . block_exaplan_calendars_header_view() . '</th>';
+    }
     $content .= '</tr>';
     $content .= '</thead>';
     $content .= '<tbody>';
@@ -59,15 +61,14 @@ function printUser($userid, $mode = 0){
         $content .= '</thead>';
         $content .= '<tbody>';
         foreach($moduleset->parts as $part) {
-        	
             $content .= '<td>';
-            if($mode == 1){
+            if ($mode == 1){
                 $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php" role="button" class="btn btn-danger"> Anfragen </a>';
             } else {
                 if ($part['date'] == null || $part['date'][0]['state'] != 2){
-                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'" role="button" class="btn btn-danger"> offen </a>';
+                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'" role="button" class="btn btn-danger exaplan-selectable-modulepart" data-modulepartId="'.$part['id'].'"> offen </a>';
                 } else {
-                    $content .= '<span class="exaplan-selectable-date" data-dateId="'.$part['date'][0]['id'].'">'.date('d.m.Y', strtotime($part['date'][0]['date'])).'</span>';
+                    $content .= '<span class="exaplan-selectable-date" data-dateId="'.$part['date'][0]['id'].'" data-modulepartId="'.$part['id'].'">'.date('d.m.Y', strtotime($part['date'][0]['date'])).'</span>';
                 }
             }
 
@@ -76,9 +77,14 @@ function printUser($userid, $mode = 0){
         $content .= '</tbody>';
         $content .= '</table>';
         $content .= '</td>';
-//        if ($moduleKey == 0) {
-//            $content .= '<td valign="top" rowspan="' . count($modulesets) . '">' . block_exaplan_select_period_view() . '</td>';
-//        }
+        if ($withCalendar && $moduleKey == 0) {
+            $content .= '<td valign="top" rowspan="' . count($modulesets) . '">';
+            if ($mode == 1) {
+                $content .= '<span class="alert alert-danger">   CALENDAR FOR ADMIN IS NOT WORKING YET!!!   </span>';
+            }
+            $content .= block_exaplan_calendars_view($userid, 2);
+            $content .= '</td>';
+        }
         $content .= '</tr>';
     }
 
@@ -93,31 +99,28 @@ function printUser($userid, $mode = 0){
 
 /**
  * Just template of calendars
+ * @param int $userid
+ * @param int $monthsCount
+ * @param bool $withHeader
  * @return string
  */
-function block_exaplan_select_period_view() {
-    $monthsCount = 2;
+function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = false) {
     $content = '<div id="block_exaplan_dashboard_calendar">';
+    $ajaxAddUserDateUrl = new moodle_url('/blocks/exaplan/ajax.php',
+        array('action' => 'addUserDate',
+            'sesskey' => sesskey(),
+        )
+    );
+    $content .= '<script>var ajaxAddUserDateUrl = "'.html_entity_decode($ajaxAddUserDateUrl).'";</script>';
+    $content .= '<script>var calendarData = '.block_exaplan_get_calendar_data(getPuser($userid)).';</script>';
     $content .= '<table>';
-    $content .= '<tr>';
-    $content .= '<td colspan="'.$monthsCount.'">';
-    $content .= '<div class="calendar_options">';
-    $content .= '<h4>Sie planen: MODULENAME | PARTNAME</h4>';
-    $content .= '<div class="midday-type">
-                    <label class="midday-type-radio">
-                        <input type="radio" name="midday_type" value="'.BLOCK_EXAPLAN_MIDDATE_BEFORE.'"> vormittags (8-12 Uhr)
-                    </label>
-                    <label class="midday-type-radio">
-                        <input type="radio" name="midday_type" value="'.BLOCK_EXAPLAN_MIDDATE_AFTER.'"> nachmittags (13-17 Uhr)
-                    </label>
-                    <label class="midday-type-radio">
-                        <input type="radio" name="midday_type" value="'.BLOCK_EXAPLAN_MIDDATE_ALL.'"> ganztags möglich
-                    </label>  
-                </div>';
-    $content .= '<p>Bitte markieren Sie im Kalender jeweils Ihren Wunschzeitraum</p>';
-    $content .= '</div>';
-    $content .= '</td>';
-    $content .= '</tr>';
+    if ($withHeader) {
+        $content .= '<tr>';
+        $content .= '<td colspan="' . $monthsCount . '">';
+        $content .= block_exaplan_calendars_header_view();
+        $content .= '</td>';
+        $content .= '</tr>';
+    };
     $content .= '<tr>';
     for ($i = 1; $i <= $monthsCount; $i++) {
         $content .= '<td width="350" valign="top"><div class="calendar-month-item" id="month' . $i . '"></div></td>';
@@ -129,3 +132,28 @@ function block_exaplan_select_period_view() {
     return $content;
 }
 
+/**
+ * Just template of calendars
+ * @param int $userid
+ * @param int $monthsCount
+ * @return string
+ */
+function block_exaplan_calendars_header_view() {
+    $content = '';
+    $content .= '<div class="calendar_options">';
+    $content .= '<h4>Sie planen: MODULENAME | PARTNAME</h4>';
+    $content .= '<div class="midday-type">
+                    <label class="midday-type-radio">
+                        <input type="radio" name="midday_type" value="' . BLOCK_EXAPLAN_MIDDATE_BEFORE . '"> vormittags (8-12 Uhr)
+                    </label>
+                    <label class="midday-type-radio">
+                        <input type="radio" name="midday_type" value="' . BLOCK_EXAPLAN_MIDDATE_AFTER . '"> nachmittags (13-17 Uhr)
+                    </label>
+                    <label class="midday-type-radio">
+                        <input type="radio" name="midday_type" value="' . BLOCK_EXAPLAN_MIDDATE_ALL . '"> ganztags möglich
+                    </label>  
+                </div>';
+    $content .= '<p>Bitte markieren Sie im Kalender jeweils Ihren Wunschzeitraum</p>';
+    $content .= '</div>';
+    return $content;
+}
