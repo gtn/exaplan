@@ -11,7 +11,7 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_title("Übersicht");
 $PAGE->set_heading("Übersicht");
 $PAGE->set_url($CFG->wwwroot.'/blocks/exaplan/dashboard.php');
-
+$isadmin = block_exaplan_is_admin();
 require_login();
 
 
@@ -39,7 +39,7 @@ if (false) { // @Fabio - or use own rule for your userid: 11 :-)
 
 
 } else {
-    echo printUser($USER->id);
+    echo printUser($USER->id,$isadmin);
 //    echo printUser($USER->id);
 }
 echo '</div>';

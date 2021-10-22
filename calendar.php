@@ -18,7 +18,7 @@ $action = optional_param("action", "", PARAM_TEXT);
 $modulepartid = optional_param("modulepartid", "", PARAM_INT);
 $date = optional_param("date", "", PARAM_TEXT);
 $timeslot = optional_param("timeslot", "", PARAM_INT);
-
+$isadmin = block_exaplan_is_admin();
 
 if (false) { // @Fabio - or use own rule for your userid: 11 :-)
     $userid = 11;
@@ -54,7 +54,8 @@ echo '<script>var calendarData = '.block_exaplan_get_calendar_data(getPuser($use
 echo '<div id="exaplan">';
 
 echo '<div class="UserCalendarCard">';
-echo printUser($userid, 1);
+
+echo printUser($userid, $isadmin);
 echo block_exaplan_select_period_view();
 
 echo '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" role="button" class="btn btn-danger"> offen </a>';
