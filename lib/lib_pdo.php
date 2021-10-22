@@ -49,11 +49,20 @@ function getPuser($userid)
 
     $params = array(
         ':userid' => $userid,
+        ':moodleid' => get_config('exaplan', 'moodle_id'),
     );
 
-    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid");
+    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid AND moodleid = :moodleid ");
     $statement->execute($params);
     $user = $statement->fetchAll();
+    if (!$user || !count($user)) {
+        // create a new pUser
+        if (getOrCreatePuser()) {
+            return getPuser($userid); // get again
+        }
+        echo 'Can not find a user! 1634892218074';
+        exit;
+    }
     return $user[0];
 }
 
@@ -69,7 +78,7 @@ function getOrCreatePuser()
     );
 
 
-    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid AND moodleid=:moodleid");
+    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid AND moodleid = :moodleid");
     $statement->execute($params);
     $user = $statement->fetchAll();
     if ($user == null) {
@@ -123,7 +132,7 @@ function getModulesOfUser($userid, $state = 2)
 {
     global $DB, $COURSE;
 
-    
+
     $modulesets = array();
     $pdo = getPdoConnect();
 
@@ -191,8 +200,9 @@ function setPrefferedDate($modulepartid, $puserid, $date, $timeslot)
 
     );
 
-
-    $statement = $pdo->prepare("INSERT INTO mdl_block_exaplandates (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp) VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp);");
+    $sql = "INSERT INTO mdl_block_exaplandates (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp) VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp);";
+//    echo $sql; exit;
+    $statement = $pdo->prepare($sql);
     $statement->execute($params);
     $dateid = $pdo->lastInsertId();
 

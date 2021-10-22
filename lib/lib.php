@@ -525,9 +525,10 @@ function block_exaplan_get_calendar_data($userid) {
         foreach ($module->parts as $part) {
             foreach ($part['date'] as $date) {
                 $dateIndex = $date['date'];
+                $dateIndex = date('Y-m-d', $dateIndex);
                 if (!array_key_exists($dateIndex, $selectedDates)) {
                     $selectedDates[$dateIndex] = [
-                        'date' => $date['date'],
+                        'date' => $dateIndex,
                         'type' => BLOCK_EXAPLAN_MIDDATE_ALL, // TODO: midday is needed????? they can be different for different module parts
                         'usedItems' => 0,
                     ];

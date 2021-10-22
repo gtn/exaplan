@@ -26,8 +26,9 @@ switch($action) {
 //        $dateId = required_param('dateId', PARAM_INT);
         $dateId = 1;
         $date = optional_param('date', '', PARAM_TEXT);
+        $dateTS = DateTime::createFromFormat('Y-m-d', $date)->getTimestamp();
         $middayType = optional_param('middayType', BLOCK_EXAPLAN_MIDDATE_ALL, PARAM_INT);
-        setPrefferedDate($dateId, getPuser($USER->id)['id'], $date, $middayType);
+        setPrefferedDate($dateId, getPuser($USER->id)['id'], $dateTS, $middayType);
         $allUserData = block_exaplan_get_calendar_data(getPuser($USER->id)['id']);
         echo json_encode($allUserData);
         exit;

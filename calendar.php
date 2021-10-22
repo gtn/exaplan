@@ -32,7 +32,8 @@ if($action == "save"){
     $calSelectedDates = optional_param("calSelectedDates", '', PARAM_TEXT);
     $calSelectedDates = json_decode($calSelectedDates);
     foreach ($calSelectedDates as $calDate) {
-        setPrefferedDate(1, getPuser($userid)['id'], $calDate, $middayType);
+        $dateTS = DateTime::createFromFormat('Y-m-d', $calDate)->getTimestamp();
+        setPrefferedDate(1, getPuser($userid)['id'], $dateTS, $middayType);
     }
 }
 

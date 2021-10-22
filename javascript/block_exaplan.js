@@ -1,5 +1,6 @@
 // for using in global scope
 var allCalendars = [];
+var exaplanCalendarDateFormat = 'YYYY-MM-DD';
 
 $(function () {
 
@@ -37,13 +38,12 @@ $(function () {
 // Tavo Calendar
 
     // var dateFormat = 'DD.MM.YYYY';
-    var dateFormat = 'YYYY-MM-DD';
 
 // dashborad calendar options
-    var lastPossiobbleDay = moment().add(2, 'M').endOf("month").format(dateFormat);
+    var lastPossiobbleDay = moment().add(2, 'M').endOf("month").format(exaplanCalendarDateFormat);
 
     var dashboard_options = {
-        format: dateFormat,
+        format: exaplanCalendarDateFormat,
         range_select: false,
         future_select: lastPossiobbleDay,
         multi_select: true,
@@ -55,21 +55,21 @@ $(function () {
         var month_options = Object.assign({}, dashboard_options);
         if (i > 0) {
             // every next calendar shows next month
-            month_options.date = moment().add(i, 'M').startOf("month").format(dateFormat);
+            month_options.date = moment().add(i, 'M').startOf("month").format(exaplanCalendarDateFormat);
         } else {
-            month_options.date = moment().format(dateFormat);
+            month_options.date = moment().format(exaplanCalendarDateFormat);
         }
         var calendar_month = new TavoCalendar(calMonth, month_options);
         allCalendars.push(calendar_month);
         calMonth.addEventListener('calendar-select', (ev) => {
             // if clicked not day, but some marker - we need to return selected this day and stop next action
             // but the calendar already has clicked day - reset it
-            if (!$(ev.explicitOriginalTarget).hasClass('tavo-calendar__day-inner')) {
+            /*if (!$(ev.explicitOriginalTarget).hasClass('tavo-calendar__day-inner')) {
                 $(ev.explicitOriginalTarget).closest('tavo-calendar__day-inner').trigger('calendar-select'); // click again!
                 updateAllCalendarMetadata();
                 ev.stopPropagation();
                 return false;
-            }
+            }*/
             return selectedDateEvent(ev, calendar_month);
         });
         calMonth.addEventListener('calendar-change', (ev) => {
@@ -123,6 +123,7 @@ function selectedDateSendAjax(calEvent, monthCalendar) {
             cache: false
         }).done(function (result) {
             calendarData = JSON.parse(result);
+            updateCalendarSelectedDates();
             updateAllCalendarMetadata();
             console.log(result);
         }).fail(function () {
@@ -132,6 +133,24 @@ function selectedDateSendAjax(calEvent, monthCalendar) {
     // }
 }
 
+
+function updateCalendarSelectedDates() {
+    if (typeof calendarData !== 'undefined') {
+        // console.log('dashboard.js:106');console.log(calendarData);// !!!!!!!!!! delete it
+        // clear al selected data
+        allCalendars.forEach((calendarInstance) => {
+            calendarInstance.clearSelected();
+        });
+        // set selected dates
+        if (calendarData.selectedDates.length) {
+            calendarData.selectedDates.forEach((date) => {
+                allCalendars.forEach((calendarInstance) => {
+                    calendarInstance.addSelected(date.date);
+                });
+            });
+        }
+    }
+}
 
 function updateAllCalendarMetadata() {
     // add metadata
@@ -151,23 +170,14 @@ function updateAllCalendarMetadata() {
 }
 
 function showUsedItemsPopup(date) {
-    console.log('block_exaplan.js:154');console.log('clicked marker of: ' +date);// !!!!!!!!!! delete it
+    console.log('block_exaplan.js:154');console.log('clicked marker of: ' + date);// !!!!!!!!!! delete it
 }
 
 $(function () {
 
     // initialize default calendar data
-    if (typeof calendarData !== 'undefined') {
-        console.log('dashboard.js:106');console.log(calendarData);// !!!!!!!!!! delete it
-        // set default selected dates
-        if (calendarData.selectedDates.length) {
-            calendarData.selectedDates.forEach((date) => {
-                allCalendars.forEach((calendarInstance) => {
-                    calendarInstance.addSelected(date.date);
-                });
-            });
-        }
-    }
+    updateCalendarSelectedDates();
+    // update metadata in calendars
     updateAllCalendarMetadata();
 
     // press 'Save' button
