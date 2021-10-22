@@ -62,6 +62,14 @@ $(function () {
         var calendar_month = new TavoCalendar(calMonth, month_options);
         allCalendars.push(calendar_month);
         calMonth.addEventListener('calendar-select', (ev) => {
+            // if clicked not day, but some marker - we need to return selected this day and stop next action
+            // but the calendar already has clicked day - reset it
+            if (!$(ev.explicitOriginalTarget).hasClass('tavo-calendar__day-inner')) {
+                $(ev.explicitOriginalTarget).closest('tavo-calendar__day-inner').trigger('calendar-select'); // click again!
+                updateAllCalendarMetadata();
+                ev.stopPropagation();
+                return false;
+            }
             return selectedDateEvent(ev, calendar_month);
         });
         calMonth.addEventListener('calendar-change', (ev) => {
@@ -140,6 +148,10 @@ function updateAllCalendarMetadata() {
             });
         }
     }
+}
+
+function showUsedItemsPopup(date) {
+    console.log('block_exaplan.js:154');console.log('clicked marker of: ' +date);// !!!!!!!!!! delete it
 }
 
 $(function () {

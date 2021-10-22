@@ -1,5 +1,7 @@
 TavoCalendar.prototype.addMetaData = function(date, metaData) {
 
+    var that = this;
+
     // var format = 'DD.MM.YYYY';
     var format = 'YYYY-MM-DD';
     var calendar_moment = moment(date, format);
@@ -37,7 +39,15 @@ TavoCalendar.prototype.addMetaData = function(date, metaData) {
             if (typeof metaData !== 'undefined') {
                 if (metaData.usedItems > 0) {
                     dayWrapper.attr('data-itemsUsed', metaData.usedItems);
-                    dayWrapper.find('span.tavo-calendar__day-inner').append('<span class="exaplan-usedItems">' + metaData.usedItems + '</span>');
+                    var usedItemsMarker = $('<span class="exaplan-usedItems">' + metaData.usedItems + '</span>');
+                    dayWrapper.find('span.tavo-calendar__day-inner').append(usedItemsMarker);
+                    // disable all EVENTS. we need it for handle own events
+                    dayWrapper.off();
+                    // console.log('gtnTavoCalendar.js:46');console.log($(dayWrapper.get(0).getElementsByClassName('exaplan-usedItems')));// !!!!!!!!!! delete it
+                    // $(dayWrapper.get(0).getElementsByClassName('exaplan-usedItems')).on('click', function(ev) {
+                    //     console.log('gtnTavoCalendar.js:42');console.log(ev.currentTarget);// !!!!!!!!!! delete it
+                    // });
+
                 }
             }
             break; // date found!
