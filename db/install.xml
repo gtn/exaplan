@@ -41,7 +41,7 @@
             </KEYS>
         </TABLE>
         <TABLE NAME="block_exaplandates"
-               COMMENT="Dates can be desired dates or fixed once the admin decided on a date. Every date refers to a modulepart.">
+               COMMENT="Fixed dates once the admin decided on a date. Every date refers to a modulepart.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="modulepartid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
@@ -49,13 +49,30 @@
                 <FIELD NAME="timeslot" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
                        COMMENT="1=Both are okay, 2=AM, 3=PM"/>
                 <FIELD NAME="state" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
-                       COMMENT="1=open, 2=desired date, 3=fixed"/>
+                       COMMENT="not used since rework and block_exaplandesired table"/>
                 <FIELD NAME="location" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false"
                        COMMENT="Name of the location"/>
                 <FIELD NAME="trainerpuserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="creatorpuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="creatortimestamp" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="modifiedpuserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="modifiedtimestamp" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+            </FIELDS>
+            <KEYS>
+                <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+                <KEY NAME="modulepartid" TYPE="foreign" FIELDS="modulepartid" REFTABLE="block_exaplanmoduleparts"
+                     REFFIELDS="id"/>
+            </KEYS>
+        </TABLE>
+        <TABLE NAME="block_exaplandesired"
+               COMMENT="Desired dates of the students.">
+            <FIELDS>
+                <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
+                <FIELD NAME="modulepartid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="date" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="timestamp"/>
+                <FIELD NAME="timeslot" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
+                       COMMENT="1=Both are okay, 2=AM, 3=PM"/>
+                <FIELD NAME="creatorpuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="modifiedtimestamp" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
