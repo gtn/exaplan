@@ -182,12 +182,10 @@ function getModulesOfUser($userid, $state = 2)
 
 function setPrefferedDate($modulepartid, $puserid, $date, $timeslot)
 {
-
-
     $pdo = getPdoConnect();
     $timestamp = new DateTime();
     $timestamp = $timestamp->getTimestamp();
-
+		$date=strtotime("today", $date); //same tstamp for whole day
     $params = array(
         ':modulepartid' => $modulepartid,
         ':date' => $date,
