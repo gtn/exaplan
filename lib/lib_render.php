@@ -59,12 +59,13 @@ function printUser($userid, $mode = 0){
         $content .= '</thead>';
         $content .= '<tbody>';
         foreach($moduleset->parts as $part) {
+        	
             $content .= '<td>';
             if($mode == 1){
                 $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php" role="button" class="btn btn-danger"> Anfragen </a>';
             } else {
                 if ($part['date'] == null || $part['date'][0]['state'] != 2){
-                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" role="button" class="btn btn-danger"> offen </a>';
+                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'" role="button" class="btn btn-danger"> offen </a>';
                 } else {
                     $content .= '<span class="exaplan-selectable-date" data-dateId="'.$part['date'][0]['id'].'">'.date('d.m.Y', strtotime($part['date'][0]['date'])).'</span>';
                 }
