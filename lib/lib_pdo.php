@@ -273,10 +273,7 @@ function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuser
 		    $statement->execute($params);
 		    $dateid = $pdo->lastInsertId();
 		    return $dateid;
-    );
-
-    
-
+		}
 }
 
 function addPUserToDate($dateid, $puserid) {
