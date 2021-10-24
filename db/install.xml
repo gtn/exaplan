@@ -72,12 +72,15 @@
                 <FIELD NAME="date" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="timestamp"/>
                 <FIELD NAME="timeslot" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
                        COMMENT="1=Both are okay, 2=AM, 3=PM"/>
+                <FIELD NAME="puserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="creatorpuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-                <FIELD NAME="modifiedtimestamp" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="timestamp" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
                 <KEY NAME="modulepartid" TYPE="foreign" FIELDS="modulepartid" REFTABLE="block_exaplanmoduleparts"
+                     REFFIELDS="id"/>
+                <KEY NAME="puserid" TYPE="foreign" FIELDS="puserid" REFTABLE="block_exaplanpuser"
                      REFFIELDS="id"/>
             </KEYS>
         </TABLE>

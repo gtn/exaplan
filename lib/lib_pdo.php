@@ -232,6 +232,53 @@ function setPrefferedDate($modulepartid, $puserid, $date, $timeslot)
 
 }
 
+function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuserid)
+{
+    $pdo = getPdoConnect();
+    $timestamp = new DateTime();
+    $timestamp = $timestamp->getTimestamp();
+		$date=strtotime("today", $date); //same tstamp for whole day
+    $params = array(
+        ':modulepartid' => $modulepartid,
+        ':date' => $date,
+        ':timeslot' => $timeslot,
+        ':puserid' => $puserid
+    );
+
+    // get existing data for this modulepartid, date, timeslot
+    $sql = "SELECT *
+              FROM mdl_block_exaplandesired              
+              WHERE modulepartid = :modulepartid           
+                AND timeslot = :timeslot 
+                AND date = :date 
+                AND puserid = :puserid";
+    $statement = $pdo->prepare($sql);
+    $statement->execute($params);
+    $dates = $statement->fetchAll();
+    if ($dates) {
+    	$DB->delete_records("mdl_block_exaplandesired", array('id' => $dates[0]['id']));
+      return 0;
+    }else{
+    	$params = array_merge($params, [
+    				':modulepartid' => $modulepartid,
+    				':date' => $date,
+    				':puserid' => $puserid,
+            ':timeslot' => $timeslot,
+            ':creatorpuserid' => $creatorpuserid,
+            ':timestamp' => $timestamp,
+        ]);
+        $sql = "INSERT INTO mdl_block_exaplandesired (modulepartid, date, puserid, timeslot, creatorpuserid, timestamp) VALUES (:modulepartid, :date, :puserid, :timeslot, :creatorpuserid, :timestamp)";
+		//  echo $sql; exit;
+		    $statement = $pdo->prepare($sql);
+		    $statement->execute($params);
+		    $dateid = $pdo->lastInsertId();
+		    return $dateid;
+    );
+
+    
+
+}
+
 function addPUserToDate($dateid, $puserid) {
 
     $pdo = getPdoConnect();

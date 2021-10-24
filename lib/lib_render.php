@@ -107,7 +107,7 @@ function printUser($userid, $mode = 0, $withCalendar = false){
 function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = false) {
     $content = '<div id="block_exaplan_dashboard_calendar">';
     $ajaxAddUserDateUrl = new moodle_url('/blocks/exaplan/ajax.php',
-        array('action' => 'addUserDate',
+        array('action' => 'addUserDisiredDate',
             'sesskey' => sesskey(),
         )
     );

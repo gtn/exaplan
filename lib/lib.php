@@ -545,6 +545,33 @@ function block_exaplan_get_calendar_data($userid) {
     return json_encode($data);
 }
 
+function block_exaplan_get_desired_data($puserid,$modulepartId) {
+    global $USER;
+    $data = [
+        'selectedDates' => []
+    ];
+
+    $statement = $pdo->prepare("SELECT * FROM block_exaplandesired WHERE modulepartid = :modulepartid AND puserid = :puserid");
+    $statement->execute($params);
+    $dates = $statement->fetchAll();
+    foreach ($dates as $date) {
+        $dateIndex = $date['date'];
+        $dateIndex = date('Y-m-d', $dateIndex);
+        if (!array_key_exists($dateIndex, $selectedDates)) {
+            $selectedDates[$dateIndex] = [
+           'date' => $dateIndex,
+           'type' => BLOCK_EXAPLAN_MIDDATE_ALL, // TODO: midday is needed????? they can be different for different module parts
+           'usedItems' => 0,   // TODO: possible different counters: dates/moduleparts
+           ];
+        }
+        $selectedDates[$dateIndex]['usedItems'] += 1;
+    }
+
+    $selectedDates = array_values($selectedDates); // clean keys. needed for correct JS function later
+    $data['selectedDates'] = $selectedDates;
+    return json_encode($data);
+}
+
 function block_exaplan_send_notification($notificationtype, $userfrom, $userto, $subject, $message, $context, $contexturl = null, $dakoramessage = false, $courseid = 0, $customdata = null) {
     global $CFG, $DB;
 
