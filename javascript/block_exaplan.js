@@ -74,12 +74,15 @@ $(function () {
         });
         calMonth.addEventListener('calendar-change', (ev) => {
             updateAllCalendarMetadata();
+            markCalendarSelectedModulepart(null);
         });
         calMonth.addEventListener('calendar-range', (ev) => {
             updateAllCalendarMetadata();
+            markCalendarSelectedModulepart(null);
         });
         calMonth.addEventListener('calendar-reset', (ev) => {
             updateAllCalendarMetadata();
+            markCalendarSelectedModulepart(null);
         });
     });
 
@@ -132,9 +135,11 @@ function selectedDateSendAjax(calEvent, monthCalendar) {
             calendarData = JSON.parse(result);
             updateCalendarSelectedDates();
             updateAllCalendarMetadata();
+            markCalendarSelectedModulepart(null);
             console.log(result);
         }).fail(function () {
             updateAllCalendarMetadata();
+            markCalendarSelectedModulepart(null);
             console.log('Something wrong in Ajax!! 1634564740109')
         });
     } else {
@@ -178,6 +183,17 @@ function updateAllCalendarMetadata() {
                 });
             });
         }
+    }
+}
+
+function markCalendarSelectedModulepart(modulepartId) {
+    if (modulepartId == null) {
+        modulepartId = $('.exaplan-selectable-date[data-modulepartid][data-dateselected = 1], .exaplan-selectable-modulepart[data-modulepartid][data-modulepartselected = 1]').first().attr('data-modulepartid')
+    }
+    if (typeof calendarData !== 'undefined') {
+        allCalendars.forEach((calendarInstance) => {
+            calendarInstance.markSelectedModulePart(modulepartId, calendarData);
+        });
     }
 }
 
@@ -237,10 +253,13 @@ $(function () {
         var currentState = $(this).attr('data-dateSelected');
         // unselect all prev selected dates:
         $('.exaplan-selectable-date').removeAttr('data-dateSelected');
+        var selectedModulepart = 0;
         // select if non-selected (if it was selected - nothing to do)
         if (!currentState || typeof currentState === 'undefined') {
             $(this).attr('data-dateSelected', 1);
+            var selectedModulepart = $(this).attr('data-modulepartid')
         }
+        markCalendarSelectedModulepart(selectedModulepart);
     })
     // select modulepart on "module part" instance
     $('.exaplan-selectable-modulepart').on('click', function (e) {
@@ -248,10 +267,14 @@ $(function () {
         var currentState = $(this).attr('data-modulepartselected');
         // unselect all prev selected parts:
         $('.exaplan-selectable-modulepart').removeAttr('data-modulepartselected');
+        var selectedModulepart = 0;
         // select if non-selected (if it was selected - nothing to do)
         if (!currentState || typeof currentState === 'undefined') {
             $(this).attr('data-modulepartselected', 1);
+            // mark selected dates in calendar
+            var selectedModulepart = $(this).attr('data-modulepartid')
         }
+        markCalendarSelectedModulepart(selectedModulepart);
     })
 });
 

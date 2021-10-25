@@ -79,9 +79,6 @@ function printUser($userid, $mode = 0, $withCalendar = false){
         $content .= '</td>';
         if ($withCalendar && $moduleKey == 0) {
             $content .= '<td valign="top" rowspan="' . count($modulesets) . '">';
-            if ($mode == 1) {
-                $content .= '<span class="alert alert-danger">   CALENDAR FOR ADMIN IS NOT WORKING YET!!!   </span>';
-            }
             $content .= block_exaplan_calendars_view($userid, 2);
             $content .= '</td>';
         }

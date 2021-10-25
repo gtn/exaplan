@@ -82,4 +82,7 @@
     margin-right: 20px;
 }
 
+#block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day.usedForModulepart .tavo-calendar__day-inner {
+    background-color: #800000 !important;
+}
 

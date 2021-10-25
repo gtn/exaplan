@@ -582,11 +582,11 @@ function block_exaplan_get_data_for_calendar($puserid, $dataType = 'desired', $m
                 'date' => $dateIndex,
                 'middayType' => $date['timeslot'],
                 'usedItems' => 0,   // TODO: possible different counters: dates/moduleparts
-                'modulepartid' => $date['modulepartid'],
                 'dateType' => $date['dateType'],
             ];
         }
         $selectedDates[$dateIndex]['usedItems'] += 1;
+        $selectedDates[$dateIndex]['moduleparts'][] = $date['modulepartid'];
     }
 
     $selectedDates = array_values($selectedDates); // clean keys. needed for correct JS function later

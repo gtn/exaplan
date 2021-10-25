@@ -59,3 +59,46 @@ TavoCalendar.prototype.addMetaData = function(date, metaData) {
     return true;
 };
 
+TavoCalendar.prototype.markSelectedModulePart = function(modulepartId, calendarData) {
+    var that = this;
+
+    if (typeof this.state.date === 'undefined') {
+        return false;
+    }
+    var format = 'YYYY-MM-DD';
+    var calendar_moment = moment(this.state.date, format);
+    var days_in_month = calendar_moment.daysInMonth();
+    var moment_copy = calendar_moment.clone();
+    moment_copy.startOf('month');
+
+    var elementIndex = 0;
+    var monthOffset = moment_copy.isoWeekday() % (7 + calendar_moment.localeData().firstDayOfWeek());
+    if (monthOffset > 0) {
+        elementIndex = elementIndex + monthOffset - 1;
+    }
+    
+    var calendarElement = this.elements.wrapper;
+
+    // go through ALL calendar elements step by step and add metadata
+    for (var d = 1; d <= days_in_month; d++) {
+        var stepDate = moment_copy.format(format);
+        var dayWrapper = $(calendarElement).find('.tavo-calendar__day').eq(elementIndex);
+        // at first remove marker for all days
+        dayWrapper.removeClass('usedForModulepart');
+        if (modulepartId > 0 && calendarData.selectedDates.length) {
+            // go through all selected days and check on modulepartid
+            calendarData.selectedDates.forEach((date) => {
+                if (stepDate == date.date && typeof date.moduleparts != 'undefined' && date.moduleparts.indexOf(modulepartId) != -1) {
+                    // mark this day
+                    console.log('gtnTavoCalendar.js:93');console.log('day ' + moment_copy.format(format) + ' marked');// !!!!!!!!!! delete it
+                    dayWrapper.addClass('usedForModulepart');
+                    // TODO: different marks? 'fixed / desired'
+                }
+            });
+        }
+        moment_copy.add(1, "d");
+        elementIndex = elementIndex + 1;
+    }
+
+    return true;
+}
