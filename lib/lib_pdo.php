@@ -256,9 +256,10 @@ function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuser
     $statement->execute($params);
     $dates = $statement->fetchAll();
     if ($dates) {
-    	$DB->delete_records("mdl_block_exaplandesired", array('id' => $dates[0]['id']));
-      return 0;
-    }else{
+        $statement = $pdo->prepare('DELETE FROM mdl_block_exaplandesired WHERE id = :id');
+        $statement->execute([':id' => $dates[0]['id']]);
+        return 0;
+    } else {
     	$params = array_merge($params, [
     				':modulepartid' => $modulepartid,
     				':date' => $date,
@@ -359,4 +360,62 @@ function updateNotifications()
         // userfrom = 2 because 2 is always admin
         block_exaplan_send_notification("date_fixed", 2, $pn["userto"], "Termin fixiert", $pn["notificationtext"], "Termin");
     }
+}
+
+/**
+ * @param int $userid
+ * @param int $modulepartid (null if needed data about all moduleparts)
+ */
+function getDesiredDatesOfUser($userid, $modulepartid = null)
+{
+    $pdo = getPdoConnect();
+    $params = [
+        ':puserid' => $userid,
+    ];
+
+    $where = ' puserid = :puserid ';
+
+    if ($modulepartid) {
+        $params[':modulepartid'] = $modulepartid;
+        $where .= ' AND modulepartid = :modulepartid ';
+    }
+
+    $sql = "SELECT *, 'desired' as dateType 
+              FROM mdl_block_exaplandesired 
+              WHERE " . $where;
+    $statement = $pdo->prepare($sql);
+    $statement->execute($params);
+    $dates = $statement->fetchAll();
+
+    return $dates;
+
+}
+
+/**
+ * @param int $userid
+ * @param int $modulepartid (null if needed data about all moduleparts)
+ */
+function getFixedDatesOfUser($userid, $modulepartid = null)
+{
+    $pdo = getPdoConnect();
+    $params = [
+        ':puserid' => $userid,
+    ];
+
+    $where = ' dumm.puserid = :puserid ';
+
+    if ($modulepartid) {
+        $params[':modulepartid'] = $modulepartid;
+        $where .= ' AND d.modulepartid = :modulepartid ';
+    }
+
+    $statement = $pdo->prepare("SELECT DISTINCT d.*, 'fixed' as dateType
+                                  FROM mdl_block_exaplanpuser_date_mm dumm
+                                    JOIN mdl_block_exaplandates d ON d.id = dumm.dateid
+                                  WHERE " . $where);
+    $statement->execute($params);
+    $dates = $statement->fetchAll();
+
+    return $dates;
+
 }

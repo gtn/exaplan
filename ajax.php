@@ -22,9 +22,9 @@ $isAdmin = block_exaplan_is_admin();
 require_sesskey();
 
 switch($action) {
-		case 'addUserDisiredDate':
-		 	$pUserId = getPuser($USER->id)['id'];
-      $date = optional_param('date', date('Y-m.-d'), PARAM_TEXT);
+    case 'addUserDisiredDate':
+        $pUserId = getPuser($USER->id)['id'];
+      $date = optional_param('date', date('Y-m-d'), PARAM_TEXT);
       $modulepartId = required_param('modulepartId', PARAM_INT);
       $dateTS = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
       if ($dateTS < strtotime("today", time())) {
@@ -33,12 +33,12 @@ switch($action) {
         exit;
       }
       $middayType = optional_param('middayType', BLOCK_EXAPLAN_MIDDATE_ALL, PARAM_INT);
-      $newDateId = setDesiredDate($modulepartId, $pUserId, $dateTS, $middayType);
-      $allUserData = block_exaplan_get_desired_data(getPuser($USER->id)['id'],$modulepartId);
+      $newDateId = setDesiredDate($modulepartId, $pUserId, $dateTS, $middayType, $pUserId);
+      $allUserData = block_exaplan_get_data_for_calendar(getPuser($USER->id)['id'], 'all');
       echo json_encode($allUserData);
       exit;
       break;
-    case 'addUserDate':
+    case 'addUserDate': // TODO: deprecated?
         $pUserId = getPuser($USER->id)['id'];
 //        $dateId = required_param('dateId', PARAM_INT);
 //        $dateId = 1;

@@ -46,11 +46,9 @@ echo $OUTPUT->header();
 echo '<div id="exaplan">';
 
 echo '<div class="UserCalendarCard">';
-echo printUser($userid, $isadmin, true);
+echo printUser($userid, $isadmin, !$isadmin);
 //echo block_exaplan_select_period_view();
 
-echo printUser($userid, $isadmin);
-echo block_exaplan_select_period_view();
 
 echo '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" role="button" class="btn btn-danger"> offen </a>';
 /*echo '<form action="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" method="post">';

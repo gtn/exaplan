@@ -545,24 +545,46 @@ function block_exaplan_get_calendar_data($userid) {
     return json_encode($data);
 }
 
-function block_exaplan_get_desired_data($puserid,$modulepartId) {
+/**
+ * @param int $puserid
+ * @param string $dataType desired | fixed | all
+ * @param int $modulepartId (null if needed data about all moduleparts)
+ * @return false|string
+ */
+function block_exaplan_get_data_for_calendar($puserid, $dataType = 'desired', $modulepartId = null) {
     global $USER;
     $data = [
         'selectedDates' => []
     ];
 
-    $statement = $pdo->prepare("SELECT * FROM block_exaplandesired WHERE modulepartid = :modulepartid AND puserid = :puserid");
-    $statement->execute($params);
-    $dates = $statement->fetchAll();
+    switch ($dataType) {
+        case 'desired': // only self desired dates
+            $dates = getDesiredDatesOfUser($puserid, $modulepartId);
+            break;
+        case 'fixed': // dates, which were fixed by admin
+            $dates = getFixedDatesOfUser($puserid, $modulepartId);
+            break;
+        case 'all': // mix of dates. needed for fill the calendar
+        default:
+            $dates1 = getDesiredDatesOfUser($puserid, $modulepartId);
+            $dates2 = getFixedDatesOfUser($puserid, $modulepartId);
+            $dates = array_merge($dates1, $dates2);
+            break;
+    }
+
+    // calendar used dates
+    $selectedDates = [];
     foreach ($dates as $date) {
         $dateIndex = $date['date'];
         $dateIndex = date('Y-m-d', $dateIndex);
-        if (!array_key_exists($dateIndex, $selectedDates)) {
+        if (!array_key_exists($dateIndex, $selectedDates)) { // TODO: do not use this condition if fixed date does not delete desired record!
             $selectedDates[$dateIndex] = [
-           'date' => $dateIndex,
-           'type' => BLOCK_EXAPLAN_MIDDATE_ALL, // TODO: midday is needed????? they can be different for different module parts
-           'usedItems' => 0,   // TODO: possible different counters: dates/moduleparts
-           ];
+                'date' => $dateIndex,
+                'middayType' => $date['timeslot'],
+                'usedItems' => 0,   // TODO: possible different counters: dates/moduleparts
+                'modulepartid' => $date['modulepartid'],
+                'dateType' => $date['dateType'],
+            ];
         }
         $selectedDates[$dateIndex]['usedItems'] += 1;
     }

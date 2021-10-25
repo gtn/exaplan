@@ -112,7 +112,7 @@ function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = f
         )
     );
     $content .= '<script>var ajaxAddUserDateUrl = "'.html_entity_decode($ajaxAddUserDateUrl).'";</script>';
-    $content .= '<script>var calendarData = '.block_exaplan_get_calendar_data(getPuser($userid)).';</script>';
+    $content .= '<script>var calendarData = '.block_exaplan_get_data_for_calendar(getPuser($userid)['id'], 'all').';</script>';
     $content .= '<table>';
     if ($withHeader) {
         $content .= '<tr>';
