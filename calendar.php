@@ -22,12 +22,7 @@ $date = optional_param("date", "", PARAM_TEXT);
 $timeslot = optional_param("timeslot", "", PARAM_INT);
 $isadmin = block_exaplan_is_admin();
 
-if (false) { // @Fabio - or use own rule for your userid: 11 :-)
-    $userid = 11;
-
-} else {
-    $userid = $USER->id;
-}
+$userid = $USER->id;
 
 if($action == "save"){
     // DO NOT WORK

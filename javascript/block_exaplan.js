@@ -118,7 +118,7 @@ function selectedDateSendAjax(calEvent, monthCalendar) {
         var selectedDate =  monthCalendar.getFocusYear() + '-' + monthCalendar.getFocusMonth() + '-' + selectedDay;
 
         // send request
-        var ajaxUrl = ajaxAddUserDateUrl;
+        var ajaxUrl = calendarAjaxUrl;
         var data = {
             modulepartId: selectedModulepartId,
             // dateId: selectedDateId,

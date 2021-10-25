@@ -63,7 +63,7 @@ function printUser($userid, $mode = 0, $withCalendar = false){
         foreach($moduleset->parts as $part) {
             $content .= '<td>';
             if ($mode == 1){
-                $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php" role="button" class="btn btn-danger"> Anfragen </a>';
+                $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$part["id"].'" role="button" class="btn btn-danger"> Anfragen </a>';
             } else {
                 if ($part['date'] == null || $part['date'][0]['state'] != 2){
                     $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'" role="button" class="btn btn-danger exaplan-selectable-modulepart" data-modulepartId="'.$part['id'].'"> offen </a>';
@@ -102,14 +102,30 @@ function printUser($userid, $mode = 0, $withCalendar = false){
  * @return string
  */
 function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = false) {
+    $isAdmin = block_exaplan_is_admin();
     $content = '<div id="block_exaplan_dashboard_calendar">';
-    $ajaxAddUserDateUrl = new moodle_url('/blocks/exaplan/ajax.php',
-        array('action' => 'addUserDisiredDate',
-            'sesskey' => sesskey(),
-        )
-    );
-    $content .= '<script>var ajaxAddUserDateUrl = "'.html_entity_decode($ajaxAddUserDateUrl).'";</script>';
-    $content .= '<script>var calendarData = '.block_exaplan_get_data_for_calendar(getPuser($userid)['id'], 'all').';</script>';
+
+    if ($userid) {
+        // for students
+        $calendarAjaxUrl = new moodle_url('/blocks/exaplan/ajax.php',
+            array('action' => 'addUserDisiredDate',
+                'sesskey' => sesskey(),
+            )
+        );
+        $content .= '<script>var calendarAjaxUrl = "'.html_entity_decode($calendarAjaxUrl).'";</script>';
+        $content .= '<script>var calendarData = ' . block_exaplan_get_data_for_calendar(getPuser($userid)['id'], 'all') . ';</script>';
+    } else {
+        if ($isAdmin) {
+            // for adminview
+            $calendarAjaxUrl = new moodle_url('/blocks/exaplan/ajax.php',
+                array('action' => 'addUserDisiredDate',
+                    'sesskey' => sesskey(),
+                )
+            );
+            $content .= '<script>var calendarAjaxUrl = "'.html_entity_decode($calendarAjaxUrl).'";</script>';
+            $content .= '';
+        }
+    }
     $content .= '<table>';
     if ($withHeader) {
         $content .= '<tr>';
@@ -153,4 +169,34 @@ function block_exaplan_calendars_header_view() {
     $content .= '<p>Bitte markieren Sie im Kalender jeweils Ihren Wunschzeitraum</p>';
     $content .= '</div>';
     return $content;
+}
+
+/**
+ * @param int $modulepartid
+ * @param string $date
+ */
+function printAdminModulepartView($modulepartid, $date = '') {
+    $content = '';
+    $content .= '<div class="adminModuleplanView">';
+    $content .= '<table class="moduleplanView-header">';
+    $moduleSetId = getTableData(BLOCK_EXAPLAN_DB_MODULEPARTS, $modulepartid, 'modulesetid');
+    // header
+    $content .= '<tr>';
+    $content .= '<td width="25%" valign="top">'.getTableData(BLOCK_EXAPLAN_DB_MODULEPARTS, $modulepartid, 'title');
+    $location = getTableData(BLOCK_EXAPLAN_DB_MODULESETS, $moduleSetId, 'location');
+    if ($location) {
+        $content .= '&nbsp;|&nbsp;' . $location;
+    }
+    $content .= '</td>';
+    $content .= '<td width="25%" valign="top">Gesamt Teilnehmer angefragt: </td>';
+    $content .= '<td width="25%" valign="top">Rest:</td>';
+    $content .= '</tr>';
+    $content .= '</table>';
+    // calendars
+    $content .= block_exaplan_calendars_view(0, 4);
+
+    $content .= '</div>';
+
+    return $content;
+
 }

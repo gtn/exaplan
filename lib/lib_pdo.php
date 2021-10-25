@@ -46,6 +46,37 @@ function getPdoConnect()
     return $pdo;
 }
 
+function getTableData($tableName, $id, $field = null) {
+    global $CFG;
+    // TODO: make static variable for performance?
+    $pdo = getPdoConnect();
+
+    $params = array(
+        ':id' => $id,
+    );
+
+    if (strpos($tableName, 'mdl_') === false) {
+        $tableName = $CFG->prefix.$tableName; // for using with constants or other cases
+    }
+
+    $sql = 'SELECT * FROM '.$tableName.' WHERE id = :id ';
+    $statement = $pdo->prepare($sql);
+    $statement->execute($params);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
+    $data = $statement->fetchAll();
+    if ($data && count($data) > 0) {
+        $data = $data[0];
+        if ($field) {
+            if (array_key_exists($field, $data)) {
+                return $data[$field];
+            }
+            return null;
+        }
+        return $data;
+    }
+    return null;
+}
+
 function getPuser($userid)
 {
 
