@@ -12,17 +12,17 @@ $(function () {
     var firstPossiobbleDay =  moment().format(dateFormat);
     var lastPossiobbleDay =  moment().add(2, 'M').endOf("month").format(dateFormat);
 
-    const dashboard_options = {
+    const calendar_default_options = {
         firstDayOfTheWeek: "2",
         language: 'de',
         "data-min": firstPossiobbleDay,
         "data-max": lastPossiobbleDay,
     }
 
-    const month1_options = Object.assign({}, dashboard_options);
+    const month1_options = Object.assign({}, calendar_default_options);
     var firstDate = moment().format(dateFormat);
     // next month
-    var month2_options = Object.assign({}, dashboard_options);
+    var month2_options = Object.assign({}, calendar_default_options);
     month2_options
     var nextMonthDate = moment().add(1, 'M').startOf("month").format(dateFormat);
 
@@ -42,7 +42,7 @@ $(function () {
 // dashborad calendar options
     var lastPossiobbleDay = moment().add(2, 'M').endOf("month").format(exaplanCalendarDateFormat);
 
-    var dashboard_options = {
+    var calendar_default_options = {
         format: exaplanCalendarDateFormat,
         range_select: false,
         future_select: lastPossiobbleDay,
@@ -50,9 +50,13 @@ $(function () {
         locale: 'de'
     }
 
+    // if (calendarsFrozen) {
+    //     calendar_default_options.frozen = true;
+    // }
+
     var allMonthElements = $('#block_exaplan_dashboard_calendar .calendar-month-item');
     allMonthElements.each(function (i, calMonth) {
-        var month_options = Object.assign({}, dashboard_options);
+        var month_options = Object.assign({}, calendar_default_options);
         if (i > 0) {
             // every next calendar shows next month
             month_options.date = moment().add(i, 'M').startOf("month").format(exaplanCalendarDateFormat);
@@ -70,6 +74,7 @@ $(function () {
                 ev.stopPropagation();
                 return false;
             }*/
+            console.log('block_exaplan.js:73');console.log('day clicked');// !!!!!!!!!! delete it
             return selectedDateEvent(ev, calendar_month);
         });
         calMonth.addEventListener('calendar-change', (ev) => {
@@ -89,8 +94,12 @@ $(function () {
 });
 
 function selectedDateEvent(calEvent, monthCalendar) {
-    // updateAllCalendarMetadata(); // if ajax will enable - disable this line
-    selectedDateSendAjax(calEvent, monthCalendar);
+    if (isExaplanAdmin) {
+        modulepartInfoByDateAjax(calEvent, monthCalendar);
+    } else {
+        // updateAllCalendarMetadata(); // if ajax will enable - disable this line
+        selectedDateSendAjax(calEvent, monthCalendar);
+    }
     return false;
 }
 
@@ -148,6 +157,30 @@ function selectedDateSendAjax(calEvent, monthCalendar) {
         // updateCalendarSelectedDates();
         // updateAllCalendarMetadata();
     }
+}
+
+function modulepartInfoByDateAjax(calEvent, monthCalendar) {
+    calEvent.preventDefault();
+    
+    var selectedDay = calEvent.explicitOriginalTarget.firstChild.textContent;
+    var selectedDate =  monthCalendar.getFocusYear() + '-' + monthCalendar.getFocusMonth() + '-' + selectedDay;
+    // console.log('block_exaplan.js:167');console.log(selectedDate);// !!!!!!!!!! delete it
+
+    // send request
+    var ajaxUrl = calendarAjaxUrl;
+    var data = {
+        date: selectedDate,
+    }
+    $.ajax({
+        method: 'post',
+        data: data,
+        url: ajaxUrl,
+        cache: false
+    }).done(function (result) {
+        $('#modulepart-date-data').html(result);
+    }).fail(function () {
+        console.log('Something wrong in Ajax!! 1635165804897')
+    });
 }
 
 

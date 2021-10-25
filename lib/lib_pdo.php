@@ -394,28 +394,42 @@ function updateNotifications()
 }
 
 /**
- * @param int $userid
+ * @param int $puserid (null id needed data about whole modulepart)
  * @param int $modulepartid (null if needed data about all moduleparts)
+ * @param string|int $date (null if for all dates)
+ * @param int $timeslot midday type
  */
-function getDesiredDatesOfUser($userid, $modulepartid = null)
+function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null)
 {
     $pdo = getPdoConnect();
-    $params = [
-        ':puserid' => $userid,
-    ];
-
-    $where = ' puserid = :puserid ';
-
+    $params = [];
+    $whereArr = [' 1=1 '];
+    if ($puserid) {
+        $params[':puserid'] = $puserid;
+        $whereArr[] = ' puserid = :puserid ';
+    }
     if ($modulepartid) {
         $params[':modulepartid'] = $modulepartid;
-        $where .= ' AND modulepartid = :modulepartid ';
+        $whereArr[] = ' modulepartid = :modulepartid ';
+    }
+    if ($date) {
+        if (!is_int($date)) {
+            $date = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
+        }
+        $params[':date'] = $date;
+        $whereArr[] = ' date = :date ';
+    }
+    if ($timeslot) {
+        $params[':timeslot'] = $timeslot;
+        $whereArr[] = ' timeslot = :timeslot ';
     }
 
-    $sql = "SELECT *, 'desired' as dateType 
+    $sql = "SELECT *, puserid as relatedUserId, 'desired' as dateType 
               FROM mdl_block_exaplandesired 
-              WHERE " . $where;
+              WHERE " . implode(' AND ', $whereArr);
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
     $dates = $statement->fetchAll();
 
     return $dates;
@@ -423,28 +437,42 @@ function getDesiredDatesOfUser($userid, $modulepartid = null)
 }
 
 /**
- * @param int $userid
+ * @param int $puserid (null if needed data about whole modulepart)
  * @param int $modulepartid (null if needed data about all moduleparts)
+ * @param string|int $date (null if for all dates)
+ * @param int $timeslot midday type
  */
-function getFixedDatesOfUser($userid, $modulepartid = null)
+function getFixedDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null)
 {
     $pdo = getPdoConnect();
-    $params = [
-        ':puserid' => $userid,
-    ];
-
-    $where = ' dumm.puserid = :puserid ';
-
+    $params = [];
+    $whereArr = [' 1=1 '];
+    if ($puserid) {
+        $params[':puserid'] = $puserid;
+        $whereArr[] = ' dumm.puserid = :puserid ';
+    }
     if ($modulepartid) {
         $params[':modulepartid'] = $modulepartid;
-        $where .= ' AND d.modulepartid = :modulepartid ';
+        $whereArr[] = ' d.modulepartid = :modulepartid ';
+    }
+    if ($date) {
+        if (!is_int($date)) {
+            $date = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
+        }
+        $params[':date'] = $date;
+        $whereArr[] = ' d.date = :date ';
+    }
+    if ($timeslot) {
+        $params[':timeslot'] = $timeslot;
+        $whereArr[] = ' d.timeslot = :timeslot ';
     }
 
-    $statement = $pdo->prepare("SELECT DISTINCT d.*, 'fixed' as dateType
+    $statement = $pdo->prepare("SELECT DISTINCT d.*, dumm.puserid as relatedUserId, 'fixed' as dateType
                                   FROM mdl_block_exaplanpuser_date_mm dumm
                                     JOIN mdl_block_exaplandates d ON d.id = dumm.dateid
-                                  WHERE " . $where);
+                                  WHERE " . implode(' AND ', $whereArr));
     $statement->execute($params);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
     $dates = $statement->fetchAll();
 
     return $dates;

@@ -23,6 +23,7 @@ require_sesskey();
 
 switch($action) {
     case 'addUserDisiredDate':
+        // save student's selected date
         $pUserId = getPuser($USER->id)['id'];
       $date = optional_param('date', date('Y-m-d'), PARAM_TEXT);
       $modulepartId = required_param('modulepartId', PARAM_INT);
@@ -42,7 +43,7 @@ switch($action) {
         $pUserId = getPuser($USER->id)['id'];
 //        $dateId = required_param('dateId', PARAM_INT);
 //        $dateId = 1;
-        $date = optional_param('date', date('Y-m.-d'), PARAM_TEXT);
+        $date = optional_param('date', date('Y-m-d'), PARAM_TEXT);
         $modulepartId = required_param('modulepartId', PARAM_INT);
         $dateTS = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
         if ($dateTS < strtotime("today", time())) {
@@ -64,6 +65,18 @@ switch($action) {
         }
         $allUserData = block_exaplan_get_calendar_data(getPuser($USER->id)['id']);
         echo json_encode($allUserData);
+        exit;
+        break;
+    case 'adminViewModulepartDate':
+        // Admin: view selected date for modulepart id
+        $isAdmin = block_exaplan_is_admin();
+        if (!$isAdmin) {
+            echo 'This information is not for you!'; exit;
+        }
+        $modulepartId = required_param('mpid', PARAM_INT);
+        $date = required_param('date', PARAM_TEXT);
+//        $dateTS = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
+        echo modulepartAdminViewByDate($modulepartId, $date);
         exit;
         break;
 }

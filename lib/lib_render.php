@@ -99,9 +99,10 @@ function printUser($userid, $mode = 0, $withCalendar = false){
  * @param int $userid
  * @param int $monthsCount
  * @param bool $withHeader
+ * @param int $modulepartId
  * @return string
  */
-function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = false) {
+function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = false, $modulepartId = null) {
     $isAdmin = block_exaplan_is_admin();
     $content = '<div id="block_exaplan_dashboard_calendar">';
 
@@ -113,17 +114,22 @@ function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = f
             )
         );
         $content .= '<script>var calendarAjaxUrl = "'.html_entity_decode($calendarAjaxUrl).'";</script>';
-        $content .= '<script>var calendarData = ' . block_exaplan_get_data_for_calendar(getPuser($userid)['id'], 'all') . ';</script>';
+        $content .= '<script>var calendarData = ' . block_exaplan_get_data_for_calendar(getPuser($userid)['id'], 'all', null) . ';</script>';
     } else {
         if ($isAdmin) {
             // for adminview
+            $content .= '<script>var isExaplanAdmin = true;</script>';
             $calendarAjaxUrl = new moodle_url('/blocks/exaplan/ajax.php',
-                array('action' => 'addUserDisiredDate',
+                array('action' => 'adminViewModulepartDate',
+                    'mpid' => $modulepartId,
                     'sesskey' => sesskey(),
                 )
             );
             $content .= '<script>var calendarAjaxUrl = "'.html_entity_decode($calendarAjaxUrl).'";</script>';
-            $content .= '';
+            if ($modulepartId) {
+//                $content .= '<script>var calendarsFrozen = true; </script>';
+                $content .= '<script>var calendarData = ' . block_exaplan_get_data_for_calendar(null, 'all', $modulepartId) . ';</script>';
+            }
         }
     }
     $content .= '<table>';
@@ -193,10 +199,150 @@ function printAdminModulepartView($modulepartid, $date = '') {
     $content .= '</tr>';
     $content .= '</table>';
     // calendars
-    $content .= block_exaplan_calendars_view(0, 4);
+    $content .= block_exaplan_calendars_view(0, 4, false, $modulepartid);
+    // day ajax reloaded data (just HTML container)
+    $content .= '<div id="modulepart-date-data"></div>';
+
 
     $content .= '</div>';
 
     return $content;
 
+}
+
+/**
+ * @param int $modulepartId
+ * @param string $date
+ * @return string
+ */
+function modulepartAdminViewByDate($modulepartId, $date) {
+    global $CFG;
+    $content = '';
+
+//    $actionUrl = $CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartId.'&date='.$date.'&timeslot=';
+//    $content .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_BEFORE.'" name="form'.$modulepartId.'1"></form>'; // needed for valid HTML. Be careful with jQuery of this form!
+//    $content .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_AFTER.'" name="form'.$modulepartId.'2"></form>'; // needed for valid HTML. Be careful with jQuery of this form!
+//    $content .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_ALL.'" name="form'.$modulepartId.'3"></form>'; // needed for valid HTML. Be careful with jQuery of this form!
+
+    $tableStartTemplate = '<table class="table table-sm exaplan-adminMosulepartView">';
+
+    $content .= $tableStartTemplate;
+    // header
+    $content .= '<thead class="thead-light">';
+    $content .= '<tr>';
+    $content .= '<th>Angefragte TN: '.$date.'</th>';
+    $content .= '<th></th>';
+    $content .= '<th>Organization</th>';
+    $content .= '<th>TN gefehit?</th>';
+    $content .= '<th>Bewertung o.ä.?</th>';
+    $content .= '<th></th>';
+    $content .= '</tr>';
+    $content .= '</thead>';
+
+    $content .= '<tbody>';
+
+    $timeslotView = function($timeslot, $title) use ($modulepartId, $date, $CFG, $tableStartTemplate) {
+        $cont = '';
+        $rowsCount = 0;
+        $mergedData = block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot);
+        if (count($mergedData) > 0) {
+            $cont .= '</table>'; // we need to start new table for correct <form> working
+            $actionUrl = $CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartId.'&date='.$date.'&timeslot='.$timeslot;
+            $cont .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_BEFORE.'" method="post">';
+            $cont .= '<input type="hidden" name="action" value="saveFixedDates" />';
+            $cont .= $tableStartTemplate;
+
+            $cont .= '<tr><td colspan="6"><h5 class="p-1 mb-1 bg-secondary text-dark">'.$title.'</h5></td></tr>';
+            $cont .= '</tr>';
+            foreach ($mergedData as $dateData) {
+                $rowsCount++;
+                $cont .= '<tr>';
+                $cont .= '<td valign="top">'.@$dateData['pUserData']['firstname'].' '.@$dateData['pUserData']['lastname'].'</td>';
+                $cont .= '<td valign="top">'./*buttons*/'</td>';
+                $companyName = getTableData('mdl_block_exaplanmoodles', $dateData['pUserData']['moodleid'], 'companyname');
+                $cont .= '<td valign="top">'.$companyName.'</td>';
+                // fixed or desired
+                $cont .= '<td valign="top">
+                            <input type="checkbox" 
+                                    value="1"                                     
+                                    name="fixed['.$dateData['pUserData']['id'].']" 
+                                    '.($dateData['dateType'] == 'fixed' ? 'checked = "checked"' : '').'/></td>';
+                $cont .= '<td valign="top"><!--Bewertung--></td>';
+                if ($rowsCount == 1) {
+                    $cont .= '<td rowspan="###FORM_ROWSPAN###"  valign="top">'.formAdminDateFixing($modulepartId, $date, $timeslot).'</td>';
+                }
+                $cont .= '</tr>';
+                $cont .= '</table>';
+                $cont .= '</form>';
+                $cont .= $tableStartTemplate;
+            }
+        }
+        $cont = str_replace('###FORM_ROWSPAN###', $rowsCount, $cont);
+        return $cont;
+    };
+
+    // before midday
+    $content .= $timeslotView(BLOCK_EXAPLAN_MIDDATE_BEFORE, 'vormittags (8-12 uhr)');
+
+    // after midday
+    $content .= $timeslotView(BLOCK_EXAPLAN_MIDDATE_AFTER, 'nachmittags (13-17 Uhr)');
+
+    // all day
+    $content .= $timeslotView(BLOCK_EXAPLAN_MIDDATE_ALL, 'ganztags möglich');
+
+    $content .= '</tbody>';
+    $content .= '</table>';
+
+    return $content;
+}
+
+function formAdminDateFixing($modulepartId, $date, $timeslot) {
+    global $CFG;
+    $content = '';
+    $dateTs = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
+    $instanceKey = $modulepartId.'_'.$dateTs.'_'.$timeslot;
+
+    $content .= '<table class="table table-sm table-borderless">';
+
+    $content .= '<tr>';
+    $content .= '<td colspan="2"><label for="trainer_'.$instanceKey.'">Trainer:</label></td>';
+    $content .= '</tr>';
+
+    $content .= '<tr>';
+    $content .= '<td>';
+    $trainers = block_exaplan_get_users_from_cohort();
+    $content .= '<select id="trainer_'.$instanceKey.'" class="form-control" >';
+    foreach ($trainers as $trainer) {
+        $content .= '<option value="'.$trainer['id'].'">'.fullname($trainer).'</option>'; // original ID (not pUser), because it is on MAIN moodle
+    }
+    $content .= '</select>';
+    $content .= '</td>';
+    $content .= '<td>';
+    $content .= '</td>';
+    $content .= '</tr>';
+
+    $content .= '<tr>';
+    $content .= '<td><label for="location_'.$instanceKey.'">Location:</label></td>';
+    $content .= '<td><label for="time_'.$instanceKey.'">Uhrzeit:</label></td>';
+    $content .= '</tr>';
+
+    $content .= '<tr>';
+    $content .= '<td><input type="text" name="location" value="" class="form-control" id="location_'.$instanceKey.'" /></td>';
+    $content .= '<td><input type="text" name="time" value="" class="form-control" id="time_'.$instanceKey.'" >';
+    $content .= '</tr>';
+
+    $content .= '<tr>';
+    $content .= '<td colspan="2">';
+    $content .= '<textarea name="description" id="description_'.$instanceKey.'" class="form-control" placeholder="Notiz" ></textarea>';
+    $content .= '</td>';
+    $content .= '</tr>';
+
+    $content .= '<tr>';
+    $content .= '<td align="left"><button name="date_block" class="btn btn-info" disabled="disabled" type="submit" >Termin blocken</button></td>';
+    $content .= '<td align="right"><button name="date_save" class="btn btn-success" type="submit" >Kurs fixieren</button></td>';
+    $content .= '</tr>';
+
+    $content .= '</table>';
+
+    return $content;
 }

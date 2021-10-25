@@ -546,28 +546,29 @@ function block_exaplan_get_calendar_data($userid) {
 }
 
 /**
- * @param int $puserid
+ * @param int $puserid (null if needed daya about whole modulepart)
  * @param string $dataType desired | fixed | all
  * @param int $modulepartId (null if needed data about all moduleparts)
+ * @param bool $readonly whole calendar is readonly
  * @return false|string
  */
-function block_exaplan_get_data_for_calendar($puserid, $dataType = 'desired', $modulepartId = null) {
-    global $USER;
+function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desired', $modulepartId = null, $readonly = false) {
+
     $data = [
         'selectedDates' => []
     ];
 
     switch ($dataType) {
         case 'desired': // only self desired dates
-            $dates = getDesiredDatesOfUser($puserid, $modulepartId);
+            $dates = getDesiredDates($puserid, $modulepartId);
             break;
         case 'fixed': // dates, which were fixed by admin
-            $dates = getFixedDatesOfUser($puserid, $modulepartId);
+            $dates = getFixedDates($puserid, $modulepartId);
             break;
         case 'all': // mix of dates. needed for fill the calendar
         default:
-            $dates1 = getDesiredDatesOfUser($puserid, $modulepartId);
-            $dates2 = getFixedDatesOfUser($puserid, $modulepartId);
+            $dates1 = getDesiredDates($puserid, $modulepartId);
+            $dates2 = getFixedDates($puserid, $modulepartId);
             $dates = array_merge($dates1, $dates2);
             break;
     }
@@ -577,7 +578,7 @@ function block_exaplan_get_data_for_calendar($puserid, $dataType = 'desired', $m
     foreach ($dates as $date) {
         $dateIndex = $date['date'];
         $dateIndex = date('Y-m-d', $dateIndex);
-        if (!array_key_exists($dateIndex, $selectedDates)) { // TODO: do not use this condition if fixed date does not delete desired record!
+        if (!array_key_exists($dateIndex, $selectedDates)) { // TODO: Check it if the user has fixed and desitrred the same date
             $selectedDates[$dateIndex] = [
                 'date' => $dateIndex,
                 'middayType' => $date['timeslot'],
@@ -587,12 +588,14 @@ function block_exaplan_get_data_for_calendar($puserid, $dataType = 'desired', $m
         }
         $selectedDates[$dateIndex]['usedItems'] += 1;
         $selectedDates[$dateIndex]['moduleparts'][] = $date['modulepartid'];
+        $selectedDates[$dateIndex]['readonly'] = $readonly; // TODO: another rules for readonly days?
     }
 
     $selectedDates = array_values($selectedDates); // clean keys. needed for correct JS function later
     $data['selectedDates'] = $selectedDates;
     return json_encode($data);
 }
+
 
 function block_exaplan_send_notification($notificationtype, $userfrom, $userto, $subject, $message, $context, $contexturl = null, $dakoramessage = false, $courseid = 0, $customdata = null) {
     global $CFG, $DB;
@@ -620,16 +623,32 @@ function block_exaplan_send_notification($notificationtype, $userfrom, $userto, 
     @message_send($eventdata);
 }
 
-function block_exaplan_get_users_from_cohort($cohortid) {
+function block_exaplan_get_users_from_cohort($cohortid = 'SW_Trainer') {
     global $DB;
 
     $sql = 'SELECT u.*
               FROM {cohort} c
               JOIN {cohort_members} cm ON c.id = cm.cohortid
               JOIN {user} u ON cm.userid=u.id
-              WHERE c.idnumber = "SW_Trainer" AND c.visible = 1';
+              WHERE c.idnumber = "'.$cohortid.'" AND c.visible = 1';
     return $DB->get_records_sql($sql);
 }
 
-// TODO: mysql e
+function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot = 3) {
+
+    $data = [];
+    
+    $dates1 = getDesiredDates(null, $modulepartId, $date, $timeslot);
+    $dates2 = getFixedDates(null, $modulepartId, $date, $timeslot);
+    $dates = array_merge($dates1, $dates2);
+
+    foreach ($dates as $k => $dateData) {
+        $pUserData = getTableData('mdl_block_exaplanpusers', $dateData['relatedUserId']);
+        $dates[$k]['pUserData'] = $pUserData;
+    }
+    
+    return $dates;
+}
+
+
 
