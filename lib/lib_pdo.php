@@ -77,29 +77,54 @@ function getTableData($tableName, $id, $field = null) {
     return null;
 }
 
-function getPuser($userid)
+function getOrCreatePuser($userid=0)
 {
+    global $USER,$DB;
+		if ($userid==0){
+			$userid=$USER->id;
+			$firstname=$USER->firstname;
+			$lastname=$USER->lastname;
+			$email=$USER->email;
+		}elseif ($userid>0){
+			$user = $DB->get_record('user', ['id' => $userid], '*', IGNORE_MISSING);
+			$firsname=$user->firstname;
+			$lastname=$user->lastname;
+			$email=$user->email;
+		}else{
+			return false;
+		}
+		
+		$region=block_exaplan_get_user_regioncohort($userid);
 
     $pdo = getPdoConnect();
 
     $params = array(
         ':userid' => $userid,
-        ':moodleid' => get_config('exaplan', 'moodle_id'),
+        ':moodleid' =>  get_config('exaplan', 'moodle_id'),
     );
 
-    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid AND moodleid = :moodleid ");
+
+    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid AND moodleid = :moodleid");
     $statement->execute($params);
     $user = $statement->fetchAll();
-    if (!$user || !count($user)) {
-        // create a new pUser
-        if (getOrCreatePuser()) {
-            return getPuser($userid); // get again
-        }
-        echo 'Can not find a user! 1634892218074';
-        exit;
+    if ($user == null) {
+        $params = array(
+            ':userid' => $userid,
+            ':moodleid' => get_config('exaplan', 'moodle_id'),
+            ':firstname' => $firstname,
+            ':lastname' => $lastname,
+            ':email' => $email,
+            ':region' => $region,
+        );
+
+        $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpusers (userid, moodleid, firstname, lastname, email, region) VALUES (:userid, :moodleid, :firstname,:lastname, :email, :region);");
+        $statement->execute($params);
+        return $pdo->lastInsertId();
+    } else {
+        return $user[0]['id'];
     }
-    return $user[0];
 }
+
 
 function getOrCreatePuser()
 {
