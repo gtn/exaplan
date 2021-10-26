@@ -623,17 +623,6 @@ function block_exaplan_send_notification($notificationtype, $userfrom, $userto, 
     @message_send($eventdata);
 }
 
-function block_exaplan_get_users_from_cohort($cohortid = 'SW_Trainer') {
-    global $DB;
-
-    $sql = 'SELECT u.*
-              FROM {cohort} c
-              JOIN {cohort_members} cm ON c.id = cm.cohortid
-              JOIN {user} u ON cm.userid=u.id
-              WHERE c.idnumber = "'.$cohortid.'" AND c.visible = 1';
-    return $DB->get_records_sql($sql);
-}
-
 function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot = 3) {
 
     $data = [];
@@ -650,5 +639,34 @@ function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $d
     return $dates;
 }
 
+function block_exaplan_get_users_from_cohort($cohortidnumber="SW_Trainer") {
+    global $DB;
+
+    $sql = 'SELECT u.*
+              FROM {cohort} c
+              JOIN {cohort_members} cm ON c.id = cm.cohortid
+              JOIN {user} u ON cm.userid=u.id
+              WHERE c.idnumber = "'.$cohortidnumber.'" AND c.visible = 1';
+    return $DB->get_records_sql($sql);
+}
+
+function block_exaplan_get_user_regioncohort($userid){
+	global $DB;
+    $sql = 'SELECT u.id,c.idnumber
+              FROM {cohort} c
+              JOIN {cohort_members} cm ON c.id = cm.cohortid
+              JOIN {user} u ON cm.userid=u.id
+              WHERE (c.idnumber = "RegionOst" OR c.idnumber = "RegionWest") AND c.visible = 1';
+    
+    if ($records=$DB->get_records_sql($sql)){
+    	foreach ($records as $record){
+    		return $record->idnumber;
+    		break;
+    	}
+
+    }else{
+    	return "";
+    }
+}
 
 

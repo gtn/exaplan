@@ -94,9 +94,10 @@
                        COMMENT="Userid from the origin moodle"/>
                 <FIELD NAME="moodleid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"
                        COMMENT="Id of the moodle, since there are multiple moodles with this block"/>
-                <FIELD NAME="firstname" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
-                <FIELD NAME="lastname" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
-                <FIELD NAME="email" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="firstname" TYPE="char" LENGTH="200" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="lastname" TYPE="char" LENGTH="200" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="email" TYPE="char" LENGTH="200" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="region" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
