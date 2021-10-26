@@ -101,9 +101,24 @@ function getPuser($userid = 0)
 }
 
 
-function getOrCreatePuser($userid = 0)
+function getOrCreatePuser($userid=0)
 {
-    global $USER, $DB;
+    global $USER,$DB;
+		if ($userid==0){
+			$userid=$USER->id;
+			$firstname=$USER->firstname;
+			$lastname=$USER->lastname;
+			$email=$USER->email;
+		}elseif ($userid>0){
+			$user = $DB->get_record('user', ['id' => $userid], '*', IGNORE_MISSING);
+			$firsname=$user->firstname;
+			$lastname=$user->lastname;
+			$email=$user->email;
+		}else{
+			return false;
+		}
+		
+		$region=block_exaplan_get_user_regioncohort($userid);
 
     $pdo = getPdoConnect();
 
@@ -117,23 +132,6 @@ function getOrCreatePuser($userid = 0)
     $statement->execute($params);
     $user = $statement->fetchAll();
     if ($user == null) {
-
-        if ($userid == 0) {
-            $userid = $USER->id;
-            $firstname = $USER->firstname;
-            $lastname = $USER->lastname;
-            $email = $USER->email;
-        } elseif ($userid > 0) {
-            $user = $DB->get_record('user', ['id' => $userid], '*', IGNORE_MISSING);
-            $firstname = $user->firstname;
-            $lastname = $user->lastname;
-            $email = $user->email;
-        } else {
-            return false;
-        }
-
-        $region=block_exaplan_get_user_regioncohort($userid);
-
         $params = array(
             ':userid' => $userid,
             ':moodleid' => get_config('exaplan', 'moodle_id'),
@@ -150,7 +148,6 @@ function getOrCreatePuser($userid = 0)
         return $user[0]['id'];
     }
 }
-
 function getAllModules()
 {
 
