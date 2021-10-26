@@ -108,6 +108,7 @@ function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = f
 
     if ($userid) {
         // for students
+        $content .= '<script>var isExaplanAdmin = false;</script>';
         $calendarAjaxUrl = new moodle_url('/blocks/exaplan/ajax.php',
             array('action' => 'addUserDisiredDate',
                 'sesskey' => sesskey(),
