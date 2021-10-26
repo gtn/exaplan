@@ -201,8 +201,11 @@ function printAdminModulepartView($modulepartid, $date = '') {
     // calendars
     $content .= block_exaplan_calendars_view(0, 4, false, $modulepartid);
     // day ajax reloaded data (just HTML container)
-    $content .= '<div id="modulepart-date-data"></div>';
-
+    $content .= '<div id="modulepart-date-data">';
+    if ($date) {
+        $content .= modulepartAdminViewByDate($modulepartid, $date);
+    }
+    $content .= '</div>';
 
     $content .= '</div>';
 
@@ -218,11 +221,6 @@ function printAdminModulepartView($modulepartid, $date = '') {
 function modulepartAdminViewByDate($modulepartId, $date) {
     global $CFG;
     $content = '';
-
-//    $actionUrl = $CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartId.'&date='.$date.'&timeslot=';
-//    $content .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_BEFORE.'" name="form'.$modulepartId.'1"></form>'; // needed for valid HTML. Be careful with jQuery of this form!
-//    $content .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_AFTER.'" name="form'.$modulepartId.'2"></form>'; // needed for valid HTML. Be careful with jQuery of this form!
-//    $content .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_ALL.'" name="form'.$modulepartId.'3"></form>'; // needed for valid HTML. Be careful with jQuery of this form!
 
     $tableStartTemplate = '<table class="table table-sm exaplan-adminModulepartView">';
 
@@ -243,6 +241,7 @@ function modulepartAdminViewByDate($modulepartId, $date) {
 
     $timeslotView = function($timeslot, $title) use ($modulepartId, $date, $CFG, $tableStartTemplate) {
         $cont = '';
+
         $rowsCount = 0;
         $mergedData = block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot);
         if (count($mergedData) > 0) {
@@ -265,7 +264,7 @@ function modulepartAdminViewByDate($modulepartId, $date) {
                 $cont .= '<td valign="top">
                             <input type="checkbox" 
                                     value="1"                                     
-                                    name="fixed['.$dateData['pUserData']['id'].']" 
+                                    name="fixedPuser['.$dateData['pUserData']['id'].']" 
                                     '.($dateData['dateType'] == 'fixed' ? 'checked = "checked"' : '').'/></td>';
                 $cont .= '<td valign="top"><!--Bewertung--></td>';
                 if ($rowsCount == 1) {
@@ -302,6 +301,12 @@ function formAdminDateFixing($modulepartId, $date, $timeslot) {
     $dateTs = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
     $instanceKey = $modulepartId.'_'.$dateTs.'_'.$timeslot;
 
+    $dateRec = getPrefferedDate($modulepartId, $dateTs, $timeslot);
+
+    $content .= '<input type="hidden" value="'.$timeslot.'" name="middayType" />';
+    $content .= '<input type="hidden" value="'.$date.'" name="date" />';
+    $content .= '<input type="hidden" value="'.$modulepartId.'" name="mpId" />';
+
     $content .= '<table class="table table-sm table-borderless">';
 
     $content .= '<tr>';
@@ -311,9 +316,10 @@ function formAdminDateFixing($modulepartId, $date, $timeslot) {
     $content .= '<tr>';
     $content .= '<td>';
     $trainers = block_exaplan_get_users_from_cohort();
-    $content .= '<select id="trainer_'.$instanceKey.'" class="form-control" >';
+    $content .= '<select id="trainer_'.$instanceKey.'" class="form-control" name="trainer">';
     foreach ($trainers as $trainer) {
-        $content .= '<option value="'.$trainer['id'].'">'.fullname($trainer).'</option>'; // original ID (not pUser), because it is on MAIN moodle
+        $trainerPid = getPuser($trainer->id);
+        $content .= '<option value="'.$trainer->id.'" '.(@$dateRec['trainerpuserid'] == $trainerPid ? ' selected="selected" ' : '').'>'.fullname($trainer).'</option>'; // original ID (not pUser), because it is on MAIN moodle
     }
     $content .= '</select>';
     $content .= '</td>';
@@ -327,13 +333,14 @@ function formAdminDateFixing($modulepartId, $date, $timeslot) {
     $content .= '</tr>';
 
     $content .= '<tr>';
-    $content .= '<td><input type="text" name="location" value="" class="form-control" id="location_'.$instanceKey.'" /></td>';
-    $content .= '<td><input type="text" name="time" value="" class="form-control" id="time_'.$instanceKey.'" >';
+    $content .= '<td><input type="text" name="location" value="'.@$dateRec['location'].'" class="form-control" id="location_'.$instanceKey.'" /></td>';
+    $timeString = (@$dateRec['starttime'] ? date('h:i', @$dateRec['starttime']) : '');
+    $content .= '<td><input type="text" name="time" value="'.$timeString.'" class="form-control" id="time_'.$instanceKey.'" >';
     $content .= '</tr>';
 
     $content .= '<tr>';
     $content .= '<td colspan="2">';
-    $content .= '<textarea name="description" id="description_'.$instanceKey.'" class="form-control" placeholder="Notiz" ></textarea>';
+    $content .= '<textarea name="description" id="description_'.$instanceKey.'" class="form-control" placeholder="Notiz" >'.@$dateRec['comment'].'</textarea>';
     $content .= '</td>';
     $content .= '</tr>';
 

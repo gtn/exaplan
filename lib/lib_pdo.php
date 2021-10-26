@@ -77,24 +77,33 @@ function getTableData($tableName, $id, $field = null) {
     return null;
 }
 
-function getOrCreatePuser($userid=0)
+function getPuser($userid = 0)
 {
-    global $USER,$DB;
-		if ($userid==0){
-			$userid=$USER->id;
-			$firstname=$USER->firstname;
-			$lastname=$USER->lastname;
-			$email=$USER->email;
-		}elseif ($userid>0){
-			$user = $DB->get_record('user', ['id' => $userid], '*', IGNORE_MISSING);
-			$firsname=$user->firstname;
-			$lastname=$user->lastname;
-			$email=$user->email;
-		}else{
-			return false;
-		}
-		
-		$region=block_exaplan_get_user_regioncohort($userid);
+    $pdo = getPdoConnect();
+
+    $params = array(
+        ':userid' => $userid,
+        ':moodleid' => get_config('exaplan', 'moodle_id'),
+    );
+
+    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid AND moodleid = :moodleid ");
+    $statement->execute($params);
+    $user = $statement->fetchAll();
+    if (!$user || !count($user)) {
+        // create a new pUser
+        if (getOrCreatePuser($userid)) {
+            return getPuser($userid); // get again
+        }
+        echo 'Can not find a user! 1634892218074';
+        exit;
+    }
+    return $user[0];
+}
+
+
+function getOrCreatePuser($userid = 0)
+{
+    global $USER, $DB;
 
     $pdo = getPdoConnect();
 
@@ -108,6 +117,23 @@ function getOrCreatePuser($userid=0)
     $statement->execute($params);
     $user = $statement->fetchAll();
     if ($user == null) {
+
+        if ($userid == 0) {
+            $userid = $USER->id;
+            $firstname = $USER->firstname;
+            $lastname = $USER->lastname;
+            $email = $USER->email;
+        } elseif ($userid > 0) {
+            $user = $DB->get_record('user', ['id' => $userid], '*', IGNORE_MISSING);
+            $firstname = $user->firstname;
+            $lastname = $user->lastname;
+            $email = $user->email;
+        } else {
+            return false;
+        }
+
+        $region=block_exaplan_get_user_regioncohort($userid);
+
         $params = array(
             ':userid' => $userid,
             ':moodleid' => get_config('exaplan', 'moodle_id'),
@@ -117,41 +143,7 @@ function getOrCreatePuser($userid=0)
             ':region' => $region,
         );
 
-        $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpusers (userid, moodleid, firstname, lastname, email, region) VALUES (:userid, :moodleid, :firstname,:lastname, :email, :region);");
-        $statement->execute($params);
-        return $pdo->lastInsertId();
-    } else {
-        return $user[0]['id'];
-    }
-}
-
-
-function getOrCreatePuser()
-{
-    global $USER;
-
-    $pdo = getPdoConnect();
-
-    $params = array(
-        ':userid' => $USER->id,
-        ':moodleid' =>  get_config('exaplan', 'moodle_id'),
-    );
-
-
-    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid AND moodleid = :moodleid");
-    $statement->execute($params);
-    $user = $statement->fetchAll();
-    if ($user == null) {
-        $params = array(
-            ':userid' => $USER->id,
-            ':moodleid' => get_config('exaplan', 'moodle_id'),
-            ':firstname' => $USER->firstname,
-            ':lastname' => $USER->lastname,
-            ':email' => $USER->email,
-        );
-
-        $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpusers (userid, moodleid, firstname, lastname, email) VALUES (:userid, :moodleid, :firstname,:lastname, :email);");
-        $statement->execute($params);
+        $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpusers (userid, moodleid, firstname, lastname, email, region) VALUES (:userid, :moodleid, :firstname,:lastname, :email, :region);");        $statement->execute($params);
         return $pdo->lastInsertId();
     } else {
         return $user[0]['id'];
@@ -240,12 +232,9 @@ function getModulesOfUser($userid, $state = 2)
     return $modulesets;
 }
 
-function setPrefferedDate($modulepartid, $puserid, $date, $timeslot)
-{
+function getPrefferedDate($modulepartid, $date, $timeslot, $state = 1) {
     $pdo = getPdoConnect();
-    $timestamp = new DateTime();
-    $timestamp = $timestamp->getTimestamp();
-		$date=strtotime("today", $date); //same tstamp for whole day
+    
     $params = array(
         ':modulepartid' => $modulepartid,
         ':date' => $date,
@@ -261,39 +250,105 @@ function setPrefferedDate($modulepartid, $puserid, $date, $timeslot)
                 AND date = :date 
                 AND state = :state";
     $statement = $pdo->prepare($sql);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
     $statement->execute($params);
     $dates = $statement->fetchAll();
-    if ($dates) {
+
+    if ($dates && count($dates) > 0) {
+        return $dates[0];
+    }
+    
+    return null;
+}
+
+/**
+ * @param bool $updateExisting Need to update?
+ * @param int $modulepartid
+ * @param int $puserid Puser id
+ * @param int $date
+ * @param int $timeslot
+ * @param string $location
+ * @param int $trainerId pUser!
+ * @param string $starttime
+ * @param string $comment
+ * @return string
+ */
+function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment)
+{
+    $pdo = getPdoConnect();
+    $timestamp = new DateTime();
+    $timestamp = $timestamp->getTimestamp();
+    $date = strtotime("today", $date); //same tstamp for whole day
+    
+    $params = [
+        ':modulepartid' => $modulepartid,
+        ':date' => $date,
+        ':timeslot' => $timeslot,
+        ':state' => 1,
+        ':modifiedpuserid' => $puserid,
+        ':modifiedtimestamp' => $timestamp,
+        ':location' => $location,
+        ':trainerpuserid' => $trainerId,
+        ':starttime' => strtotime(date('Y-m-d', $date).' '.$starttime),
+        ':comment' => trim($comment),
+    ];
+
+    $dateRec = getPrefferedDate($modulepartid, $date, $timeslot);
+    
+    if ($dateRec) {
+        $dateId = $dateRec['id'];
         // return existing dateId. We do not need to create it
-        return $dates[0]['id'];
+        if ($updateExisting) {
+            unset($params[':modulepartid']); unset($params[':date']); unset($params[':state']); unset($params[':timeslot']); // for leave PHP warnings
+            $sql = "UPDATE mdl_block_exaplandates 
+                        SET modifiedpuserid = :modifiedpuserid,
+                             modifiedtimestamp = :modifiedtimestamp,
+                             location = :location, 
+                             trainerpuserid = :trainerpuserid,
+                             starttime = :starttime,
+                             comment = :comment
+                        WHERE id = ". $dateId .";";
+            $statement = $pdo->prepare($sql);
+            $statement->execute($params);
+        }
+        return $dateId;
     }
 
     $params = array_merge($params, [
-            ':creatorpuserid' => $puserid,
-            ':creatortimestamp' => $timestamp,
-            ':modifiedpuserid' => $puserid,
-            ':modifiedtimestamp' => $timestamp,
-        ]
-    );
+        ':creatorpuserid' => $puserid,
+        ':creatortimestamp' => $timestamp,
+    ]);
 
-    $sql = "INSERT INTO mdl_block_exaplandates (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp) VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp);";
+    $sql = "INSERT INTO mdl_block_exaplandates 
+                        (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp, location, trainerpuserid, starttime, comment) 
+                  VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp, :location, :trainerpuserid, :starttime, :comment);";
+//    echo "<pre>debug:<strong>lib_pdo.php:297</strong>\r\n"; print_r($params); echo '</pre>'; // !!!!!!!!!! delete it
 //    echo $sql; exit;
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
     $dateid = $pdo->lastInsertId();
 
-    addPUserToDate($dateid, $puserid);
+//    addPUserToDate($dateid, $puserid);
 
-    return '_NEW'; // flag that was created NEW record
+    return $dateid;
 
 }
 
-function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuserid)
+/**
+ * set desired date. DELETE if it is existing
+ * @param int $modulepartid
+ * @param int $puserid
+ * @param int $date
+ * @param int $timeslot
+ * @param int $creatorpuserid
+ * @return int|string
+ */
+function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuserid = null)
 {
     $pdo = getPdoConnect();
     $timestamp = new DateTime();
     $timestamp = $timestamp->getTimestamp();
-		$date=strtotime("today", $date); //same tstamp for whole day
+    $date = strtotime("today", $date); //same tstamp for whole day
     $params = array(
         ':modulepartid' => $modulepartid,
         ':date' => $date,
@@ -317,9 +372,9 @@ function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuser
         return 0;
     } else {
     	$params = array_merge($params, [
-    				':modulepartid' => $modulepartid,
-    				':date' => $date,
-    				':puserid' => $puserid,
+            ':modulepartid' => $modulepartid,
+            ':date' => $date,
+            ':puserid' => $puserid,
             ':timeslot' => $timeslot,
             ':creatorpuserid' => $creatorpuserid,
             ':timestamp' => $timestamp,
@@ -363,8 +418,9 @@ function addPUserToDate($dateid, $puserid) {
     );
     $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpuser_date_mm (dateid, puserid, creatorpuserid) VALUES (:dateid, :puserid, :creatorpuserid);");
     $statement->execute($params);
+    $id = $pdo->lastInsertId();
 
-    return '_NEW';
+    return $id;
 }
 
 function removePUserFromDate($dateid, $puserid) {

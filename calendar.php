@@ -24,7 +24,7 @@ $isadmin = block_exaplan_is_admin();
 
 $userid = $USER->id;
 
-if($action == "save"){
+/*if($action == "save"){
     // DO NOT WORK
     $middayType = optional_param("calMidday", 3, PARAM_INT);
     $calSelectedDates = optional_param("calSelectedDates", '', PARAM_TEXT);
@@ -33,7 +33,7 @@ if($action == "save"){
         $dateTS = DateTime::createFromFormat('Y-m-d', $calDate)->getTimestamp();
         setPrefferedDate(1, getPuser($userid)['id'], $dateTS, $middayType);
     }
-}
+}*/
 
 
 echo $OUTPUT->header();
