@@ -143,7 +143,8 @@ function getOrCreatePuser($userid = 0)
             ':region' => $region,
         );
 
-        $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpusers (userid, moodleid, firstname, lastname, email, region) VALUES (:userid, :moodleid, :firstname,:lastname, :email, :region);");        $statement->execute($params);
+        $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpusers (userid, moodleid, firstname, lastname, email, region) VALUES (:userid, :moodleid, :firstname,:lastname, :email, :region);");
+        $statement->execute($params);
         return $pdo->lastInsertId();
     } else {
         return $user[0]['id'];
@@ -234,7 +235,7 @@ function getModulesOfUser($userid, $state = 2)
 
 function getPrefferedDate($modulepartid, $date, $timeslot, $state = 1) {
     $pdo = getPdoConnect();
-    
+
     $params = array(
         ':modulepartid' => $modulepartid,
         ':date' => $date,
@@ -257,7 +258,7 @@ function getPrefferedDate($modulepartid, $date, $timeslot, $state = 1) {
     if ($dates && count($dates) > 0) {
         return $dates[0];
     }
-    
+
     return null;
 }
 
@@ -279,7 +280,7 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
     $timestamp = new DateTime();
     $timestamp = $timestamp->getTimestamp();
     $date = strtotime("today", $date); //same tstamp for whole day
-    
+
     $params = [
         ':modulepartid' => $modulepartid,
         ':date' => $date,
@@ -294,7 +295,7 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
     ];
 
     $dateRec = getPrefferedDate($modulepartid, $date, $timeslot);
-    
+
     if ($dateRec) {
         $dateId = $dateRec['id'];
         // return existing dateId. We do not need to create it
