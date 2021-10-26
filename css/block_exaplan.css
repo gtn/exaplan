@@ -86,27 +86,36 @@
     background-color: #800000 !important;
 }
 
-table.exaplan-adminMosulepartView {
+.adminModuleplanView #block_exaplan_dashboard_calendar {
+    margin-bottom: 25px;
+}
+
+table.exaplan-adminModulepartView {
     width: 100%;
 }
 
-table.exaplan-adminMosulepartView th:nth-child(1),
-table.exaplan-adminMosulepartView td:nth-child(1) {
+table.exaplan-adminModulepartView th:nth-child(1),
+table.exaplan-adminModulepartView td:nth-child(1) {
     width: 15% !important;
 }
-table.exaplan-adminMosulepartView th:nth-child(2), table.exaplan-adminMosulepartView td:nth-child(2) {
+table.exaplan-adminModulepartView th:nth-child(2),
+table.exaplan-adminModulepartView td:nth-child(2) {
     width: 10% !important;
 }
-table.exaplan-adminMosulepartView th:nth-child(3), table.exaplan-adminMosulepartView td:nth-child(3) {
+table.exaplan-adminModulepartView th:nth-child(3),
+table.exaplan-adminModulepartView td:nth-child(3) {
     width: 15% !important;
 }
-table.exaplan-adminMosulepartView th:nth-child(4), table.exaplan-adminMosulepartView td:nth-child(4) {
+table.exaplan-adminModulepartView th:nth-child(4),
+table.exaplan-adminModulepartView td:nth-child(4) {
     width: 10% !important;
 }
-table.exaplan-adminMosulepartView th:nth-child(5), table.exaplan-adminMosulepartView td:nth-child(5) {
+table.exaplan-adminModulepartView th:nth-child(5),
+table.exaplan-adminModulepartView td:nth-child(5) {
     width: 10% !important;
 }
-table.exaplan-adminMosulepartView th:nth-child(6), table.exaplan-adminMosulepartView td:nth-child(6) {
+table.exaplan-adminModulepartView th:nth-child(6),
+table.exaplan-adminModulepartView td:nth-child(6) {
     width: 40% !important;
 }
 

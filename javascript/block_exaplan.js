@@ -74,9 +74,12 @@ $(function () {
                 ev.stopPropagation();
                 return false;
             }*/
-            console.log('block_exaplan.js:73');console.log('day clicked');// !!!!!!!!!! delete it
+            // console.log('block_exaplan.js:73');console.log('day clicked');// !!!!!!!!!! delete it
             return selectedDateEvent(ev, calendar_month);
         });
+        /*calMonth.addEventListener('calendar-select-after', (ev) => {
+            return selectedDateEvent(ev, calendar_month);
+        });*/
         calMonth.addEventListener('calendar-change', (ev) => {
             updateAllCalendarMetadata();
             markCalendarSelectedModulepart(null);
@@ -164,7 +167,9 @@ function modulepartInfoByDateAjax(calEvent, monthCalendar) {
     
     var selectedDay = calEvent.explicitOriginalTarget.firstChild.textContent;
     var selectedDate =  monthCalendar.getFocusYear() + '-' + monthCalendar.getFocusMonth() + '-' + selectedDay;
-    // console.log('block_exaplan.js:167');console.log(selectedDate);// !!!!!!!!!! delete it
+    // console.log('block_exaplan.js:167');console.log(calEvent);// !!!!!!!!!! delete it
+
+    // monthCalendar.returnDay(selectedDate);
 
     // send request
     var ajaxUrl = calendarAjaxUrl;

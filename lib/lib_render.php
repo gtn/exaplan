@@ -224,7 +224,7 @@ function modulepartAdminViewByDate($modulepartId, $date) {
 //    $content .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_AFTER.'" name="form'.$modulepartId.'2"></form>'; // needed for valid HTML. Be careful with jQuery of this form!
 //    $content .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_ALL.'" name="form'.$modulepartId.'3"></form>'; // needed for valid HTML. Be careful with jQuery of this form!
 
-    $tableStartTemplate = '<table class="table table-sm exaplan-adminMosulepartView">';
+    $tableStartTemplate = '<table class="table table-sm exaplan-adminModulepartView">';
 
     $content .= $tableStartTemplate;
     // header

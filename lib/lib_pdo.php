@@ -424,6 +424,10 @@ function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $t
         $whereArr[] = ' timeslot = :timeslot ';
     }
 
+    if (!count($params)) {
+        return null;
+    }
+
     $sql = "SELECT *, puserid as relatedUserId, 'desired' as dateType 
               FROM mdl_block_exaplandesired 
               WHERE " . implode(' AND ', $whereArr);
@@ -465,6 +469,10 @@ function getFixedDates($puserid = null, $modulepartid = null, $date = null, $tim
     if ($timeslot) {
         $params[':timeslot'] = $timeslot;
         $whereArr[] = ' d.timeslot = :timeslot ';
+    }
+
+    if (!count($params)) {
+        return null;
     }
 
     $statement = $pdo->prepare("SELECT DISTINCT d.*, dumm.puserid as relatedUserId, 'fixed' as dateType

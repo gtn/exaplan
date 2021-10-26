@@ -1,3 +1,17 @@
+// add custom dayClick event 'calendar-select-after'
+/*
+(function(dayClick) {
+    TavoCalendar.prototype.dayClick = function() {
+        var result = dayClick.apply(this, arguments);
+        // console.log('gtnTavoCalendar.js:5');console.log(this);// !!!!!!!!!! delete it
+        this.elements.wrapper.dispatchEvent(new Event('calendar-select-after'))
+        return result;
+    };
+})(TavoCalendar.prototype.dayClick);
+*/
+
+
+
 TavoCalendar.prototype.addMetaData = function(date, metaData) {
 
     var that = this;
@@ -95,6 +109,65 @@ TavoCalendar.prototype.markSelectedModulePart = function(modulepartId, calendarD
                     // TODO: different marks? 'fixed / desired'
                 }
             });
+        }
+        moment_copy.add(1, "d");
+        elementIndex = elementIndex + 1;
+    }
+
+    return true;
+}
+
+
+// function to ignore click on the day.
+// every clicking on the day will call tavo-calendar events. Sometime we need to return this sate.
+// but trigger 'click' is not suitable - use this function
+// (tavo-calendar recreates calendar html after every event)
+TavoCalendar.prototype.returnDay = function(selectedDate) {
+    var that = this;
+
+    // var format = 'DD.MM.YYYY';
+    var format = 'YYYY-MM-DD';
+    var calendar_moment = moment(this.state.date, format);
+    var days_in_month = calendar_moment.daysInMonth();
+
+    var moment_copy = calendar_moment.clone();
+    moment_copy.startOf('month');
+
+    var elementIndex = 0;
+    var monthOffset = moment_copy.isoWeekday() % (7 + calendar_moment.localeData().firstDayOfWeek());
+    if (monthOffset > 0) {
+        elementIndex = elementIndex + monthOffset - 1;
+    }
+
+    console.log('gtnTavoCalendar.js:126');console.log(this.state.selected);// !!!!!!!!!! delete it
+
+    if (this.state.selected.indexOf(selectedDate) != -1) {
+        // if no selected after click - we need to add this date again
+        this.state.selected.push(selectedDate);
+        var actionSelectDay = true;
+    } else {
+        // if exists after click - we need to remove it
+        var index = this.state.selected.indexOf(selectedDate);
+        if (index !== -1) {
+            this.state.selected.splice(index, 1);
+        }
+        var actionSelectDay = false;
+    }
+
+    var calendarElement = this.elements.wrapper;
+
+    // go through ALL calendar elements step by step and work with html of the selected day
+    for (var d = 1; d <= days_in_month; d++) {
+        var stepDate = moment_copy.format(format);
+        if (stepDate == selectedDate) {
+            var dayWrapper = $(calendarElement).find('.tavo-calendar__day').eq(elementIndex);
+            console.log('gtnTavoCalendar.js:148');console.log(dayWrapper);// !!!!!!!!!! delete it
+            // if (actionSelectDay) {
+                dayWrapper.addClass('tavo-calendar__day_select');
+            // } else {
+            //     dayWrapper.removeClass('tavo-calendar__day_select');
+            // }
+            break; // date found!
         }
         moment_copy.add(1, "d");
         elementIndex = elementIndex + 1;
