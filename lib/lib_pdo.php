@@ -125,38 +125,30 @@ function getOrCreatePuser($userid=0)
     }
 }
 
-
-function getOrCreatePuser()
+function getPuser($userid)
 {
-    global $USER;
 
     $pdo = getPdoConnect();
 
     $params = array(
-        ':userid' => $USER->id,
-        ':moodleid' =>  get_config('exaplan', 'moodle_id'),
+        ':userid' => $userid,
+        ':moodleid' => get_config('exaplan', 'moodle_id'),
     );
 
-
-    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid AND moodleid = :moodleid");
+    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid AND moodleid = :moodleid ");
     $statement->execute($params);
     $user = $statement->fetchAll();
-    if ($user == null) {
-        $params = array(
-            ':userid' => $USER->id,
-            ':moodleid' => get_config('exaplan', 'moodle_id'),
-            ':firstname' => $USER->firstname,
-            ':lastname' => $USER->lastname,
-            ':email' => $USER->email,
-        );
-
-        $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpusers (userid, moodleid, firstname, lastname, email) VALUES (:userid, :moodleid, :firstname,:lastname, :email);");
-        $statement->execute($params);
-        return $pdo->lastInsertId();
-    } else {
-        return $user[0]['id'];
+    if (!$user || !count($user)) {
+        // create a new pUser
+        if (getOrCreatePuser()) {
+            return getPuser($userid); // get again
+        }
+        echo 'Can not find a user! 1634892218074';
+        exit;
     }
+    return $user[0];
 }
+
 
 function getAllModules()
 {
