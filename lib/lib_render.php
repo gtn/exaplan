@@ -71,7 +71,10 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
                     $buttonClass = '';
                     if (getDesiredDates($pUser['id'], $part['id'])) {
                         $buttonTitle = 'Wunschtermin';
-                        $buttonClass = 'exaplan-date-desired';
+                        $buttonClass .= ' exaplan-date-desired ';
+                    }
+                    if ($modulepartid == $part["id"]) {
+                        $buttonClass .= ' exaplan-date-current-modulepart ';
                     }
                     $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'" 
                                     role="button" 
@@ -81,8 +84,12 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
                                 > '.$buttonTitle.' </a>';
                 } else {
                     // fixed date exists
+                    $buttonClass = '';
+                    if ($modulepartid == $part["id"]) {
+                        $buttonClass .= ' exaplan-date-current-modulepart ';
+                    }
                     $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/dateDetails.php?mpid='.$part["id"].'&dateid='.$part['date'][0]['id'].'"
-                                    class="btn exaplan-date-fixed exaplan-selectable-date" 
+                                    class="btn exaplan-date-fixed exaplan-selectable-date '.$buttonClass.'" 
                                     data-dateId="'.$part['date'][0]['id'].'" 
                                     data-modulepartId="'.$part['id'].'">
                                 '.date('d.m.Y', $part['date'][0]['date']).
@@ -97,7 +104,7 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
         $content .= '</td>';
         if ($withCalendar && $moduleKey == 0) {
             $content .= '<td valign="top" rowspan="' . count($modulesets) . '">';
-            $content .= block_exaplan_calendars_view($userid, 2);
+            $content .= block_exaplan_calendars_view($userid, 2, false, $modulepartid);
             $content .= '</td>';
         }
         if ($withDateDetails && $moduleKey == 0) {
@@ -156,6 +163,10 @@ function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = f
             }
         }
     }
+    if ($modulepartId) {
+        $content .= '<script>var currentModulepartId = "'.$modulepartId.'";</script>';
+    }
+
     $content .= '<table>';
     if ($withHeader) {
         $content .= '<tr>';

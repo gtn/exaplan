@@ -14,7 +14,7 @@ class block_exaplan extends block_base {
         $this->content         =  new stdClass;
         $this->content->items = array();
         $this->content->text = '<a title="dashboard" href="'.$CFG->wwwroot.'/blocks/exaplan/dashboard.php">Dashboard</a>';
-        $this->content->text .= '<br><a title="dashboard" href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php">Calendar</a>';
+//        $this->content->text .= '<br><a title="dashboard" href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php">Calendar</a>';
 
         return $this->content;
     }

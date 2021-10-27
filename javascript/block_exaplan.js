@@ -223,6 +223,7 @@ function updateAllCalendarMetadata() {
                         usedItems: date.usedItems,
                         desired: date.desired,
                         fixed: date.fixed,
+                        moduleparts: date.moduleparts,
                     }
                     calendarInstance.addMetaData(date.date, metaData);
                 });

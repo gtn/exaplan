@@ -50,7 +50,7 @@ TavoCalendar.prototype.addMetaData = function(date, metaData) {
         if (stepDate == date) {
             var dayWrapper = $(calendarElement).find('.tavo-calendar__day').eq(elementIndex);
             if (typeof metaData !== 'undefined') {
-                console.log('gtnTavoCalendar.js:53');console.log(metaData);// !!!!!!!!!! delete it
+                // console.log('gtnTavoCalendar.js:53');console.log(metaData);// !!!!!!!!!! delete it
                 if (metaData.usedItems > 0) {
                     dayWrapper.attr('data-itemsUsed', metaData.usedItems);
                     var usedItemsMarker = $('<span class="exaplan-usedItems">' + metaData.usedItems + '</span>');
@@ -67,6 +67,13 @@ TavoCalendar.prototype.addMetaData = function(date, metaData) {
                 }
                 if (metaData.fixed) {
                     dayWrapper.addClass('exaplan-calendar-date-fixed');
+                }
+                if (metaData.moduleparts && typeof currentModulepartId != 'undefined' && currentModulepartId > 0) {
+                    console.log('gtnTavoCalendar.js:72');console.log(metaData.moduleparts);// !!!!!!!!!! delete it
+                    if (metaData.moduleparts.indexOf(currentModulepartId) == -1) {
+                        // add class to mute this day
+                        dayWrapper.addClass('exaplan-calendar-date-anotherModulepart');
+                    }
                 }
             }
             break; // date found!
