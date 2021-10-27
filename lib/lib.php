@@ -506,18 +506,6 @@ function block_exaplan_get_calendar_data($userid) {
         'selectedDates' => []
     ];
 
-    // EXAMPLE DATA!!
-    // add random dates
-/*    $dateFrom = time();
-    $dateTo = time() + (30 * 24 * 60 * 60); // simple + month
-    for ($i = 1; $i <= 15; $i++) {
-        $newDate = [
-            'date' => date('d.m.Y', random_int($dateFrom, $dateTo)),
-            'type' => block_exaplan_get_middate_string_key(random_int(BLOCK_EXAPLAN_MIDDATE_BEFORE, BLOCK_EXAPLAN_MIDDATE_ALL)),
-            'usedItems' => random_int(0, 15),
-        ];
-        $data['selectedDates'][] = $newDate;
-    }*/
 
     $userModules = getModulesOfUser($USER->id, 1);
     $dateCounts = [];
@@ -583,12 +571,15 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
                 'date' => $dateIndex,
                 'middayType' => $date['timeslot'],
                 'usedItems' => 0,   // TODO: possible different counters: dates/moduleparts
-                'dateType' => $date['dateType'],
+                'dateType' => $date['dateType'], // needed?
+                'desired' => false,
+                'fixed' => false,
             ];
         }
         $selectedDates[$dateIndex]['usedItems'] += 1;
         $selectedDates[$dateIndex]['moduleparts'][] = $date['modulepartid'];
         $selectedDates[$dateIndex]['readonly'] = $readonly; // TODO: another rules for readonly days?
+        $selectedDates[$dateIndex][$date['dateType']] = true;
     }
 
     $selectedDates = array_values($selectedDates); // clean keys. needed for correct JS function later
@@ -627,8 +618,8 @@ function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $d
 
     $data = [];
     
-    $dates1 = getDesiredDates(null, $modulepartId, $date, $timeslot);
-    $dates2 = getFixedDates(null, $modulepartId, $date, $timeslot);
+    $dates1 = getFixedDates(null, $modulepartId, $date, $timeslot);
+    $dates2 = getDesiredDates(null, $modulepartId, $date, $timeslot);
     $dates = array_merge($dates1, $dates2);
 
     foreach ($dates as $k => $dateData) {

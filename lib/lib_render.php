@@ -261,10 +261,15 @@ function modulepartAdminViewByDate($modulepartId, $date) {
 
             $cont .= '<tr><td colspan="6"><h5 class="p-1 mb-1 bg-secondary text-dark">'.$title.'</h5></td></tr>';
             $cont .= '</tr>';
-            foreach ($mergedData as $dateData) {
+            foreach ($mergedData as $dKey => $dateData) {
+                $setRowHight = 20;
+                end($mergedData);
+                if ($dKey === key($mergedData)) {
+                    $setRowHight = '';
+                }
                 $rowsCount++;
                 $cont .= '<tr>';
-                $cont .= '<td valign="top">'.@$dateData['pUserData']['firstname'].' '.@$dateData['pUserData']['lastname'].'</td>';
+                $cont .= '<td valign="top" height="'.$setRowHight.'">'.@$dateData['pUserData']['firstname'].' '.@$dateData['pUserData']['lastname'].'</td>';
                 $cont .= '<td valign="top">'./*buttons*/'</td>';
                 $companyName = getTableData('mdl_block_exaplanmoodles', $dateData['pUserData']['moodleid'], 'companyname');
                 $cont .= '<td valign="top">'.$companyName.'</td>';
@@ -279,10 +284,10 @@ function modulepartAdminViewByDate($modulepartId, $date) {
                     $cont .= '<td rowspan="###FORM_ROWSPAN###"  valign="top">'.formAdminDateFixing($modulepartId, $date, $timeslot).'</td>';
                 }
                 $cont .= '</tr>';
-                $cont .= '</table>';
-                $cont .= '</form>';
-                $cont .= $tableStartTemplate;
             }
+            $cont .= '</table>';
+            $cont .= '</form>';
+            $cont .= $tableStartTemplate;
         }
         $cont = str_replace('###FORM_ROWSPAN###', $rowsCount, $cont);
         return $cont;

@@ -218,8 +218,11 @@ function updateAllCalendarMetadata() {
         if (calendarData.selectedDates.length) {
             calendarData.selectedDates.forEach((date) => {
                 allCalendars.forEach((calendarInstance) => {
+                    // add only needed props to metaData
                     var metaData = {
-                        usedItems: date.usedItems
+                        usedItems: date.usedItems,
+                        desired: date.desired,
+                        fixed: date.fixed,
                     }
                     calendarInstance.addMetaData(date.date, metaData);
                 });

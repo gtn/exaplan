@@ -86,6 +86,28 @@
     background-color: #800000 !important;
 }
 
+#block_exaplan_dashboard_calendar .tavo-calendar .exaplan-calendar-date-desired span.tavo-calendar__day-inner {
+    background-color: orange !important;
+    color: white;
+}
+#block_exaplan_dashboard_calendar .tavo-calendar .exaplan-calendar-date-fixed span.tavo-calendar__day-inner {
+    background-color: #008000 !important;
+    color: white;
+}
+#block_exaplan_dashboard_calendar .tavo-calendar .exaplan-calendar-date-desired.exaplan-calendar-date-fixed span.tavo-calendar__day-inner {
+    background-image: linear-gradient(
+            135deg,
+            #008800 25%,
+            orange 25%,
+            orange 50%,
+            #008800 50%,
+            #008800 75%,
+            orange 75%,
+            orange 100%
+    );
+    background-size: 19.80px 19.80px;
+}
+
 .adminModuleplanView #block_exaplan_dashboard_calendar {
     margin-bottom: 25px;
 }

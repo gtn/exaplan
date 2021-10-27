@@ -123,7 +123,7 @@ function getOrCreatePuser($userid=0)
 			$email=$USER->email;
 		}elseif ($userid>0){
 			$user = $DB->get_record('user', ['id' => $userid], '*', IGNORE_MISSING);
-			$firsname=$user->firstname;
+            $firstname=$user->firstname;
 			$lastname=$user->lastname;
 			$email=$user->email;
 		}else{
