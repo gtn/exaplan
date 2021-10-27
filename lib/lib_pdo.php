@@ -231,12 +231,12 @@ function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_CONFIRMED)
                         ':puserid' => getPuser($userid)['id'],
                         ':state' => $state,
                     );
-                    $statement = $pdo->prepare("SELECT * 
-                                                  FROM mdl_block_exaplandates 
-                                                    JOIN mdl_block_exaplanpuser_date_mm ON mdl_block_exaplandates.id = mdl_block_exaplanpuser_date_mm.dateid 
-                                                  WHERE modulepartid = :modulepartid 
-                                                        AND puserid = :puserid 
-                                                        AND state = :state");
+                    $statement = $pdo->prepare("SELECT d.* 
+                                                  FROM mdl_block_exaplandates d
+                                                    JOIN mdl_block_exaplanpuser_date_mm udmm ON d.id = udmm.dateid 
+                                                  WHERE d.modulepartid = :modulepartid 
+                                                        AND udmm.puserid = :puserid 
+                                                        AND d.state = :state");
                     $statement->execute($params);
                     $statement->setFetchMode(PDO::FETCH_ASSOC);
                     $date = $statement->fetchAll();
