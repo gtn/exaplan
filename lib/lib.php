@@ -459,7 +459,10 @@ function block_exaplan_init_js_css($courseid = 0) {
     // TavoCalendar
     $PAGE->requires->js("/blocks/exaplan/javascript/TavoCalendar.js", true);
     $PAGE->requires->js("/blocks/exaplan/javascript/gtnTavoCalendar.js", true);
+    $PAGE->requires->js("/blocks/exaplan/javascript/tooltipster.bundle.min.js", true);
     $PAGE->requires->css('/blocks/exaplan/css/tavo-calendar.css');
+    $PAGE->requires->css('/blocks/exaplan/css/tooltipster.bundle.min.css');
+    $PAGE->requires->css('/blocks/exaplan/css/tooltipster-sideTip-light.min.css');
 
 
     // jsCalendar

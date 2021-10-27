@@ -25,6 +25,16 @@ $isadmin = block_exaplan_is_admin();
 
 $userid = $USER->id;
 
+switch ($action) {
+    case 'registerToDate':
+        if ($dateId > 0) {
+            addPUserToDate($dateId, getPuser($userid)['id']);
+            $url = new moodle_url('/blocks/exaplan/dateDetails.php', array('mpid' => $modulepartid, 'dateid' => $dateId));
+            redirect($url, 'You were registered');
+        }
+        break;
+}
+
 echo $OUTPUT->header();
 
 echo '<div id="exaplan">';

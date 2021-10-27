@@ -187,18 +187,50 @@ function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = f
 }
 
 /**
- * Just template of calendars
- * @param int $userid
- * @param int $monthsCount
+ * Just template of header of calendar
+ * @param int $modulepartId
  * @return string
  */
 function block_exaplan_calendars_header_view($modulepartId = 0) {
+    global $CFG;
+
     $content = '';
     $content .= '<div class="calendar_options">';
     $modulepartName = getTableData('mdl_block_exaplanmoduleparts', $modulepartId, 'title');
     $moduleId = getTableData('mdl_block_exaplanmoduleparts', $modulepartId, 'modulesetid');
     $moduleName = getTableData('mdl_block_exaplanmodulesets', $moduleId, 'title');
+    $existingDates = getFixedDates(null, $modulepartId, null);
     $content .= '<h4>Sie planen: '.$moduleName.' | '.$modulepartName.'</h4>';
+    if ($existingDates) {
+        $content .= '<div class="register-existing-dates">';
+        $tooltips = '<div class="tooltip_templates">';
+        $content .= '<table class="table table-sm table-borderless">';
+        foreach ($existingDates as $dKey => $date) {
+            $content .= '<tr>';
+            $content .= '<td>';
+            if ($dKey === 0) {
+                $content .= 'Termine zur Auswahl:';
+            }
+            $content .= '</td>';
+            $trainer = getTableData('mdl_block_exaplanpusers', $date['trainerpuserid']);
+            $tooltips .= '<span id="tooltipster_content'.$date['id'].'">';
+            $tooltips .= ($date['starttime'] ? 'Uhrzeit: <strong>'.date('H:i', $date['starttime']).'</strong> '.date('d.m.Y', $date['date']).'<br>' : '')
+                .($date['location'] ? 'Location: '.$date['location'].'<br>' : '')
+                .($trainer ? 'Skillswork-Trainer: '.@$trainer['firstname'].' '.@$trainer['lastname'].'<br>' : '');
+            $tooltips .= '</span>';
+            $content .= '<td align="right"><a href="#" class="btn btn-sm exaplan-existing-date tooltipster" data-tooltip-content="#tooltipster_content'.$date['id'].'">'.date('d.m.Y', $date['date']).'</a></td>';
+            $url = $CFG->wwwroot.'/blocks/exaplan/calendar.php?action=registerToDate&mpid='.$modulepartId.'&dateid='.$date['id'];
+            $content .= '<td align="left"><a href="'.$url.'" class="btn btn-sm exaplan-register-toDate">Termin bestätigen</a></td>';
+
+            $content .= '</tr>';
+        }
+        $content .= '</table>';
+        $tooltips .= '</div>';
+        $content .= $tooltips;
+        $content .= '<strong>ODER</strong><br>';
+        $content .= 'Wunschtermin wählen:';
+        $content .= '</div>';
+    }
     $content .= '<div class="midday-type">
                     <label class="midday-type-radio">
                         <input type="radio" name="midday_type" value="' . BLOCK_EXAPLAN_MIDDATE_BEFORE . '"> vormittags (8-12 Uhr)

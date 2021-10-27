@@ -69,7 +69,6 @@ TavoCalendar.prototype.addMetaData = function(date, metaData) {
                     dayWrapper.addClass('exaplan-calendar-date-fixed');
                 }
                 if (metaData.moduleparts && typeof currentModulepartId != 'undefined' && currentModulepartId > 0) {
-                    console.log('gtnTavoCalendar.js:72');console.log(metaData.moduleparts);// !!!!!!!!!! delete it
                     if (metaData.moduleparts.indexOf(currentModulepartId) == -1) {
                         // add class to mute this day
                         dayWrapper.addClass('exaplan-calendar-date-anotherModulepart');

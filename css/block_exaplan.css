@@ -214,3 +214,45 @@ table.exaplan-date-details-table td {
 table.exaplan-date-details-table td.dataContent {
     font-weight: bold;
 }
+
+.register-existing-dates {
+    /*background-color: rgb(150, 150, 150, 0.05);*/
+    padding: 5px 0px;
+    margin-bottom: 10px;
+}
+.register-existing-dates table {
+    margin-bottom: 0px;
+}
+.register-existing-dates table td {
+    padding-left: 0px;
+}
+.register-existing-dates .exaplan-existing-date,
+.register-existing-dates .exaplan-register-toDate {
+    padding-top: 0px;
+    padding-bottom: 0px;
+    background-color: red;
+    color: white;
+    border-radius: 5px;
+}
+.register-existing-dates .exaplan-register-toDate:hover {
+    background-color: rgb(255, 0, 0, 0.5);
+}
+
+/*tooltipster*/
+.tooltip_templates {
+    display: none;
+}
+/*tooltip content box*/
+/*.tooltipster-sidetip.tooltipster-light.tooltipster-exaplan .tooltipster-box {*/
+    /*background: #e1e4e6;*/
+    /*border: 1px solid #c6c6c7;*/
+    /*border-radius: 5px;*/
+/*}*/
+/*content text*/
+.tooltipster-sidetip.tooltipster-light.tooltipster-exaplan .tooltipster-content {
+    /*color:  black;*/
+    font-size: 0.75em;
+    /*padding: 8px;*/
+}
+
+

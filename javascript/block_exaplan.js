@@ -322,6 +322,11 @@ $(function () {
         }
         markCalendarSelectedModulepart(selectedModulepart);
     })
+
+    $('.tooltipster').tooltipster({
+        theme: ['tooltipster-light', 'tooltipster-exaplan']
+    });
+
 });
 
 
