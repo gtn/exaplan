@@ -79,6 +79,14 @@ function getTableData($tableName, $id, $field = null) {
 
 function getPuser($userid = 0)
 {
+    static $getAttempts = null;
+    if ($getAttempts === null) {
+        $getAttempts = array();
+    }
+    if (!array_key_exists($userid, $getAttempts)) {
+        $getAttempts[$userid] = 0;
+    }
+
     $pdo = getPdoConnect();
 
     $params = array(
@@ -92,6 +100,10 @@ function getPuser($userid = 0)
     if (!$user || !count($user)) {
         // create a new pUser
         if (getOrCreatePuser($userid)) {
+            $getAttempts[$userid]++;
+            if ($getAttempts[$userid] > 3) { // ONLY FOR development server - NO such user in the server
+                return ['id' => 0, 'firstname' => 'TEST', 'lastname' => 'USER', 'email' => ''];
+            }
             return getPuser($userid); // get again
         }
         echo 'Can not find a user! 1634892218074';
@@ -287,7 +299,7 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
         ':modifiedtimestamp' => $timestamp,
         ':location' => $location,
         ':trainerpuserid' => $trainerId,
-        ':starttime' => strtotime(date('Y-m-d', $date).' '.$starttime),
+        ':starttime' => (strtotime(date('Y-m-d', $date).' '.$starttime) ?: strtotime('today midnight')), // todays midninght if no time in the form!
         ':comment' => trim($comment),
     ];
 
@@ -386,7 +398,28 @@ function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuser
 		}
 }
 
+/**
+ * remove all desired dates for the user and module part
+ * @param int $modulepartid
+ * @param int $puserid
+ * @return bool
+ */
+function removeDesiredDate($modulepartid, $puserid) {
+    if (!$modulepartid || !$puserid) {
+        return true;
+    }
+    $pdo = getPdoConnect();
+    $params = [
+        ':modulepartid' => $modulepartid,
+        ':puserid' => $puserid,
+    ];
+    $statement = $pdo->prepare('DELETE FROM mdl_block_exaplandesired WHERE modulepartid = :modulepartid AND puserid = :puserid');
+    $statement->execute($params);
+    return true;
+}
+
 function addPUserToDate($dateid, $puserid) {
+    global $USER;
 
     $pdo = getPdoConnect();
 
@@ -409,9 +442,11 @@ function addPUserToDate($dateid, $puserid) {
         return $existing[0]['id'];
     }
 
+    $creatorpUserid = getPuser($USER->id)['id'];
+
     // create a new relation
     $params = array_merge($params, [
-            ':creatorpuserid' => $puserid,
+            ':creatorpuserid' => $creatorpUserid,
         ]
     );
     $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpuser_date_mm (dateid, puserid, creatorpuserid) VALUES (:dateid, :puserid, :creatorpuserid);");

@@ -1,14 +1,13 @@
 // add custom dayClick event 'calendar-select-after'
-/*
 (function(dayClick) {
     TavoCalendar.prototype.dayClick = function() {
-        var result = dayClick.apply(this, arguments);
+        // var result = dayClick.apply(this, arguments);
         // console.log('gtnTavoCalendar.js:5');console.log(this);// !!!!!!!!!! delete it
+        var result = this.gtnDayClick(arguments[0], arguments[1]); // day, cal_el
         this.elements.wrapper.dispatchEvent(new Event('calendar-select-after'))
         return result;
     };
 })(TavoCalendar.prototype.dayClick);
-*/
 
 
 
@@ -174,4 +173,45 @@ TavoCalendar.prototype.returnDay = function(selectedDate) {
     }
 
     return true;
+}
+
+// Own DayClick function!
+TavoCalendar.prototype.gtnDayClick = function(date, day_el) {
+    lastCalendarSelectedDate = date;
+    lastCalendarSelectedDay = $(day_el).clone().find(':not(.tavo-calendar__day-inner)').remove().end().text(); // not the best way, but works
+
+    if (this.config.frozen) return;
+
+    //Day lock
+    if (day_el.classList.contains('tavo-calendar__day_lock')) return;
+
+    if (this.config.range_select) {
+        if ((!this.state.date_start && !this.state.date_end) || (this.state.date_start && this.state.date_end)) {
+            this.state.date_start = date;
+            this.state.date_end = null;
+        }  else {
+            if (!this.state.date_end) {
+                this.state.date_end = date
+            }
+
+            this.state.lock = true;
+            this.elements.wrapper.dispatchEvent(new Event('calendar-range'))
+        }
+    } else {
+        if (this.config.multi_select) {
+            if (this.state.selected.indexOf(date) > -1) {
+                this.state.selected = this.state.selected.filter(date_selected => date_selected != date);
+            } else {
+                this.state.selected.push(date);
+            }
+        } else {
+            this.state.selected = [date];
+        }
+
+        this.elements.wrapper.dispatchEvent(new Event('calendar-select'))
+    }
+
+    this.destroy()
+    this.mount()
+    this.bindEvents();
 }

@@ -17,9 +17,9 @@ block_exaplan_init_js_css();
 require_login();
 
 $action = optional_param("action", "", PARAM_TEXT);
-$modulepartid = optional_param("modulepartid", "", PARAM_INT);
+$modulepartid = optional_param("mpid", 0, PARAM_INT);
 $date = optional_param("date", "", PARAM_TEXT);
-$timeslot = optional_param("timeslot", "", PARAM_INT);
+$timeslot = optional_param("timeslot", 0, PARAM_INT);
 $isadmin = block_exaplan_is_admin();
 
 $userid = $USER->id;
@@ -42,12 +42,14 @@ echo '<div id="exaplan">';
 
 echo '<div class="UserCalendarCard">';
 
-$withCalendar = false;
-if (!$isadmin) {
-    $withCalendar = true;
+if (!$modulepartid || $isadmin) {
+    // only moduleparts
+    echo printUser($userid, $isadmin, $modulepartid, false);
+} else {
+    // with calendar
+    echo printUser($userid, $isadmin, $modulepartid, true);
+//    echo block_exaplan_calendars_view($userid, 2);
 }
-echo printUser($userid, $isadmin, $withCalendar);
-//echo block_exaplan_select_period_view();
 
 echo '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" role="button" class="btn btn-danger"> offen </a>';
 /*echo '<form action="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" method="post">';

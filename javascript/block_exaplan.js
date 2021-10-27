@@ -1,6 +1,8 @@
 // for using in global scope
 var allCalendars = [];
 var exaplanCalendarDateFormat = 'YYYY-MM-DD';
+var lastCalendarSelectedDate = '';
+var lastCalendarSelectedDay = '';
 
 $(function () {
 
@@ -75,6 +77,8 @@ $(function () {
                 return false;
             }*/
             // console.log('block_exaplan.js:73');console.log('day clicked');// !!!!!!!!!! delete it
+            console.log('block_exaplan.js:80');console.log(ev.currentTarget);// !!!!!!!!!! delete it
+            currentSelectedDate = '13123';
             return selectedDateEvent(ev, calendar_month);
         });
         /*calMonth.addEventListener('calendar-select-after', (ev) => {
@@ -124,10 +128,10 @@ function selectedDateSendAjax(calEvent, monthCalendar) {
         // var selectedDateId = selectedDateEl.attr('data-dateId');
         // var selectedDate = monthCalendar.getSelected(); // get ALL selected days
         // get selected date from html element
-    // console.log('block_exaplan.js:98');console.log(calEvent.explicitOriginalTarget);// !!!!!!!!!! delete it
-        var selectedDay = calEvent.explicitOriginalTarget.firstChild.textContent;
+        console.log('block_exaplan.js:98');console.log(calEvent);// !!!!!!!!!! delete it
+        // var selectedDay = calEvent.explicitOriginalTarget.firstChild.textContent;
         // var selectedDate = selectedDay + '.' + monthCalendar.getFocusMonth() + '.' + monthCalendar.getFocusYear();
-        var selectedDate =  monthCalendar.getFocusYear() + '-' + monthCalendar.getFocusMonth() + '-' + selectedDay;
+        var selectedDate = lastCalendarSelectedDate; //monthCalendar.getFocusYear() + '-' + monthCalendar.getFocusMonth() + '-' + selectedDay;
 
         // send request
         var ajaxUrl = calendarAjaxUrl;
@@ -165,8 +169,8 @@ function selectedDateSendAjax(calEvent, monthCalendar) {
 function modulepartInfoByDateAjax(calEvent, monthCalendar) {
     calEvent.preventDefault();
     
-    var selectedDay = calEvent.explicitOriginalTarget.firstChild.textContent;
-    var selectedDate =  monthCalendar.getFocusYear() + '-' + monthCalendar.getFocusMonth() + '-' + selectedDay;
+    // var selectedDay = calEvent.explicitOriginalTarget.firstChild.textContent;
+    var selectedDate =  lastCalendarSelectedDate;//monthCalendar.getFocusYear() + '-' + monthCalendar.getFocusMonth() + '-' + selectedDay;
     // console.log('block_exaplan.js:167');console.log(calEvent);// !!!!!!!!!! delete it
 
     // monthCalendar.returnDay(selectedDate);
@@ -286,7 +290,7 @@ $(function () {
     })
 
     // select date on "module part" instance
-    $('.exaplan-selectable-date').on('click', function (e) {
+    $('.exaplan-selectable-date').on('clickDISABLED', function (e) {
         e.preventDefault();
         var currentState = $(this).attr('data-dateSelected');
         // unselect all prev selected dates:
@@ -300,7 +304,7 @@ $(function () {
         markCalendarSelectedModulepart(selectedModulepart);
     })
     // select modulepart on "module part" instance
-    $('.exaplan-selectable-modulepart').on('click', function (e) {
+    $('.exaplan-selectable-modulepart').on('clickDISABLED', function (e) {
         e.preventDefault();
         var currentState = $(this).attr('data-modulepartselected');
         // unselect all prev selected parts:

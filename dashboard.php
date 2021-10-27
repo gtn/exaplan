@@ -11,21 +11,30 @@ $PAGE->set_pagelayout('admin');
 $PAGE->set_title("Übersicht");
 $PAGE->set_heading("Übersicht");
 $PAGE->set_url($CFG->wwwroot.'/blocks/exaplan/dashboard.php');
+
+$modulepartid = optional_param("mpid", 0, PARAM_INT);
 $isadmin = block_exaplan_is_admin();
+
+$userid = $USER->id;
 
 block_exaplan_init_js_css();
 
 require_login();
 
 
-
 echo $OUTPUT->header();
 
 echo '<div id="exaplan">';
 
-getOrCreatePuser();
+//getOrCreatePuser();
 
-echo printUser($USER->id, $isadmin, true);
+if (!$modulepartid || $isadmin) {
+    // only moduleparts
+    echo printUser($userid, $isadmin, $modulepartid, false);
+} else {
+    // with calendar
+    echo printUser($userid, $isadmin, $modulepartid, true);
+}
 
 echo '</div>';
 

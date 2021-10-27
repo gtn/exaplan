@@ -37,9 +37,9 @@ switch ($action) {
         $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description);
         foreach ($students as $student) {
             addPUserToDate($dateId, $student);
-            // delete desired data
-            setDesiredDate($modulepartid, $student, $dateTS, $middayType);
-
+            // delete ALL desired dates
+            removeDesiredDate($modulepartid, $student);
+//            setDesiredDate($modulepartid, $student, $dateTS, $middayType);
         }
         break;
 }
