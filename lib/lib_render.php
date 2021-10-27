@@ -78,7 +78,7 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
                     }
                     $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'" 
                                     role="button" 
-                                    class="btn btn-danger exaplan-selectable-modulepart '.$buttonClass.'"                                     
+                                    class="btn exaplan-selectable-modulepart '.$buttonClass.'"                                     
                                     data-modulepartId="'.$part['id'].'"
                                     '.($modulepartid == $part["id"] ? 'data-modulepartselected="1"' : '').'
                                 > '.$buttonTitle.' </a>';
