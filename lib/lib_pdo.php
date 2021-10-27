@@ -190,7 +190,7 @@ function getAllModules()
 
 }
 
-function getModulesOfUser($userid, $state = 2)
+function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_CONFIRMED)
 {
     global $DB, $COURSE;
 
@@ -209,6 +209,7 @@ function getModulesOfUser($userid, $state = 2)
                 );
                 $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmodulesets WHERE courseidnumber = :courseidnumber");
                 $statement->execute($params);
+                $statement->setFetchMode(PDO::FETCH_ASSOC);
                 $modules = $statement->fetchAll();
                 if (!(is_array($modules) && count($modules) > 0)) {
                     continue;
@@ -220,6 +221,7 @@ function getModulesOfUser($userid, $state = 2)
                 );
                 $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmoduleparts WHERE modulesetid = :modulesetid");
                 $statement->execute($params);
+                $statement->setFetchMode(PDO::FETCH_ASSOC);
                 $moduleset->parts = $statement->fetchAll();
 
                 $dates = array();
@@ -229,8 +231,14 @@ function getModulesOfUser($userid, $state = 2)
                         ':puserid' => getPuser($userid)['id'],
                         ':state' => $state,
                     );
-                    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplandates JOIN mdl_block_exaplanpuser_date_mm ON mdl_block_exaplandates.id=mdl_block_exaplanpuser_date_mm.dateid WHERE modulepartid = :modulepartid AND puserid = :puserid AND state = :state");
+                    $statement = $pdo->prepare("SELECT * 
+                                                  FROM mdl_block_exaplandates 
+                                                    JOIN mdl_block_exaplanpuser_date_mm ON mdl_block_exaplandates.id = mdl_block_exaplanpuser_date_mm.dateid 
+                                                  WHERE modulepartid = :modulepartid 
+                                                        AND puserid = :puserid 
+                                                        AND state = :state");
                     $statement->execute($params);
+                    $statement->setFetchMode(PDO::FETCH_ASSOC);
                     $date = $statement->fetchAll();
                     $moduleset->parts[$key]['date'] = $date;
                 }
@@ -249,7 +257,7 @@ function getPrefferedDate($modulepartid, $date, $timeslot, $state = 1) {
         ':modulepartid' => $modulepartid,
         ':date' => $date,
         ':timeslot' => $timeslot,
-        ':state' => 1
+        ':state' => $state
     );
 
     // get existing data for this modulepartid, date, timeslot
@@ -294,7 +302,7 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
         ':modulepartid' => $modulepartid,
         ':date' => $date,
         ':timeslot' => $timeslot,
-        ':state' => 1,
+        ':state' => BLOCK_EXAPLAN_DATE_CONFIRMED,
         ':modifiedpuserid' => $puserid,
         ':modifiedtimestamp' => $timestamp,
         ':location' => $location,
@@ -303,7 +311,7 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
         ':comment' => trim($comment),
     ];
 
-    $dateRec = getPrefferedDate($modulepartid, $date, $timeslot);
+    $dateRec = getPrefferedDate($modulepartid, $date, $timeslot, BLOCK_EXAPLAN_DATE_CONFIRMED);
 
     if ($dateRec) {
         $dateId = $dateRec['id'];
@@ -599,4 +607,22 @@ function getFixedDates($puserid = null, $modulepartid = null, $date = null, $tim
 
     return $dates;
 
+}
+
+function isPuserIsFixedForDate($puserid, $dateid) {
+    if (!$puserid || !$dateid) {
+        return false;
+    }
+    $pdo = getPdoConnect();
+    $params = [
+        ':dateid' => $dateid,
+        ':puserid' => $puserid,
+    ];
+    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpuser_date_mm WHERE dateid = :dateid AND puserid = :puserid;");
+    $statement->execute($params);
+    $dates = $statement->fetchAll();
+    if ($dates) {
+        return true;
+    }
+    return false;
 }

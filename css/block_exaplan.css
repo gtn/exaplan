@@ -7,6 +7,16 @@
     background-color: #c6c6c7;
 }
 
+a.exaplan-date-fixed.exaplan-selectable-date {
+    background-color: #005300;
+    color: white;
+}
+a.exaplan-selectable-modulepart.exaplan-date-desired {
+    background-color: #F6B80C;
+    border-color: #F6B80C;
+    color: white;
+}
+
 .exaplan-selectable-modulepart:hover {
     background-color: rgba(0, 83, 0, 0.50);
 }
@@ -87,7 +97,7 @@
 }
 
 #block_exaplan_dashboard_calendar .tavo-calendar .exaplan-calendar-date-desired span.tavo-calendar__day-inner {
-    background-color: orange !important;
+    background-color: #F6B80C !important;
     color: white;
 }
 #block_exaplan_dashboard_calendar .tavo-calendar .exaplan-calendar-date-fixed span.tavo-calendar__day-inner {
@@ -98,12 +108,12 @@
     background-image: linear-gradient(
             135deg,
             #008800 25%,
-            orange 25%,
-            orange 50%,
+            #F6B80C 25%,
+            #F6B80C 50%,
             #008800 50%,
             #008800 75%,
-            orange 75%,
-            orange 100%
+            #F6B80C 75%,
+            #F6B80C 100%
     );
     background-size: 19.80px 19.80px;
 }
@@ -141,3 +151,17 @@ table.exaplan-adminModulepartView td:nth-child(6) {
     width: 40% !important;
 }
 
+table.exaplan-date-details-table {
+    margin-left: 25px;
+}
+table.exaplan-date-details-table th {
+    background-color: rgb(0, 83, 0, 0.75);;
+    color: white;
+    padding-right: 25px;
+}
+table.exaplan-date-details-table td {
+    border-bottom: 1px solid rgb(0, 83, 0, 0.2);
+}
+table.exaplan-date-details-table td.dataContent {
+    font-weight: bold;
+}

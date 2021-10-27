@@ -15,23 +15,23 @@
  * Creats the overview of dates for a User
  * @return string
  */
-function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false){
+function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false, $dateId = 0, $withDateDetails = false){
     global $CFG;
 
 
     if ($mode == 1) {
         $modulesets = getAllModules();
+        $pUser = [];
     } else{
         $modulesets = getModulesOfUser($userid);
-        $user = getPuser($userid);
+        $pUser = getPuser($userid);
     }
-
     $content = '<div class="UserBlock">';
     $content .= '<div class="BlockHeader">';
     if ($mode == 1){
 
     } else {
-        $content .= '<b>'.$user["firstname"].' '.$user["lastname"].'</b>';
+        $content .= '<b>'.$pUser["firstname"].' '.$pUser["lastname"].'</b>';
         $content .= '<button type="button" class="btn btn-outline-danger"> Planung Präsenztermine </button>';
     }
     $content .= '</div>';
@@ -61,18 +61,32 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false)
         $content .= '<tbody>';
         foreach($moduleset->parts as $part) {
             $content .= '<td>';
-            if ($mode == 1){
+            if ($mode == 1) {
+                // for admins
                 $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$part["id"].'" role="button" class="btn btn-danger"> Anfragen </a>';
             } else {
-                if ($part['date'] == null || $part['date'][0]['state'] != 2){
+                if (!$part['date'] || $part['date'][0]['state'] != BLOCK_EXAPLAN_DATE_CONFIRMED) {
+                    // desired dates
+                    $buttonTitle = 'offen';
+                    $buttonClass = '';
+                    if (getDesiredDates($pUser['id'], $part['id'])) {
+                        $buttonTitle = 'Wunschtermin';
+                        $buttonClass = 'exaplan-date-desired';
+                    }
                     $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'" 
                                     role="button" 
-                                    class="btn btn-danger exaplan-selectable-modulepart"                                     
+                                    class="btn btn-danger exaplan-selectable-modulepart '.$buttonClass.'"                                     
                                     data-modulepartId="'.$part['id'].'"
                                     '.($modulepartid == $part["id"] ? 'data-modulepartselected="1"' : '').'
-                                > offen </a>';
+                                > '.$buttonTitle.' </a>';
                 } else {
-                    $content .= '<span class="exaplan-selectable-date" data-dateId="'.$part['date'][0]['id'].'" data-modulepartId="'.$part['id'].'">'.date('d.m.Y', strtotime($part['date'][0]['date'])).'</span>';
+                    // fixed date exists
+                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/dateDetails.php?mpid='.$part["id"].'&dateid='.$part['date'][0]['id'].'"
+                                    class="btn exaplan-date-fixed exaplan-selectable-date" 
+                                    data-dateId="'.$part['date'][0]['id'].'" 
+                                    data-modulepartId="'.$part['id'].'">
+                                '.date('d.m.Y', $part['date'][0]['date']).
+                                '</a>';
                 }
             }
 
@@ -84,6 +98,11 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false)
         if ($withCalendar && $moduleKey == 0) {
             $content .= '<td valign="top" rowspan="' . count($modulesets) . '">';
             $content .= block_exaplan_calendars_view($userid, 2);
+            $content .= '</td>';
+        }
+        if ($withDateDetails && $moduleKey == 0) {
+            $content .= '<td valign="top" rowspan="' . count($modulesets) . '">';
+            $content .= studentEventDetailsView($userid, $modulepartid, $dateId);
             $content .= '</td>';
         }
         $content .= '</tr>';
@@ -314,7 +333,7 @@ function formAdminDateFixing($modulepartId, $date, $timeslot) {
     $dateTs = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
     $instanceKey = $modulepartId.'_'.$dateTs.'_'.$timeslot;
 
-    $dateRec = getPrefferedDate($modulepartId, $dateTs, $timeslot);
+    $dateRec = getPrefferedDate($modulepartId, $dateTs, $timeslot, BLOCK_EXAPLAN_DATE_CONFIRMED);
 
     $content .= '<input type="hidden" value="'.$timeslot.'" name="middayType" />';
     $content .= '<input type="hidden" value="'.$date.'" name="date" />';
@@ -361,6 +380,55 @@ function formAdminDateFixing($modulepartId, $date, $timeslot) {
     $content .= '<td align="left"><button name="date_block" class="btn btn-info" disabled="disabled" type="submit" >Termin blocken</button></td>';
     $content .= '<td align="right"><button name="date_save" class="btn btn-success" type="submit" >Kurs fixieren</button></td>';
     $content .= '</tr>';
+
+    $content .= '</table>';
+
+    return $content;
+}
+
+function studentEventDetailsView($userId, $modulepartId, $dateId) {
+    $content = '';
+
+    $puserId = getPuser($userId)['id'];
+
+    if (!isPuserIsFixedForDate($puserId, $dateId)) {
+        return 'No data!';
+    }
+
+    $content .= '<table class="table table-sm table-borderless exaplan-date-details-table">';
+
+    $modulepartName = getTableData('mdl_block_exaplanmoduleparts', $modulepartId, 'title');
+    $moduleId = getTableData('mdl_block_exaplanmoduleparts', $modulepartId, 'modulesetid');
+    $moduleName = getTableData('mdl_block_exaplanmodulesets', $moduleId, 'title');
+    $dateData = getTableData('mdl_block_exaplandates', $dateId);
+
+
+    $content .= '<tr>';
+    $content .= '<th>Sie planen: '.$moduleName.' | '.$modulepartName.'</th>';
+    $content .= '<th>'.date('d.m.Y', $dateData['date']).'</th>';
+    $content .= '</tr>';
+
+    $content .= '<tr>';
+    $content .= '<td class="dataLabel">Location:</td>';
+    $content .= '<td class="dataContent">'.$dateData['location'].'</td>';
+    $content .= '</tr>';
+
+    $content .= '<tr>';
+    $content .= '<td class="dataLabel">Uhrzeit:</td>';
+    $content .= '<td class="dataContent">'.date('H:i', $dateData['starttime']).'</td>';
+    $content .= '</tr>';
+
+    $content .= '<tr>';
+    $content .= '<td class="dataLabel">Skillswork-Trainer:</td>';
+    $trainer = getTableData('mdl_block_exaplanpusers', $dateData['trainerpuserid']);
+    $content .= '<td class="dataContent">'.@$trainer['firstname'].' '.@$trainer['lastname'].'</td>';
+    $content .= '</tr>';
+
+    if ($dateData['comment']) {
+        $content .= '<tr>';
+        $content .= '<td colspan="2"><strong>Notiz:</strong><br>'.$dateData['comment'].'</td>';
+        $content .= '</tr>';
+    }
 
     $content .= '</table>';
 

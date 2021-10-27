@@ -16,11 +16,8 @@ block_exaplan_init_js_css();
 
 require_login();
 
-$action = optional_param("action", "", PARAM_TEXT);
 $modulepartid = optional_param("mpid", 0, PARAM_INT);
-$dateId = optional_param("dateid", 0, PARAM_INT);
-$date = optional_param("date", "", PARAM_TEXT);
-$timeslot = optional_param("timeslot", 0, PARAM_INT);
+$dateId = required_param("dateid", PARAM_INT);
 $isadmin = block_exaplan_is_admin();
 
 $userid = $USER->id;
@@ -31,19 +28,7 @@ echo '<div id="exaplan">';
 
 echo '<div class="UserCalendarCard">';
 
-if (!$modulepartid || $isadmin) {
-    // only moduleparts overview
-    echo printUser($userid, $isadmin, $modulepartid, false);
-} else {
-    if ($modulepartid && $dateId) {
-        // details of fixed modulepart
-        // TODO: delete? moved to dateDetails.php
-        echo printUser($userid, $isadmin, $modulepartid, false, $dateId, true);
-    } else {
-        // overview with calendar
-        echo printUser($userid, $isadmin, $modulepartid, true);
-    }
-}
+echo printUser($userid, $isadmin, $modulepartid, false, $dateId, true);
 
 echo '<br>';
 echo '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" role="button" class="btn btn-info"> back </a>';
