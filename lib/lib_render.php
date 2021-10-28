@@ -89,7 +89,7 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
                     if ($modulepartid == $part["id"]) {
                         $buttonClass .= ' exaplan-date-current-modulepart ';
                     }
-                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'" 
+                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'&userid='.$userid.'" 
                                     role="button" 
                                     class="btn exaplan-selectable-modulepart '.$buttonClass.'"                                     
                                     data-modulepartId="'.$part['id'].'"
@@ -341,12 +341,13 @@ function modulepartAdminViewByDate($modulepartId, $date) {
 
         $rowsCount = 0;
         $mergedData = block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot);
+
+        $cont .= '</table>'; // we need to start new table for correct <form> working
+        $actionUrl = $CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartId.'&date='.$date.'&timeslot='.$timeslot;
+        $cont .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_BEFORE.'" method="post">';
+        $cont .= '<input type="hidden" name="action" value="saveFixedDates" />';
+        $cont .= $tableStartTemplate;
         if (count($mergedData) > 0) {
-            $cont .= '</table>'; // we need to start new table for correct <form> working
-            $actionUrl = $CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartId.'&date='.$date.'&timeslot='.$timeslot;
-            $cont .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_BEFORE.'" method="post">';
-            $cont .= '<input type="hidden" name="action" value="saveFixedDates" />';
-            $cont .= $tableStartTemplate;
 
             $cont .= '<tr><td colspan="6"><h5 class="p-1 mb-1 bg-secondary text-dark">'.$title.'</h5></td></tr>';
             $cont .= '</tr>';
@@ -358,26 +359,59 @@ function modulepartAdminViewByDate($modulepartId, $date) {
                 }
                 $rowsCount++;
                 $cont .= '<tr>';
-                $cont .= '<td valign="top" height="'.$setRowHight.'">'.@$dateData['pUserData']['firstname'].' '.@$dateData['pUserData']['lastname'].'</td>';
+                $cont .= '<td valign="top" height="'.$setRowHight.'">';
+                // fixed or desired
+                $cont .= '<input type="checkbox" 
+                                    value="1"      
+                                    id = "fixedUser"'.$dateData['pUserData']['id'].'"                               
+                                    name = "fixedPuser['.$dateData['pUserData']['id'].']" 
+                                    '.($dateData['dateType'] == 'fixed' ? 'checked = "checked"' : '').'/>&nbsp;';
+                $cont .= '<label for="fixedUser"'.$dateData['pUserData']['id'].'">'.@$dateData['pUserData']['firstname'].' '.@$dateData['pUserData']['lastname'].'</label>';
+                $cont .= '</td>';
                 $cont .= '<td valign="top">'./*buttons*/'</td>';
                 $companyName = getTableData('mdl_block_exaplanmoodles', $dateData['pUserData']['moodleid'], 'companyname');
                 $cont .= '<td valign="top">'.$companyName.'</td>';
-                // fixed or desired
+                // absend or not
+                $absend = '';
+                if ($relationData = isPuserIsFixedForDate($dateData['pUserData']['id'], $dateData['id'], true)) {
+                    if ($relationData['absend']) {
+                        $absend = ' checked = "checked" ';
+                    }
+                }
                 $cont .= '<td valign="top">
                             <input type="checkbox" 
                                     value="1"                                     
-                                    name="fixedPuser['.$dateData['pUserData']['id'].']" 
-                                    '.($dateData['dateType'] == 'fixed' ? 'checked = "checked"' : '').'/></td>';
+                                    name="absendPuser['.$dateData['pUserData']['id'].']" 
+                                    '.$absend.'/></td>';
                 $cont .= '<td valign="top"><!--Bewertung--></td>';
                 if ($rowsCount == 1) {
                     $cont .= '<td rowspan="###FORM_ROWSPAN###"  valign="top">'.formAdminDateFixing($modulepartId, $date, $timeslot).'</td>';
                 }
                 $cont .= '</tr>';
             }
-            $cont .= '</table>';
-            $cont .= '</form>';
-            $cont .= $tableStartTemplate;
+
+        } else {
+            // show empty (no students) from to create an empty date
+
+            $cont .= '<tr><td colspan="6"><h5 class="p-1 mb-1 bg-secondary text-dark">'.$title.'</h5></td></tr>';
+            $cont .= '</tr>';
+
+                $rowsCount++;
+                $cont .= '<tr>';
+                $cont .= '<td></td>';
+                $cont .= '<td></td>';
+                $cont .= '<td></td>';
+                $cont .= '<td></td>';
+                $cont .= '<td></td>';
+                $cont .= '<td rowspan="###FORM_ROWSPAN###"  valign="top">'.formAdminDateFixing($modulepartId, $date, $timeslot).'</td>';
+                $cont .= '</tr>';
+
         }
+
+        $cont .= '</table>';
+        $cont .= '</form>';
+        $cont .= $tableStartTemplate;
+
         $cont = str_replace('###FORM_ROWSPAN###', $rowsCount, $cont);
         return $cont;
     };
@@ -397,6 +431,14 @@ function modulepartAdminViewByDate($modulepartId, $date) {
     return $content;
 }
 
+/**
+ * inputs for main data of 'mdl_block_exaplandates'.
+ * Look also inputs in function modulepartAdminViewByDate()
+ * @param int $modulepartId
+ * @param string $date
+ * @param int $timeslot
+ * @return string
+ */
 function formAdminDateFixing($modulepartId, $date, $timeslot) {
     global $CFG;
     $content = '';
@@ -412,7 +454,8 @@ function formAdminDateFixing($modulepartId, $date, $timeslot) {
     $content .= '<table class="table table-sm table-borderless">';
 
     $content .= '<tr>';
-    $content .= '<td colspan="2"><label for="trainer_'.$instanceKey.'">Trainer:</label></td>';
+    $content .= '<td><label for="trainer_'.$instanceKey.'">Trainer:</label></td>';
+    $content .= '<td><label for="region_'.$instanceKey.'">Region:</label></td>';
     $content .= '</tr>';
 
     $content .= '<tr>';
@@ -423,6 +466,13 @@ function formAdminDateFixing($modulepartId, $date, $timeslot) {
         $trainerPid = getPuser($trainer->id);
         $content .= '<option value="'.$trainer->id.'" '.(@$dateRec['trainerpuserid'] == $trainerPid ? ' selected="selected" ' : '').'>'.fullname($trainer).'</option>'; // original ID (not pUser), because it is on MAIN moodle
     }
+    $content .= '</select>';
+    $content .= '</td>';
+    $content .= '<td>';
+    $content .= '<select id="region_'.$instanceKey.'" class="form-control" name="region">';
+    $content .= '<option value="all">Alle Regionen</option>';
+    $content .= '<option value="RegionOst" '.(@$dateRec['region'] == 'RegionOst' ? 'selected="selected' : '').'>Ost</option>';
+    $content .= '<option value="RegionWest" '.(@$dateRec['region'] == 'RegionWest' ? 'selected="selected' : '').'>West</option>';
     $content .= '</select>';
     $content .= '</td>';
     $content .= '<td>';

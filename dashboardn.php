@@ -14,7 +14,6 @@ $PAGE->set_url($CFG->wwwroot.'/blocks/exaplan/dashboard.php');
 
 $modulepartid = optional_param("mpid", 0, PARAM_INT);
 $isadmin = block_exaplan_is_admin();
-$isteacher = block_exaplan_is_teacher_in_any_course();
 
 $userid = $USER->id;
 
@@ -26,33 +25,32 @@ require_login();
 echo $OUTPUT->header();
 
 echo '<div id="exaplan">';
-
+echo '
+<div class="exaplan-result-item">
+<div class="result-item-header">
+<div class="result-item-header-cnt">
+	
+<div class="icon">
+<img src="pix/teilnehmer.svg" height="90" width="90">
+</div>
+<h5 class="item-header-title">Max Musterteilnehmer</h5>   
+	<button type="button" class="btn btn-outline-danger">
+			Planung Präsenztermine  
+	</button>
+	<h4>Symbols, Notifications,...etc.</h4>	
+	</div>
+</div>
+';
 //getOrCreatePuser();
 
-if ($isteacher) {
-    $students = array();
-    $enrolled = array();
-    $courses = block_exaplan_get_courses();
-    foreach( $courses as $course){
-        $enrolled = get_enrolled_users(block_exaplan_get_context_from_courseid($course->id), 'block/exaplan:student' );
-        $students = array_merge($students, $enrolled);
-    }
-    $studentids = array();
-    foreach($students as $student){
-        if(!in_array($student->id,$studentids)){
-            echo printUser($student->id, $isadmin, $modulepartid, false);
-            $studentids[] = $student->id;
-        }
-    }
-} else if(!$modulepartid || $isadmin) {
+if (!$modulepartid || $isadmin) {
     // only moduleparts
     echo printUser($userid, $isadmin, $modulepartid, false);
-
 } else {
     // with calendar
     echo printUser($userid, $isadmin, $modulepartid, true);
 }
-
+echo '</div><!-- / exaplan-result-item --->';
 echo '</div>';
 
 echo $OUTPUT->footer();

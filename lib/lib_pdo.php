@@ -328,9 +328,10 @@ function getPrefferedDate($modulepartid, $date, $timeslot, $state = 1)
  * @param int $trainerId pUser!
  * @param string $starttime
  * @param string $comment
+ * @param string $region
  * @return string
  */
-function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment)
+function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment, $region)
 {
     $pdo = getPdoConnect();
     $timestamp = new DateTime();
@@ -346,8 +347,9 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
         ':modifiedtimestamp' => $timestamp,
         ':location' => $location,
         ':trainerpuserid' => $trainerId,
-        ':starttime' => (strtotime(date('Y-m-d', $date) . ' ' . $starttime) ?: strtotime('today midnight')), // todays midninght if no time in the form!
+        ':starttime' => (strtotime(date('Y-m-d', $date) . ' ' . $starttime) ?: strtotime('today midnight')), // day's midninght if no time in the form!
         ':comment' => trim($comment),
+        ':region' => trim($region),
     ];
 
     $dateRec = getPrefferedDate($modulepartid, $date, $timeslot, BLOCK_EXAPLAN_DATE_CONFIRMED);
@@ -367,6 +369,7 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
                              trainerpuserid = :trainerpuserid,
                              starttime = :starttime,
                              comment = :comment
+                             region = :region
                         WHERE id = " . $dateId . ";";
             $statement = $pdo->prepare($sql);
             $statement->execute($params);
@@ -380,15 +383,13 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
     ]);
 
     $sql = "INSERT INTO mdl_block_exaplandates
-                        (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp, location, trainerpuserid, starttime, comment)
-                  VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp, :location, :trainerpuserid, :starttime, :comment);";
+                        (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp, location, trainerpuserid, starttime, comment, region)
+                  VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp, :location, :trainerpuserid, :starttime, :comment, :region);";
 //    echo "<pre>debug:<strong>lib_pdo.php:297</strong>\r\n"; print_r($params); echo '</pre>'; // !!!!!!!!!! delete it
 //    echo $sql; exit;
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
     $dateid = $pdo->lastInsertId();
-
-//    addPUserToDate($dateid, $puserid);
 
     return $dateid;
 
@@ -469,7 +470,13 @@ function removeDesiredDate($modulepartid, $puserid)
     return true;
 }
 
-function addPUserToDate($dateid, $puserid, $creatorpuserid=null, $date=null, $moduleset=null, $modulepart=null)
+/**
+ * @param int $dateid
+ * @param int $puserid
+ * @param int $absend
+ * @return string
+ */
+function addPUserToDate($dateid, $puserid, $absend = 0,  $creatorpuserid=null, $date=null, $moduleset=null, $modulepart=null)
 {
     global $USER;
 
@@ -499,9 +506,10 @@ function addPUserToDate($dateid, $puserid, $creatorpuserid=null, $date=null, $mo
     // create a new relation
     $params = array_merge($params, [
             ':creatorpuserid' => $creatorpUserid,
+            ':absend' => $absend,
         ]
     );
-    $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpuser_date_mm (dateid, puserid, creatorpuserid) VALUES (:dateid, :puserid, :creatorpuserid);");
+    $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpuser_date_mm (dateid, puserid, creatorpuserid, absend) VALUES (:dateid, :puserid, :creatorpuserid, :absend);");
     $statement->execute($params);
     $id = $pdo->lastInsertId();
 
@@ -674,7 +682,13 @@ function getFixedDates($puserid = null, $modulepartid = null, $date = null, $tim
 
 }
 
-function isPuserIsFixedForDate($puserid, $dateid)
+/**
+ * @param int $puserid
+ * @param int $dateid
+ * @param bool $returnData
+ * @return bool
+ */
+function isPuserIsFixedForDate($puserid, $dateid, $returnData = false)
 {
     if (!$puserid || !$dateid) {
         return false;
@@ -686,9 +700,13 @@ function isPuserIsFixedForDate($puserid, $dateid)
     ];
     $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpuser_date_mm WHERE dateid = :dateid AND puserid = :puserid;");
     $statement->execute($params);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
     $dates = $statement->fetchAll();
     if ($dates) {
+        if ($returnData) {
+            return $dates[0];
+        }
         return true;
     }
-    return false;
+    return null;
 }

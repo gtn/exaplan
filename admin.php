@@ -34,13 +34,20 @@ switch ($action) {
         $description = optional_param('description', '', PARAM_TEXT);
         $trainerId = optional_param('trainer', 0, PARAM_INT);
         $pTrainer = getPuser($trainerId)['id'];
-        $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description);
+        $region = optional_param('region', 'all', PARAM_TEXT);
 
         $modulepart = getModulepartByModulepartid($modulepartid);
         $moduleset = getModulesetByModulesetid($modulepart["modulesetid"]);
 
+        $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $region);
+        $absends = optional_param_array('absendPuser', [], PARAM_INT);
+        $absends = array_keys($absends);
         foreach ($students as $student) {
-            addPUserToDate($dateId, $student, $pUserId, $date, $moduleset, $modulepart);
+            $absend = 0;
+            if (in_array($student, $absends)) {
+                $absend = 1;
+            }
+            addPUserToDate($dateId, $student, $absend);
             // delete ALL desired dates
             removeDesiredDate($modulepartid, $student);
 //            setDesiredDate($modulepartid, $student, $dateTS, $middayType);
@@ -63,5 +70,3 @@ echo '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" role="button" clas
 echo '</div>';
 
 echo $OUTPUT->footer();
-
-
