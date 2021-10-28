@@ -29,7 +29,7 @@ echo '<div id="exaplan">';
 
 //getOrCreatePuser();
 
-if ($isteacher) {
+if ($isteacher && !$isadmin) {
     $students = array();
     $enrolled = array();
     $courses = block_exaplan_get_courses();
