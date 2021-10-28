@@ -453,17 +453,24 @@ function block_exaplan_init_js_css($courseid = 0) {
 //    $PAGE->requires->jquery_plugin('ui');
 //    $PAGE->requires->jquery_plugin('ui-css');
 
+    // Moment.js
     $PAGE->requires->js("/blocks/exaplan/javascript/moment.js", true);
     $PAGE->requires->js("/blocks/exaplan/javascript/locale/moment/de.js", true);
-
     // TavoCalendar
     $PAGE->requires->js("/blocks/exaplan/javascript/TavoCalendar.js", true);
     $PAGE->requires->js("/blocks/exaplan/javascript/gtnTavoCalendar.js", true);
-    $PAGE->requires->js("/blocks/exaplan/javascript/tooltipster.bundle.min.js", true);
     $PAGE->requires->css('/blocks/exaplan/css/tavo-calendar.css');
+    // Tooltip
+    $PAGE->requires->js("/blocks/exaplan/javascript/tooltipster.bundle.min.js", true);
     $PAGE->requires->css('/blocks/exaplan/css/tooltipster.bundle.min.css');
     $PAGE->requires->css('/blocks/exaplan/css/tooltipster-sideTip-light.min.css');
-
+    // preloadinator
+//    $PAGE->requires->js("/blocks/exaplan/javascript/jquery.preloadinator.js", true);
+//    $PAGE->requires->css('/blocks/exaplan/css/jquery.preloadinator.css');
+    // threedots
+//    $PAGE->requires->css('/blocks/exaplan/css/three-dots.min.css');
+    // loader
+    $PAGE->requires->css('/blocks/exaplan/css/loader.css');
 
     // jsCalendar
 //    $PAGE->requires->css('/blocks/exaplan/css/jsCalendar.css');

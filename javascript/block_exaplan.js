@@ -6,42 +6,9 @@ var lastCalendarSelectedDay = '';
 
 $(function () {
 
-
-    /*
-    // jsCalendar
-    var dateFormat = 'DD/MM/YYYY';
-
-    var firstPossiobbleDay =  moment().format(dateFormat);
-    var lastPossiobbleDay =  moment().add(2, 'M').endOf("month").format(dateFormat);
-
-    const calendar_default_options = {
-        firstDayOfTheWeek: "2",
-        language: 'de',
-        "data-min": firstPossiobbleDay,
-        "data-max": lastPossiobbleDay,
-    }
-
-    const month1_options = Object.assign({}, calendar_default_options);
-    var firstDate = moment().format(dateFormat);
-    // next month
-    var month2_options = Object.assign({}, calendar_default_options);
-    month2_options
-    var nextMonthDate = moment().add(1, 'M').startOf("month").format(dateFormat);
-
-    // Create the calendar
-    // jsCalendar.new('#block_exaplan_dashboard_calendar #month1');
-    var calendar1 = '#month1';
-    console.log('dashboard.js:24');console.log(month1_options);// !!!!!!!!!! delete it
-    jsCalendar.new(calendar1, firstDate, month1_options);
-    var calendar2 = '#month2';
-    jsCalendar.new(calendar2, nextMonthDate, month2_options);*/
-
-
 // Tavo Calendar
 
-    // var dateFormat = 'DD.MM.YYYY';
-
-// dashborad calendar options
+    // calendar options
     var lastPossiobbleDay = moment().add(2, 'M').endOf("month").format(exaplanCalendarDateFormat);
 
     var calendar_default_options = {
@@ -51,10 +18,6 @@ $(function () {
         multi_select: true,
         locale: 'de'
     }
-
-    // if (calendarsFrozen) {
-    //     calendar_default_options.frozen = true;
-    // }
 
     var allMonthElements = $('#block_exaplan_dashboard_calendar .calendar-month-item');
     allMonthElements.each(function (i, calMonth) {
@@ -67,18 +30,10 @@ $(function () {
         }
         var calendar_month = new TavoCalendar(calMonth, month_options);
         allCalendars.push(calendar_month);
+        calMonth.addEventListener('calendar-select-before', (ev) => {
+            calendar_month.blurCalendar();
+        });
         calMonth.addEventListener('calendar-select', (ev) => {
-            // if clicked not day, but some marker - we need to return selected this day and stop next action
-            // but the calendar already has clicked day - reset it
-            /*if (!$(ev.explicitOriginalTarget).hasClass('tavo-calendar__day-inner')) {
-                $(ev.explicitOriginalTarget).closest('tavo-calendar__day-inner').trigger('calendar-select'); // click again!
-                updateAllCalendarMetadata();
-                ev.stopPropagation();
-                return false;
-            }*/
-            // console.log('block_exaplan.js:73');console.log('day clicked');// !!!!!!!!!! delete it
-            console.log('block_exaplan.js:80');console.log(ev.currentTarget);// !!!!!!!!!! delete it
-            currentSelectedDate = '13123';
             return selectedDateEvent(ev, calendar_month);
         });
         /*calMonth.addEventListener('calendar-select-after', (ev) => {
@@ -86,16 +41,16 @@ $(function () {
         });*/
         calMonth.addEventListener('calendar-change', (ev) => {
             updateAllCalendarMetadata();
-            markCalendarSelectedModulepart(null);
         });
         calMonth.addEventListener('calendar-range', (ev) => {
             updateAllCalendarMetadata();
-            markCalendarSelectedModulepart(null);
         });
         calMonth.addEventListener('calendar-reset', (ev) => {
             updateAllCalendarMetadata();
-            markCalendarSelectedModulepart(null);
         });
+        /*calMonth.addEventListener('calendar-metadata-finished', (ev) => {
+
+        });*/
     });
 
 });
@@ -104,7 +59,6 @@ function selectedDateEvent(calEvent, monthCalendar) {
     if (isExaplanAdmin) {
         modulepartInfoByDateAjax(calEvent, monthCalendar);
     } else {
-        // updateAllCalendarMetadata(); // if ajax will enable - disable this line
         selectedDateSendAjax(calEvent, monthCalendar);
     }
     return false;
@@ -125,13 +79,8 @@ function selectedDateSendAjax(calEvent, monthCalendar) {
         if (!selectedModulepartId) {
             selectedModulepartId = selectedDateEl.attr('data-modulepartId');
         }
-        // var selectedDateId = selectedDateEl.attr('data-dateId');
-        // var selectedDate = monthCalendar.getSelected(); // get ALL selected days
-        // get selected date from html element
-        console.log('block_exaplan.js:98');console.log(calEvent);// !!!!!!!!!! delete it
-        // var selectedDay = calEvent.explicitOriginalTarget.firstChild.textContent;
-        // var selectedDate = selectedDay + '.' + monthCalendar.getFocusMonth() + '.' + monthCalendar.getFocusYear();
-        var selectedDate = lastCalendarSelectedDate; //monthCalendar.getFocusYear() + '-' + monthCalendar.getFocusMonth() + '-' + selectedDay;
+
+        var selectedDate = lastCalendarSelectedDate;
 
         // send request
         var ajaxUrl = calendarAjaxUrl;
@@ -151,29 +100,21 @@ function selectedDateSendAjax(calEvent, monthCalendar) {
             calendarData = JSON.parse(result);
             updateCalendarSelectedDates();
             updateAllCalendarMetadata();
-            markCalendarSelectedModulepart(null);
-            console.log(result);
         }).fail(function () {
             updateAllCalendarMetadata();
-            markCalendarSelectedModulepart(null);
             console.log('Something wrong in Ajax!! 1634564740109')
         });
     } else {
-        $(calEvent.explicitOriginalTarget).trigger('click');
         // TODO: return metadata
-        // updateCalendarSelectedDates();
-        // updateAllCalendarMetadata();
+        updateCalendarSelectedDates();
+        updateAllCalendarMetadata();
     }
 }
 
 function modulepartInfoByDateAjax(calEvent, monthCalendar) {
     calEvent.preventDefault();
     
-    // var selectedDay = calEvent.explicitOriginalTarget.firstChild.textContent;
-    var selectedDate =  lastCalendarSelectedDate;//monthCalendar.getFocusYear() + '-' + monthCalendar.getFocusMonth() + '-' + selectedDay;
-    // console.log('block_exaplan.js:167');console.log(calEvent);// !!!!!!!!!! delete it
-
-    // monthCalendar.returnDay(selectedDate);
+    var selectedDate =  lastCalendarSelectedDate;
 
     // send request
     var ajaxUrl = calendarAjaxUrl;
@@ -186,7 +127,12 @@ function modulepartInfoByDateAjax(calEvent, monthCalendar) {
         url: ajaxUrl,
         cache: false
     }).done(function (result) {
-        $('#modulepart-date-data').html(result);
+        var resultData = JSON.parse(result);
+        calendarData = JSON.parse(resultData.calendarData);
+        updateCalendarSelectedDates();
+        updateAllCalendarMetadata();
+        $('#modulepart-date-data').html(resultData.htmlContent);
+        monthCalendar.unBlurCalendar();
     }).fail(function () {
         console.log('Something wrong in Ajax!! 1635165804897')
     });
@@ -195,7 +141,6 @@ function modulepartInfoByDateAjax(calEvent, monthCalendar) {
 
 function updateCalendarSelectedDates() {
     if (typeof calendarData !== 'undefined') {
-        // console.log('dashboard.js:106');console.log(calendarData);// !!!!!!!!!! delete it
         // clear al selected data
         allCalendars.forEach((calendarInstance) => {
             calendarInstance.clearSelected();
@@ -232,20 +177,6 @@ function updateAllCalendarMetadata() {
     }
 }
 
-function markCalendarSelectedModulepart(modulepartId) {
-    if (modulepartId == null) {
-        modulepartId = $('.exaplan-selectable-date[data-modulepartid][data-dateselected = 1], .exaplan-selectable-modulepart[data-modulepartid][data-modulepartselected = 1]').first().attr('data-modulepartid')
-    }
-    if (typeof calendarData !== 'undefined') {
-        allCalendars.forEach((calendarInstance) => {
-            calendarInstance.markSelectedModulePart(modulepartId, calendarData);
-        });
-    }
-}
-
-function showUsedItemsPopup(date) {
-    console.log('block_exaplan.js:154');console.log('clicked marker of: ' + date);// !!!!!!!!!! delete it
-}
 
 $(function () {
 
@@ -269,14 +200,6 @@ $(function () {
             if ($.inArray(e, newArray) == -1) newArray.push(e);
         });
         selectedDates = newArray;
-        // convert into format for PHP (JS uses DD.MM.YYYY, PHP uses YYYY-MM-DD right now)
-       /* var newArray = [];
-        $.each(selectedDates, function(i, e) {
-            var tempDate = moment(e, 'DD.MM.YYYY');
-            var newDate = tempDate.format('YYYY-MM-DD');
-            newArray.push(newDate);
-        });
-        selectedDates = newArray;*/
         // add data to the form
         var selectedDatesJson = JSON.stringify(selectedDates);
         var form = $(this).closest('form');
@@ -305,7 +228,7 @@ $(function () {
             $(this).attr('data-dateSelected', 1);
             var selectedModulepart = $(this).attr('data-modulepartid')
         }
-        markCalendarSelectedModulepart(selectedModulepart);
+        // markCalendarSelectedModulepart(selectedModulepart);
     })
     // select modulepart on "module part" instance
     $('.exaplan-selectable-modulepart').on('clickDISABLED', function (e) {
@@ -320,12 +243,15 @@ $(function () {
             // mark selected dates in calendar
             var selectedModulepart = $(this).attr('data-modulepartid')
         }
-        markCalendarSelectedModulepart(selectedModulepart);
+        // markCalendarSelectedModulepart(selectedModulepart);
     })
 
-    $('.tooltipster').tooltipster({
-        theme: ['tooltipster-light', 'tooltipster-exaplan']
-    });
+    if ($('.tooltipster').length) {
+        $('.tooltipster').tooltipster({
+            theme: ['tooltipster-light', 'tooltipster-exaplan']
+        });
+    }
+
 
 });
 

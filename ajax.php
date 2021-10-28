@@ -75,8 +75,12 @@ switch($action) {
         }
         $modulepartId = required_param('mpid', PARAM_INT);
         $date = required_param('date', PARAM_TEXT);
-//        $dateTS = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
-        echo modulepartAdminViewByDate($modulepartId, $date);
+        $calendarData = block_exaplan_get_data_for_calendar(null, 'all', $modulepartId);
+        $result = [
+            'calendarData' => $calendarData,
+            'htmlContent' => modulepartAdminViewByDate($modulepartId, $date),
+        ];
+        echo json_encode($result);
         exit;
         break;
 }

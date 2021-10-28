@@ -88,12 +88,12 @@ a.exaplan-selectable-modulepart.exaplan-date-desired.exaplan-date-current-module
 }
 
 #block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day_select span.tavo-calendar__day-inner {
-    background-color: #008000 !important;
+    /*background-color: #008000 !important;*/
     color: white;
 }
 
 #block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day span.tavo-calendar__day-inner:hover {
-    background-color: #008000;
+    /*background-color: #008000;*/
     color: white;
 }
 
@@ -255,4 +255,19 @@ table.exaplan-date-details-table td.dataContent {
     /*padding: 8px;*/
 }
 
+.exaplan-celendar-blured .tavo-calendar__day {
+    -webkit-filter: blur(5px);
+    -moz-filter: blur(5px);
+    -o-filter: blur(5px);
+    -ms-filter: blur(5px);
+    filter: blur(5px);
+    /*width: 100%;*/
+    /*height: 100%;*/
+    background-color: #ffffff;
+}
 
+.exaplan-calendarContainer {
+    position: relative;
+    width: 350px;
+    min-width: 350px;
+}

@@ -133,8 +133,23 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
  * @return string
  */
 function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = false, $modulepartId = null) {
+    static $preloadinatorHtml = null;
+    $content = '';
+    if ($preloadinatorHtml === null) {
+//        $preloadinatorHtml = '<div class="dot-windmill" id="spinner" style="1111display: none;"></div>';
+/*        $preloadinatorHtml = '<div class="preloader js-preloader flex-center">
+                                  <div class="dots">
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                    <div class="dot"></div>
+                                  </div>
+                                </div>'*/;
+    }
+
     $isAdmin = block_exaplan_is_admin();
-    $content = '<div id="block_exaplan_dashboard_calendar">';
+
+    $content .= '<div id="block_exaplan_dashboard_calendar">';
+    $content .= $preloadinatorHtml;
 
     if ($userid) {
         // for students
@@ -177,7 +192,7 @@ function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = f
     };
     $content .= '<tr>';
     for ($i = 1; $i <= $monthsCount; $i++) {
-        $content .= '<td width="350" valign="top"><div class="calendar-month-item" id="month' . $i . '"></div></td>';
+        $content .= '<td valign="top" class="exaplan-calendarContainer"><div class="calendar-month-item" id="month' . $i . '"></div></td>';
     }
     $content .= '</tr>';
     $content .= '</table>';
