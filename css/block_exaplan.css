@@ -8,8 +8,8 @@
 }
 
 a.exaplan-date-fixed.exaplan-selectable-date {
-    background-color: rgb(0, 83, 0, 0.25);
-    color: black;
+    color: green;
+   
 }
 a.exaplan-date-fixed.exaplan-selectable-date:hover {
     background-color: rgb(0, 83, 0, 0.5);
@@ -20,15 +20,14 @@ a.exaplan-date-fixed.exaplan-selectable-date.exaplan-date-current-modulepart {
     color: white;
 }
 a.exaplan-selectable-modulepart {
-    background-color: rgba(255, 0, 0, 0.35);
+   
     color: rgba(85, 0, 0, 1);
 }
 a.exaplan-selectable-modulepart:hover {
-    background-color: rgba(255, 0, 0, 0.5);
     color: white
 }
 a.exaplan-selectable-modulepart.exaplan-date-current-modulepart {
-    background-color: rgba(250, 0, 0, 1);
+   
     color: white;
 }
 /*
@@ -38,13 +37,9 @@ a.exaplan-selectable-modulepart[data-modulepartselected="1"] {
 }
 */
 a.exaplan-selectable-modulepart.exaplan-date-desired {
-    background-color: rgb(246, 184, 12, 0.25);
-    border-color: rgb(246, 184, 12, 0.25);
     color: black;
 }
 a.exaplan-selectable-modulepart.exaplan-date-desired:hover {
-    background-color: rgb(246, 184, 12, 0.5);
-    border-color: rgb(246, 184, 12, 0.5);
     color: black;
 }
 a.exaplan-selectable-modulepart.exaplan-date-desired.exaplan-date-current-modulepart {
@@ -59,8 +54,7 @@ a.exaplan-admin-modulepart-button.exaplan-date-desired {
     color: white;
 }
 a.exaplan-admin-modulepart-button.exaplan-date-desired:hover {
-    background-color: rgb(246, 184, 12, 0.5);
-    border-color: rgb(246, 184, 12, 0.5);
+    border-color: white;
     color: black;
 }
 a.exaplan-admin-modulepart-button.exaplan-date-no-desired {
@@ -312,7 +306,7 @@ body {
 #exaplan td, #exaplan th {
   border-bottom: 1px solid #dddddd;
   text-align: left;
-  padding: 10px;
+  padding: 1px;
    
 	
 }
@@ -389,7 +383,7 @@ body {
     display: inline-block;
 }
 
-#exaplan .btn-danger {
+#exaplan .btn-danger, #exaplan .btn-desire {
 	font-family: Arial;
 	color: #ffffff;
 	background: #C20530;
@@ -401,7 +395,10 @@ body {
 	font-size: 0.6rem;
 	line-height: 1.2rem; 
 }
-
+#exaplan .btn-desire {
+	background: rgb(246, 184, 12, 0.25);
+	color: #000000;
+}
 
 #exaplan .btn-outline-danger {
 	border-style: none;
@@ -437,3 +434,5 @@ body {
 #exaplan .css {width: 80%; background-color: #C20530;} 
 #exaplan .js {width: 65%; background-color: #C20530;} 
 #exaplan .php {width: 100%; background-color: #E02061;}  
+
+#exaplan .btn {padding: .175rem .25rem;}

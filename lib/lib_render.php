@@ -30,19 +30,7 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
     }
     $content = '
 <div class="exaplan-result-item">
-<div class="result-item-header">
-<div class="result-item-header-cnt">
-	
-<div class="icon">
-<img src="pix/teilnehmer.svg" height="90" width="90">
-</div>
-<h5 class="item-header-title">'.$tnname.'</h5>   
-	<button type="button" class="btn btn-outline-danger">
-			Planung Präsenztermine  
-	</button>
-	<h4>Symbols, Notifications,...etc.</h4>	
-	</div>
-</div>
+
 ';
     
     
@@ -54,6 +42,21 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
     $content .= '<div class="BlockBody">';
     $content .= '<table class="ModuleTable">';
     $content .= '<thead>';
+    $content .= '<tr>';
+    $content .= '<th colspan=4><div class="result-item-header">
+<div class="result-item-header-cnt">
+	
+<div class="icon">
+<img src="pix/teilnehmer.svg" height="90" width="90">
+</div>
+<h5 class="item-header-title">'.$tnname.'</h5>   
+	<button type="button" class="btn btn-outline-danger">
+			Planung Präsenztermine  
+	</button>
+	<h4>Symbols, Notifications,...etc.</h4>	
+	</div>
+</div></th>';
+     $content .= '</tr>';
     $content .= '<tr>';
     $content .= '<th>Meine gebuchten Module</th>';
     $content .= '<th>Termine</th>';
@@ -101,16 +104,18 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
                     if (getDesiredDates($pUser['id'], $part['id'])) {
                         $buttonTitle = 'Wunschtermin';
                         $buttonClass .= ' exaplan-date-desired ';
+                        $innerButtonClass = ' btn btn-desire ';
                     }
                     if ($modulepartid == $part["id"]) {
                         $buttonClass .= ' exaplan-date-current-modulepart ';
+                        $innerButtonClass = ' btn btn-danger ';
                     }
                     $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'&userid='.$userid.'" 
                                     role="button" 
                                     class="btn exaplan-selectable-modulepart '.$buttonClass.'"                                     
                                     data-modulepartId="'.$part['id'].'"
                                     '.($modulepartid == $part["id"] ? 'data-modulepartselected="1"' : '').'
-                                > '.$buttonTitle.' </a>';
+                                > <button type="button" class="'.$innerButtonClass.'">'.$buttonTitle.'</button> </a>';
                 } else {
                     // fixed date exists
                     $buttonClass = '';
