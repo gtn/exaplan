@@ -292,3 +292,148 @@ table.exaplan-date-details-table td.dataContent {
     width: 350px;
     min-width: 350px;
 }
+
+
+/*----------------------- new code from vanessa -------------------v--->*/
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-size: 0.9375rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;}
+
+#exaplan table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+ 
+}
+
+#exaplan td, #exaplan th {
+  border-bottom: 1px solid #dddddd;
+  text-align: left;
+  padding: 10px;
+   
+	
+}
+
+
+
+#exaplan table.exaplan-result-item-table th {font-size: 1rem; padding: 30px; }
+
+#exaplan .header-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin-left: -45px;
+    border: 3px solid #ddd;
+    border-radius: 50%;
+    box-sizing: content-box;
+    width: 90px;
+    height: 90px;
+}
+
+#exaplan h3.exaplan-result-item-table {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 1rem;
+	color: #C20530;
+}
+
+#exaplan h2 {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 1rem;
+	font-style: bold; 
+	color: #C20530;
+}
+
+
+#exaplan .result-item-header-cnt {
+	display: -ms-flexbox !important;
+	display: flex;
+	-ms-flex-direction: row !important;
+	flex-direction: row;
+	-ms-flex-pack: justify !important;
+	
+	justify-content: space-between !important;
+	aalign-items:  center; /*didi, führt zu herunterrückung vom icon*/
+  position: relative; 
+}
+
+
+#exaplan .item-header-title {
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 20px;
+	letter-spacing: 2px;
+	word-spacing: 2px;
+	color: #2E2E2E;
+	padding-left: 75px;
+}
+
+#exaplan .circleBase {
+    border-radius: 50%;
+    behavior: url(PIE.htc); /* remove if you don't care about IE8 */
+}
+
+#exaplan .type1 {
+    width: 1rem;
+    height:  1rem;
+    background: #C20530;
+	display: inline-block;
+  
+}
+
+#exaplan .type2 {
+    width: 1rem;
+    height:  1rem;
+    background: #ddd;
+    display: inline-block;
+}
+
+#exaplan .btn-danger {
+	font-family: Arial;
+	color: #ffffff;
+	background: #C20530;
+	text-decoration: none;
+	border-style: none; 
+	border-radius: 4px; 
+	padding-left: 20px; 
+	padding-right: 20px; 
+	font-size: 0.6rem;
+	line-height: 1.2rem; 
+}
+
+
+#exaplan .btn-outline-danger {
+	border-style: none;
+	background-color: #ddd;
+}
+
+#exaplan .result-item-header {
+	background-color: #ddd;
+	min-height:90px;
+}
+
+#exaplan .exaplan-result-item {
+	margin-left: 70px;
+}	
+
+/* skill bar------------------------------------------------------------------------*/
+
+* {box-sizing:border-box}
+
+#exaplan .result-item-header-cnt {
+  width: 100%; /* Full width */
+  background-color: #ddd; /* Grey background */
+}
+
+#exaplan .skills {
+  text-align: right; 
+  padding-top: 3px; 
+  padding-bottom: 3px; 
+  color: white; 
+}
+
+#exaplan .html {width: 90%; background-color: #C20530;} 
+#exaplan .css {width: 80%; background-color: #C20530;} 
+#exaplan .js {width: 65%; background-color: #C20530;} 
+#exaplan .php {width: 100%; background-color: #E02061;}  
