@@ -33,6 +33,14 @@ $CFG->centraldbname = $dbname;
 $CFG->centraldbusername = $dbusername;
 $CFG->centraldbpassword = $dbpassword;
 
+// only for SZ developer server:
+if (isset($CFG->uniqueMoodleIdentificator) && $CFG->uniqueMoodleIdentificator == 'dfldf8dfh784hj484489045b4590tuydldfg954u4lf') {
+    $dbname = $CFG->dbname;
+    $dbusername = $CFG->dbuser;
+    $dbpassword = $CFG->dbpass;
+};
+
+
 
 function getPdoConnect()
 {

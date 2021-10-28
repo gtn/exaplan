@@ -63,7 +63,20 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
             $content .= '<td>';
             if ($mode == 1) {
                 // for admins
-                $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$part["id"].'" role="button" class="btn btn-danger"> Anfragen </a>';
+                $desiredDates = getDesiredDates(null, $part['id']);
+                $buttonClass = '';
+                if (count($desiredDates) > 0) {
+                    $title = count($desiredDates).' Anfragen';
+                    $buttonClass .= ' exaplan-date-desired ';
+                } else {
+                    $title = ' - - ';
+                    $buttonClass .= ' exaplan-date-no-desired ';
+                }
+                $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$part["id"].'" 
+                                role="button" 
+                                data-modulepartId="'.$part['id'].'"
+                                class="btn btn-danger exaplan-admin-modulepart-button '.$buttonClass.'"
+                            > '.$title.' </a>';
             } else {
                 if (!$part['date'] || $part['date'][0]['state'] != BLOCK_EXAPLAN_DATE_CONFIRMED) {
                     // desired dates
@@ -270,15 +283,14 @@ function printAdminModulepartView($modulepartid, $date = '') {
     $content = '';
     $content .= '<div class="adminModuleplanView">';
     $content .= '<table class="moduleplanView-header">';
+    $titleSet = [];
     $moduleSetId = getTableData(BLOCK_EXAPLAN_DB_MODULEPARTS, $modulepartid, 'modulesetid');
+    $titleSet[] = getTableData(BLOCK_EXAPLAN_DB_MODULESETS, $moduleSetId, 'title');
+    $titleSet[] = getTableData(BLOCK_EXAPLAN_DB_MODULEPARTS, $modulepartid, 'title');
+    $titleSet[] = getTableData(BLOCK_EXAPLAN_DB_MODULESETS, $moduleSetId, 'location');
     // header
     $content .= '<tr>';
-    $content .= '<td width="25%" valign="top">'.getTableData(BLOCK_EXAPLAN_DB_MODULEPARTS, $modulepartid, 'title');
-    $location = getTableData(BLOCK_EXAPLAN_DB_MODULESETS, $moduleSetId, 'location');
-    if ($location) {
-        $content .= '&nbsp;|&nbsp;' . $location;
-    }
-    $content .= '</td>';
+    $content .= '<td width="25%" valign="top">'.implode('&nbsp;|&nbsp;', $titleSet).'</td>';
     $content .= '<td width="25%" valign="top">Gesamt Teilnehmer angefragt: </td>';
     $content .= '<td width="25%" valign="top">Rest:</td>';
     $content .= '</tr>';
