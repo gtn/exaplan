@@ -32,6 +32,7 @@ global $CFG;
 $CFG->centraldbname = $dbname;
 $CFG->centraldbusername = $dbusername;
 $CFG->centraldbpassword = $dbpassword;
+// this is needed because otherwise in cron tasks $dbname etc does not exist
 
 // only for SZ developer server:
 if (isset($CFG->uniqueMoodleIdentificator) && $CFG->uniqueMoodleIdentificator == 'dfldf8dfh784hj484489045b4590tuydldfg954u4lf') {
@@ -39,7 +40,6 @@ if (isset($CFG->uniqueMoodleIdentificator) && $CFG->uniqueMoodleIdentificator ==
     $dbusername = $CFG->dbuser;
     $dbpassword = $CFG->dbpass;
 };
-
 
 
 function getPdoConnect()
@@ -55,7 +55,8 @@ function getPdoConnect()
     return $pdo;
 }
 
-function getTableData($tableName, $id, $field = null) {
+function getTableData($tableName, $id, $field = null)
+{
     global $CFG;
     // TODO: make static variable for performance?
     $pdo = getPdoConnect();
@@ -65,10 +66,10 @@ function getTableData($tableName, $id, $field = null) {
     );
 
     if (strpos($tableName, 'mdl_') === false) {
-        $tableName = $CFG->prefix.$tableName; // for using with constants or other cases
+        $tableName = $CFG->prefix . $tableName; // for using with constants or other cases
     }
 
-    $sql = 'SELECT * FROM '.$tableName.' WHERE id = :id ';
+    $sql = 'SELECT * FROM ' . $tableName . ' WHERE id = :id ';
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
     $statement->setFetchMode(PDO::FETCH_ASSOC);
@@ -122,30 +123,30 @@ function getPuser($userid = 0)
 }
 
 
-function getOrCreatePuser($userid=0)
+function getOrCreatePuser($userid = 0)
 {
-    global $USER,$DB;
-		if ($userid==0){
-			$userid=$USER->id;
-			$firstname=$USER->firstname;
-			$lastname=$USER->lastname;
-			$email=$USER->email;
-		}elseif ($userid>0){
-			$user = $DB->get_record('user', ['id' => $userid], '*', IGNORE_MISSING);
-            $firstname=$user->firstname;
-			$lastname=$user->lastname;
-			$email=$user->email;
-		}else{
-			return false;
-		}
+    global $USER, $DB;
+    if ($userid == 0) {
+        $userid = $USER->id;
+        $firstname = $USER->firstname;
+        $lastname = $USER->lastname;
+        $email = $USER->email;
+    } elseif ($userid > 0) {
+        $user = $DB->get_record('user', ['id' => $userid], '*', IGNORE_MISSING);
+        $firstname = $user->firstname;
+        $lastname = $user->lastname;
+        $email = $user->email;
+    } else {
+        return false;
+    }
 
-		$region=block_exaplan_get_user_regioncohort($userid);
+    $region = block_exaplan_get_user_regioncohort($userid);
 
     $pdo = getPdoConnect();
 
     $params = array(
         ':userid' => $userid,
-        ':moodleid' =>  get_config('exaplan', 'moodle_id'),
+        ':moodleid' => get_config('exaplan', 'moodle_id'),
     );
 
 
@@ -169,6 +170,7 @@ function getOrCreatePuser($userid=0)
         return $user[0]['id'];
     }
 }
+
 function getAllModules()
 {
 
@@ -210,7 +212,7 @@ function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_CONFIRMED)
     $courses = $DB->get_records('course');
     foreach ($courses as $course) {
         if ($course->idnumber > 0) {
-        	$context = context_course::instance($course->id);
+            $context = context_course::instance($course->id);
             if (is_enrolled($context, $userid, '', true)) {
                 $moduleset = new \stdClass;
                 $params = array(
@@ -259,7 +261,8 @@ function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_CONFIRMED)
     return $modulesets;
 }
 
-function getPrefferedDate($modulepartid, $date, $timeslot, $state = 1) {
+function getPrefferedDate($modulepartid, $date, $timeslot, $state = 1)
+{
     $pdo = getPdoConnect();
 
     $params = array(
@@ -316,7 +319,7 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
         ':modifiedtimestamp' => $timestamp,
         ':location' => $location,
         ':trainerpuserid' => $trainerId,
-        ':starttime' => (strtotime(date('Y-m-d', $date).' '.$starttime) ?: strtotime('today midnight')), // todays midninght if no time in the form!
+        ':starttime' => (strtotime(date('Y-m-d', $date) . ' ' . $starttime) ?: strtotime('today midnight')), // todays midninght if no time in the form!
         ':comment' => trim($comment),
     ];
 
@@ -326,7 +329,10 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
         $dateId = $dateRec['id'];
         // return existing dateId. We do not need to create it
         if ($updateExisting) {
-            unset($params[':modulepartid']); unset($params[':date']); unset($params[':state']); unset($params[':timeslot']); // for leave PHP warnings
+            unset($params[':modulepartid']);
+            unset($params[':date']);
+            unset($params[':state']);
+            unset($params[':timeslot']); // for leave PHP warnings
             $sql = "UPDATE mdl_block_exaplandates 
                         SET modifiedpuserid = :modifiedpuserid,
                              modifiedtimestamp = :modifiedtimestamp,
@@ -334,7 +340,7 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
                              trainerpuserid = :trainerpuserid,
                              starttime = :starttime,
                              comment = :comment
-                        WHERE id = ". $dateId .";";
+                        WHERE id = " . $dateId . ";";
             $statement = $pdo->prepare($sql);
             $statement->execute($params);
         }
@@ -398,7 +404,7 @@ function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuser
         $statement->execute([':id' => $dates[0]['id']]);
         return 0;
     } else {
-    	$params = array_merge($params, [
+        $params = array_merge($params, [
             ':modulepartid' => $modulepartid,
             ':date' => $date,
             ':puserid' => $puserid,
@@ -407,12 +413,12 @@ function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuser
             ':timestamp' => $timestamp,
         ]);
         $sql = "INSERT INTO mdl_block_exaplandesired (modulepartid, date, puserid, timeslot, creatorpuserid, timestamp) VALUES (:modulepartid, :date, :puserid, :timeslot, :creatorpuserid, :timestamp)";
-		//  echo $sql; exit;
-		    $statement = $pdo->prepare($sql);
-		    $statement->execute($params);
-		    $dateid = $pdo->lastInsertId();
-		    return $dateid;
-		}
+        //  echo $sql; exit;
+        $statement = $pdo->prepare($sql);
+        $statement->execute($params);
+        $dateid = $pdo->lastInsertId();
+        return $dateid;
+    }
 }
 
 /**
@@ -421,7 +427,8 @@ function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuser
  * @param int $puserid
  * @return bool
  */
-function removeDesiredDate($modulepartid, $puserid) {
+function removeDesiredDate($modulepartid, $puserid)
+{
     if (!$modulepartid || !$puserid) {
         return true;
     }
@@ -435,7 +442,8 @@ function removeDesiredDate($modulepartid, $puserid) {
     return true;
 }
 
-function addPUserToDate($dateid, $puserid) {
+function addPUserToDate($dateid, $puserid)
+{
     global $USER;
 
     $pdo = getPdoConnect();
@@ -473,7 +481,8 @@ function addPUserToDate($dateid, $puserid) {
     return $id;
 }
 
-function removePUserFromDate($dateid, $puserid) {
+function removePUserFromDate($dateid, $puserid)
+{
     $pdo = getPdoConnect();
     $params = [
         ':dateid' => $dateid,
@@ -484,7 +493,8 @@ function removePUserFromDate($dateid, $puserid) {
     $statement->execute($params);
 }
 
-function removeDateIfNoUsers($dateid) {
+function removeDateIfNoUsers($dateid)
+{
     $pdo = getPdoConnect();
     // get related to 'date' users
     $params = [':dateid' => $dateid];
@@ -523,7 +533,7 @@ function updateNotifications()
     // iterate over all notifications that have not been used for creating moodle notifications and create them
     foreach ($plannotifications as $pn) {
         // userfrom = 2 because 2 is always admin
-        block_exaplan_send_notification("datefixed", 2, $pn["userto"], "Termin fixiert", $pn["notificationtext"], "Termin");
+        block_exaplan_send_moodle_notification("datefixed", 2, $pn["userto"], "Termin fixiert", $pn["notificationtext"], "Termin");
 
         // set the moodlenotificationcreated to true
         $statement = $pdo->prepare("
@@ -534,6 +544,8 @@ function updateNotifications()
         $statement->execute(array(':id' => $pn['id']));
     }
 }
+
+
 
 /**
  * @param int $puserid (null id needed data about whole modulepart)
@@ -629,7 +641,8 @@ function getFixedDates($puserid = null, $modulepartid = null, $date = null, $tim
 
 }
 
-function isPuserIsFixedForDate($puserid, $dateid) {
+function isPuserIsFixedForDate($puserid, $dateid)
+{
     if (!$puserid || !$dateid) {
         return false;
     }

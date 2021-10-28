@@ -40,6 +40,9 @@ switch ($action) {
             // delete ALL desired dates
             removeDesiredDate($modulepartid, $student);
 //            setDesiredDate($modulepartid, $student, $dateTS, $middayType);
+
+            // create notification for users
+            block_exaplan_create_plannotification($pUserId,$student,"Termin für Modulteil ".$modulepartid." fixiert am ".$date.".");
         }
         break;
 }

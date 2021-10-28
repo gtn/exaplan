@@ -25,6 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 const BLOCK_EXAPLAN_DB_MODULESETS = 'block_exaplanmodulesets';
 const BLOCK_EXAPLAN_DB_MODULEPARTS = 'block_exaplanmoduleparts';
 const BLOCK_EXAPLAN_DB_DATES = 'block_exaplandates';
+const BLOCK_EXAPLAN_DB_PLANNOTIFICATIONS = 'block_EXAPLANNOTIFICATIONS';
 
 /**
  * DATE STATES
@@ -424,7 +425,6 @@ function block_exaplan_get_modulesets_by_puserid($puserid = null)
     $modulesets = [];
 
 
-
 //    $sql = 'SELECT s.stid FROM {' . BLOCK_EXAPLAN_DB_MODULESETS . '} t
 //			JOIN {' . BLOCK_EXACOMP_DB_SUBJECTS . '} s ON t.subjid=s.id
 //			WHERE t.id=?';
@@ -439,7 +439,8 @@ function block_exaplan_get_modulesets_by_puserid($puserid = null)
  *
  * Includes all neccessary JavaScript files
  */
-function block_exaplan_init_js_css($courseid = 0) {
+function block_exaplan_init_js_css($courseid = 0)
+{
     global $PAGE, $CFG;
 
     // only allowed to be called once
@@ -485,15 +486,16 @@ function block_exaplan_init_js_css($courseid = 0) {
 
     // page specific js/css
     $scriptName = preg_replace('!\.[^\.]+$!', '', basename($_SERVER['PHP_SELF']));
-    if (file_exists($CFG->dirroot.'/blocks/exaplan/css/'.$scriptName.'.css')) {
-        $PAGE->requires->css('/blocks/exaplan/css/'.$scriptName.'.css');
+    if (file_exists($CFG->dirroot . '/blocks/exaplan/css/' . $scriptName . '.css')) {
+        $PAGE->requires->css('/blocks/exaplan/css/' . $scriptName . '.css');
     }
-    if (file_exists($CFG->dirroot.'/blocks/exaplan/javascript/'.$scriptName.'.js')) {
-        $PAGE->requires->js('/blocks/exaplan/javascript/'.$scriptName.'.js', false);
+    if (file_exists($CFG->dirroot . '/blocks/exaplan/javascript/' . $scriptName . '.js')) {
+        $PAGE->requires->js('/blocks/exaplan/javascript/' . $scriptName . '.js', false);
     }
 }
 
-function block_exaplan_get_middate_string_key($keyIndex) {
+function block_exaplan_get_middate_string_key($keyIndex)
+{
     switch ($keyIndex) {
         case BLOCK_EXAPLAN_MIDDATE_AFTER:
             return 'after';
@@ -510,7 +512,8 @@ function block_exaplan_get_middate_string_key($keyIndex) {
  * gwt JSON calendar data for single user (pUser!)
  * @param $userid
  */
-function block_exaplan_get_calendar_data($userid) {
+function block_exaplan_get_calendar_data($userid)
+{
     global $USER;
     $data = [
         'selectedDates' => []
@@ -550,7 +553,8 @@ function block_exaplan_get_calendar_data($userid) {
  * @param bool $readonly whole calendar is readonly
  * @return false|string
  */
-function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desired', $modulepartId = null, $readonly = false) {
+function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desired', $modulepartId = null, $readonly = false)
+{
 
     $data = [
         'selectedDates' => []
@@ -598,10 +602,11 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
 }
 
 
-function block_exaplan_send_notification($notificationtype, $userfrom, $userto, $subject, $message, $context, $contexturl = null, $dakoramessage = false, $courseid = 0, $customdata = null) {
+function block_exaplan_send_moodle_notification($notificationtype, $userfrom, $userto, $subject, $message, $context, $contexturl = null, $dakoramessage = false, $courseid = 0, $customdata = null)
+{
     global $CFG, $DB;
 
-    require_once($CFG->dirroot.'/message/lib.php');
+    require_once($CFG->dirroot . '/message/lib.php');
 
     $eventdata = new core\message\message();
 
@@ -624,7 +629,8 @@ function block_exaplan_send_notification($notificationtype, $userfrom, $userto, 
     message_send($eventdata);
 }
 
-function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot = 3) {
+function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot = 3)
+{
 
     $data = [];
 
@@ -640,34 +646,50 @@ function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $d
     return $dates;
 }
 
-function block_exaplan_get_users_from_cohort($cohortidnumber="SW_Trainer") {
+function block_exaplan_get_users_from_cohort($cohortidnumber = "SW_Trainer")
+{
     global $DB;
 
     $sql = 'SELECT u.*
               FROM {cohort} c
               JOIN {cohort_members} cm ON c.id = cm.cohortid
               JOIN {user} u ON cm.userid=u.id
-              WHERE c.idnumber = "'.$cohortidnumber.'" AND c.visible = 1';
+              WHERE c.idnumber = "' . $cohortidnumber . '" AND c.visible = 1';
     return $DB->get_records_sql($sql);
 }
 
-function block_exaplan_get_user_regioncohort($userid){
-	global $DB;
+function block_exaplan_get_user_regioncohort($userid)
+{
+    global $DB;
     $sql = 'SELECT u.id,c.idnumber
               FROM {cohort} c
               JOIN {cohort_members} cm ON c.id = cm.cohortid
               JOIN {user} u ON cm.userid=u.id
               WHERE (c.idnumber = "RegionOst" OR c.idnumber = "RegionWest") AND c.visible = 1';
 
-    if ($records=$DB->get_records_sql($sql)){
-    	foreach ($records as $record){
-    		return $record->idnumber;
-    		break;
-    	}
+    if ($records = $DB->get_records_sql($sql)) {
+        foreach ($records as $record) {
+            return $record->idnumber;
+            break;
+        }
 
-    }else{
-    	return "";
+    } else {
+        return "";
     }
 }
+
+function block_exaplan_create_plannotification($puseridfrom = null, $puseridto = null, $notificationtext = "")
+{
+    global $DB;
+
+    $plannotification = new stdClass();
+    $plannotification->puseridfrom = $puseridfrom;
+    $plannotification->puseridto = $puseridto;
+    $plannotification->notificationtext = $notificationtext;
+    $plannotification->moodlenotificationcreated = 0;
+
+    return $DB->insert_record(BLOCK_EXAPLAN_DB_PLANNOTIFICATIONS, $plannotification);
+}
+
 
 
