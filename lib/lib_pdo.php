@@ -442,7 +442,13 @@ function removeDesiredDate($modulepartid, $puserid)
     return true;
 }
 
-function addPUserToDate($dateid, $puserid)
+/**
+ * @param int $dateid
+ * @param int $puserid
+ * @param int $absend
+ * @return string
+ */
+function addPUserToDate($dateid, $puserid, $absend = 0)
 {
     global $USER;
 
@@ -472,9 +478,10 @@ function addPUserToDate($dateid, $puserid)
     // create a new relation
     $params = array_merge($params, [
             ':creatorpuserid' => $creatorpUserid,
+            ':absend' => $absend,
         ]
     );
-    $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpuser_date_mm (dateid, puserid, creatorpuserid) VALUES (:dateid, :puserid, :creatorpuserid);");
+    $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpuser_date_mm (dateid, puserid, creatorpuserid, absend) VALUES (:dateid, :puserid, :creatorpuserid, :absend);");
     $statement->execute($params);
     $id = $pdo->lastInsertId();
 
@@ -641,7 +648,13 @@ function getFixedDates($puserid = null, $modulepartid = null, $date = null, $tim
 
 }
 
-function isPuserIsFixedForDate($puserid, $dateid)
+/**
+ * @param int $puserid
+ * @param int $dateid
+ * @param bool $returnData
+ * @return bool
+ */
+function isPuserIsFixedForDate($puserid, $dateid, $returnData = false)
 {
     if (!$puserid || !$dateid) {
         return false;
@@ -653,9 +666,15 @@ function isPuserIsFixedForDate($puserid, $dateid)
     ];
     $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpuser_date_mm WHERE dateid = :dateid AND puserid = :puserid;");
     $statement->execute($params);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
     $dates = $statement->fetchAll();
     if ($dates) {
+        if ($returnData) {
+            return $dates[0];
+        }
         return true;
     }
-    return false;
+    return null;
 }
+
+

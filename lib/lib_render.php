@@ -358,16 +358,30 @@ function modulepartAdminViewByDate($modulepartId, $date) {
                 }
                 $rowsCount++;
                 $cont .= '<tr>';
-                $cont .= '<td valign="top" height="'.$setRowHight.'">'.@$dateData['pUserData']['firstname'].' '.@$dateData['pUserData']['lastname'].'</td>';
+                $cont .= '<td valign="top" height="'.$setRowHight.'">';
+                // fixed or desired
+                $cont .= '<input type="checkbox" 
+                                    value="1"      
+                                    id = "fixedUser"'.$dateData['pUserData']['id'].'"                               
+                                    name = "fixedPuser['.$dateData['pUserData']['id'].']" 
+                                    '.($dateData['dateType'] == 'fixed' ? 'checked = "checked"' : '').'/>&nbsp;';
+                $cont .= '<label for="fixedUser"'.$dateData['pUserData']['id'].'">'.@$dateData['pUserData']['firstname'].' '.@$dateData['pUserData']['lastname'].'</label>';
+                $cont .= '</td>';
                 $cont .= '<td valign="top">'./*buttons*/'</td>';
                 $companyName = getTableData('mdl_block_exaplanmoodles', $dateData['pUserData']['moodleid'], 'companyname');
                 $cont .= '<td valign="top">'.$companyName.'</td>';
-                // fixed or desired
+                // absend or not
+                $absend = '';
+                if ($relationData = isPuserIsFixedForDate($dateData['pUserData']['id'], $dateData['id'], true)) {
+                    if ($relationData['absend']) {
+                        $absend = ' checked = "checked" ';
+                    }
+                }
                 $cont .= '<td valign="top">
                             <input type="checkbox" 
                                     value="1"                                     
-                                    name="fixedPuser['.$dateData['pUserData']['id'].']" 
-                                    '.($dateData['dateType'] == 'fixed' ? 'checked = "checked"' : '').'/></td>';
+                                    name="absendPuser['.$dateData['pUserData']['id'].']" 
+                                    '.$absend.'/></td>';
                 $cont .= '<td valign="top"><!--Bewertung--></td>';
                 if ($rowsCount == 1) {
                     $cont .= '<td rowspan="###FORM_ROWSPAN###"  valign="top">'.formAdminDateFixing($modulepartId, $date, $timeslot).'</td>';
@@ -397,6 +411,14 @@ function modulepartAdminViewByDate($modulepartId, $date) {
     return $content;
 }
 
+/**
+ * inputs for main data of 'mdl_block_exaplandates'.
+ * Look also inputs in function modulepartAdminViewByDate()
+ * @param int $modulepartId
+ * @param string $date
+ * @param int $timeslot
+ * @return string
+ */
 function formAdminDateFixing($modulepartId, $date, $timeslot) {
     global $CFG;
     $content = '';

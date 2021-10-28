@@ -35,8 +35,14 @@ switch ($action) {
         $trainerId = optional_param('trainer', 0, PARAM_INT);
         $pTrainer = getPuser($trainerId)['id'];
         $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description);
+        $absends = optional_param_array('absendPuser', [], PARAM_INT);
+        $absends = array_keys($absends);
         foreach ($students as $student) {
-            addPUserToDate($dateId, $student);
+            $absend = 0;
+            if (in_array($student, $absends)) {
+                $absend = 1;
+            }
+            addPUserToDate($dateId, $student, $absend);
             // delete ALL desired dates
             removeDesiredDate($modulepartid, $student);
 //            setDesiredDate($modulepartid, $student, $dateTS, $middayType);
