@@ -607,20 +607,20 @@ function block_exaplan_send_notification($notificationtype, $userfrom, $userto, 
     $eventdata->fullmessageformat = FORMAT_HTML;
     $eventdata->fullmessagehtml = $message;
     $eventdata->smallmessage = $subject;
-    $eventdata->component = 'block_exaport';
+    $eventdata->component = 'block_exaplan';
     $eventdata->notification = 1;
     $eventdata->contexturl = $contexturl;
     $eventdata->contexturlname = $context;
     $eventdata->courseid = $courseid;
     $eventdata->customdata = $customdata;    // version must be 3.7 or higher, otherwise this field does not yet exist
 
-    @message_send($eventdata);
+    message_send($eventdata);
 }
 
 function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot = 3) {
 
     $data = [];
-    
+
     $dates1 = getFixedDates(null, $modulepartId, $date, $timeslot);
     $dates2 = getDesiredDates(null, $modulepartId, $date, $timeslot);
     $dates = array_merge($dates1, $dates2);
@@ -629,7 +629,7 @@ function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $d
         $pUserData = getTableData('mdl_block_exaplanpusers', $dateData['relatedUserId']);
         $dates[$k]['pUserData'] = $pUserData;
     }
-    
+
     return $dates;
 }
 
@@ -651,7 +651,7 @@ function block_exaplan_get_user_regioncohort($userid){
               JOIN {cohort_members} cm ON c.id = cm.cohortid
               JOIN {user} u ON cm.userid=u.id
               WHERE (c.idnumber = "RegionOst" OR c.idnumber = "RegionWest") AND c.visible = 1';
-    
+
     if ($records=$DB->get_records_sql($sql)){
     	foreach ($records as $record){
     		return $record->idnumber;

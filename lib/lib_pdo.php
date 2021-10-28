@@ -29,19 +29,20 @@ global $CFG;
 // SZ: in function getPdoConnect(): dbname/dbuser/dbpassword from config.php will be used. If they are not working - will be used global moodle $CFG values
 // it is useful for development on the single Moodle installation.
 // if you have correct Moodle installtions and exaplan/config.php - all must work ok
-//$CFG->dbname = $dbname;
-//$CFG->dbusername = $dbusername;
-//$CFG->dbpassword = $dbpassword;
+$CFG->centraldbname = $dbname;
+$CFG->centraldbusername = $dbusername;
+$CFG->centraldbpassword = $dbpassword;
 
 
 function getPdoConnect()
 {
     global $CFG, $dbname, $dbusername, $dbpassword;
+    require_once __DIR__ . '/../config.php';
     try {
         $pdo = new PDO('mysql:host=localhost;dbname=' . $dbname, $dbusername, $dbpassword); // TODO: constant, global?
     } catch (Exception $e) {
         // use global parameters
-        $pdo = new PDO('mysql:host=localhost;dbname=' . $CFG->dbname, $CFG->dbuser, $CFG->dbpass);
+        $pdo = new PDO('mysql:host=localhost;dbname=' . $CFG->centraldbname, $CFG->centraldbusername, $CFG->centraldbpassword);
     }
     return $pdo;
 }
@@ -129,7 +130,7 @@ function getOrCreatePuser($userid=0)
 		}else{
 			return false;
 		}
-		
+
 		$region=block_exaplan_get_user_regioncohort($userid);
 
     $pdo = getPdoConnect();
@@ -497,13 +498,16 @@ function updateNotifications()
         ':moodleid' => get_config('exaplan', 'moodle_id')
     );
 
+    // pu.id is the puserid used for the notification in the centralmoodle
+    // pu.userid is the userid in the foreignmoodle
     $statement = $pdo->prepare("
-        SELECT pu.userid as userto, n.notificationtext
+        SELECT pu.userid as userto, n.notificationtext, n.id
         FROM mdl_block_exaplannotifications as n
-        JOIN mdl_block_exaplanpusers as pu ON pu.userid = n.puseridto
+        JOIN mdl_block_exaplanpusers as pu ON pu.id = n.puseridto
         WHERE n.moodlenotificationcreated = false
         AND pu.moodleid = :moodleid
      ");
+
     $statement->execute($params);
 
     $plannotifications = $statement->fetchAll();
@@ -511,7 +515,15 @@ function updateNotifications()
     // iterate over all notifications that have not been used for creating moodle notifications and create them
     foreach ($plannotifications as $pn) {
         // userfrom = 2 because 2 is always admin
-        block_exaplan_send_notification("date_fixed", 2, $pn["userto"], "Termin fixiert", $pn["notificationtext"], "Termin");
+        block_exaplan_send_notification("datefixed", 2, $pn["userto"], "Termin fixiert", $pn["notificationtext"], "Termin");
+
+        // set the moodlenotificationcreated to true
+        $statement = $pdo->prepare("
+            UPDATE mdl_block_exaplannotifications
+            SET moodlenotificationcreated = 1
+            WHERE id = :id;
+        ");
+        $statement->execute(array(':id' => $pn['id']));
     }
 }
 
