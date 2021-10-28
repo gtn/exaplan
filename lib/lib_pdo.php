@@ -301,9 +301,10 @@ function getPrefferedDate($modulepartid, $date, $timeslot, $state = 1)
  * @param int $trainerId pUser!
  * @param string $starttime
  * @param string $comment
+ * @param string $region
  * @return string
  */
-function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment)
+function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment, $region)
 {
     $pdo = getPdoConnect();
     $timestamp = new DateTime();
@@ -319,8 +320,9 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
         ':modifiedtimestamp' => $timestamp,
         ':location' => $location,
         ':trainerpuserid' => $trainerId,
-        ':starttime' => (strtotime(date('Y-m-d', $date) . ' ' . $starttime) ?: strtotime('today midnight')), // todays midninght if no time in the form!
+        ':starttime' => (strtotime(date('Y-m-d', $date) . ' ' . $starttime) ?: strtotime('today midnight')), // day's midninght if no time in the form!
         ':comment' => trim($comment),
+        ':region' => trim($region),
     ];
 
     $dateRec = getPrefferedDate($modulepartid, $date, $timeslot, BLOCK_EXAPLAN_DATE_CONFIRMED);
@@ -340,6 +342,7 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
                              trainerpuserid = :trainerpuserid,
                              starttime = :starttime,
                              comment = :comment
+                             region = :region
                         WHERE id = " . $dateId . ";";
             $statement = $pdo->prepare($sql);
             $statement->execute($params);
@@ -353,15 +356,13 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
     ]);
 
     $sql = "INSERT INTO mdl_block_exaplandates 
-                        (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp, location, trainerpuserid, starttime, comment) 
-                  VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp, :location, :trainerpuserid, :starttime, :comment);";
+                        (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp, location, trainerpuserid, starttime, comment, region) 
+                  VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp, :location, :trainerpuserid, :starttime, :comment, :region);";
 //    echo "<pre>debug:<strong>lib_pdo.php:297</strong>\r\n"; print_r($params); echo '</pre>'; // !!!!!!!!!! delete it
 //    echo $sql; exit;
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
     $dateid = $pdo->lastInsertId();
-
-//    addPUserToDate($dateid, $puserid);
 
     return $dateid;
 

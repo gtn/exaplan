@@ -34,7 +34,9 @@ switch ($action) {
         $description = optional_param('description', '', PARAM_TEXT);
         $trainerId = optional_param('trainer', 0, PARAM_INT);
         $pTrainer = getPuser($trainerId)['id'];
-        $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description);
+        $region = optional_param('region', 'all', PARAM_TEXT);
+
+        $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $region);
         $absends = optional_param_array('absendPuser', [], PARAM_INT);
         $absends = array_keys($absends);
         foreach ($students as $student) {

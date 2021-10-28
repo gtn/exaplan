@@ -434,7 +434,8 @@ function formAdminDateFixing($modulepartId, $date, $timeslot) {
     $content .= '<table class="table table-sm table-borderless">';
 
     $content .= '<tr>';
-    $content .= '<td colspan="2"><label for="trainer_'.$instanceKey.'">Trainer:</label></td>';
+    $content .= '<td><label for="trainer_'.$instanceKey.'">Trainer:</label></td>';
+    $content .= '<td><label for="region_'.$instanceKey.'">Region:</label></td>';
     $content .= '</tr>';
 
     $content .= '<tr>';
@@ -445,6 +446,13 @@ function formAdminDateFixing($modulepartId, $date, $timeslot) {
         $trainerPid = getPuser($trainer->id);
         $content .= '<option value="'.$trainer->id.'" '.(@$dateRec['trainerpuserid'] == $trainerPid ? ' selected="selected" ' : '').'>'.fullname($trainer).'</option>'; // original ID (not pUser), because it is on MAIN moodle
     }
+    $content .= '</select>';
+    $content .= '</td>';
+    $content .= '<td>';
+    $content .= '<select id="region_'.$instanceKey.'" class="form-control" name="region">';
+    $content .= '<option value="all">Alle Regionen</option>';
+    $content .= '<option value="RegionOst" '.($dateRec['region'] == 'RegionOst' ? 'selected="selected' : '').'>Ost</option>';
+    $content .= '<option value="RegionWest" '.($dateRec['region'] == 'RegionWest' ? 'selected="selected' : '').'>West</option>';
     $content .= '</select>';
     $content .= '</td>';
     $content .= '<td>';
