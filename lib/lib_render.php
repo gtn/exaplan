@@ -316,7 +316,7 @@ function modulepartAdminViewByDate($modulepartId, $date) {
     $content .= '<th>Angefragte TN: '.$date.'</th>';
     $content .= '<th></th>';
     $content .= '<th>Organization</th>';
-    $content .= '<th>TN gefehit?</th>';
+    $content .= '<th>TN gefehlt?</th>';
     $content .= '<th>Bewertung o.ä.?</th>';
     $content .= '<th></th>';
     $content .= '</tr>';

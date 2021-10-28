@@ -12,9 +12,6 @@
                        COMMENT="Title of the moduleset"/>
                 <FIELD NAME="description" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false"
                        COMMENT="Description of the moduleset"/>
-                <FIELD NAME="trainerpuserid" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"/>
-                <FIELD NAME="location" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false"
-                       COMMENT="Name of the location"/>
                 <FIELD NAME="courseidnumber" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"
                        COMMENT="mdl_course.idnumber of the referenced moodlecourse"/>
             </FIELDS>
@@ -111,6 +108,7 @@
                 <FIELD NAME="id" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="dateid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="puserid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="absent" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="creatorpuserid" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
