@@ -18,22 +18,38 @@
 function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false, $dateId = 0, $withDateDetails = false){
     global $CFG;
 
-
+   
     if ($mode == 1) {
         $modulesets = getAllModules();
         $pUser = [];
+        $tnname = '';
     } else{
         $modulesets = getModulesOfUser($userid);
         $pUser = getPuser($userid);
+        $tnname = '<b>'.$pUser["firstname"].' '.$pUser["lastname"].'</b>';
     }
-    $content = '<div class="UserBlock">';
+    $content = '
+<div class="exaplan-result-item">
+<div class="result-item-header">
+<div class="result-item-header-cnt">
+	
+<div class="icon">
+<img src="pix/teilnehmer.svg" height="90" width="90">
+</div>
+<h5 class="item-header-title">'.$tnname.'</h5>   
+	<button type="button" class="btn btn-outline-danger">
+			Planung Präsenztermine  
+	</button>
+	<h4>Symbols, Notifications,...etc.</h4>	
+	</div>
+</div>
+';
+    
+    
+    
+    $content.= '<div class="UserBlock">';
     $content .= '<div class="BlockHeader">';
-    if ($mode == 1){
-
-    } else {
-        $content .= '<b>'.$pUser["firstname"].' '.$pUser["lastname"].'</b>';
-        $content .= '<button type="button" class="btn btn-outline-danger"> Planung Präsenztermine </button>';
-    }
+    
     $content .= '</div>';
     $content .= '<div class="BlockBody">';
     $content .= '<table class="ModuleTable">';
@@ -132,7 +148,7 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
     $content .= '</table>';
     $content .= '</div>';
     $content .= '</div>';
-
+		$content .= '</div><!-- / exaplan-result-item --->';
     return $content;
 }
 
