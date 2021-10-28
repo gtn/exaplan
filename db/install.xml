@@ -49,7 +49,7 @@
                        COMMENT="not used since rework and block_exaplandesired table"/>
                 <FIELD NAME="location" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false"
                        COMMENT="Name of the location"/>
-               <FIELD NAME="region" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"/>
+               <FIELD NAME="region" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="comment" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="starttime" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="begin of event"/>
                 <FIELD NAME="trainerpuserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
