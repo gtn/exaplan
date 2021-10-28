@@ -62,22 +62,19 @@ function block_exaplan_is_teacher($context = null, $userid = null)
     return has_capability('block/exaplan:teacher', $context, $userid);
 }
 
+
 function block_exaplan_is_teacher_in_any_course()
 {
-    global $USER;
+    global $CFG, $DB, $USER;
 
-    $courses = block_exaplan_get_courses($USER->id);
-
-    foreach ($courses as $course) {
-        $context = context_course::instance($course["courseid"]);
-
-        $isTeacher = block_exaplan_is_teacher($context);
-
-        if ($isTeacher) {
-            return true;
+    $courses = $DB->get_records("course");
+    foreach($courses as $course) {
+        if($course->idnumber != 0){
+            if (block_exaplan_is_teacher(block_exaplan_get_context_from_courseid($course->id))) {
+                return true;
+            }
         }
     }
-
     return false;
 }
 
@@ -100,61 +97,19 @@ function block_exaplan_get_courses_where_isteacher()
     return false;
 }
 
-//function block_exaplan_get_courses($userid = null)
-//{
-//    global $CFG, $DB, $USER;
-//    require_once("$CFG->dirroot/lib/enrollib.php");
-//
-//    static::validate_parameters(static::get_courses_parameters(), array(
-//        'userid' => $userid,
-//    ));
-//
-//    if (!$userid) {
-//        $userid = $USER->id;
-//    }
-//
-//    static::require_can_access_user($userid);
-//
-//    $mycourses = enrol_get_users_courses($userid, true);
-//    $courses = array();
-//
-//    $time = time();
-//
-//    foreach ($mycourses as $mycourse) {
-//        if ($mycourse->visible == 0 || $mycourse->enddate < $time && $mycourse->enddate != 0) { //enddate is a smaller number than today ==> NOT visible, since it is over already
-//            continue;
-//        }
-//
-//        $context = context_course::instance($mycourse->id);
-//        if ($DB->record_exists("block_instances", array(
-//            "blockname" => "exacomp",
-//            "parentcontextid" => $context->id,
-//        ))
-//        ) {
-//
-//            if (block_exacomp_is_teacher($mycourse->id, $userid)) {
-//                $exarole = BLOCK_EXACOMP_WS_ROLE_TEACHER;
-//
-//                $teachercanedit = block_exacomp_is_editingteacher($mycourse->id, $userid);
-//            } else {
-//                $exarole = BLOCK_EXACOMP_ROLE_STUDENT;
-//                $teachercanedit = false;
-//            }
-//
-//            $course = array(
-//                "courseid" => $mycourse->id,
-//                "fullname" => $mycourse->fullname,
-//                "shortname" => $mycourse->shortname,
-//                "assessment_config" => $DB->get_field('block_exacompsettings', 'assessmentconfiguration', ['courseid' => $mycourse->id]),
-//                "exarole" => $exarole,
-//                "teachercanedit" => $teachercanedit,
-//            );
-//            $courses[] = $course;
-//        }
-//    }
-//
-//    return $courses;
-//}
+function block_exaplan_get_courses()
+{
+    global $CFG, $DB, $USER;
+
+    $ret = array();
+    $courses = $DB->get_records("course");
+    foreach($courses as $course) {
+        if($course->idnumber != 0){
+            $ret[] = $course;
+        }
+    }
+    return $ret;
+}
 
 function block_exaplan_get_context_from_courseid($courseid)
 {
