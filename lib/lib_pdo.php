@@ -471,12 +471,16 @@ function removeDesiredDate($modulepartid, $puserid)
 }
 
 /**
- * @param int $dateid
- * @param int $puserid
+ * @param $dateid
+ * @param $puserid
  * @param int $absend
- * @return string
+ * @param null $creatorpuserid
+ * @param null $date
+ * @param null $moduleset
+ * @param null $modulepart
+ * @return mixed|string
  */
-function addPUserToDate($dateid, $puserid, $absend = 0,  $creatorpuserid=null, $date=null, $moduleset=null, $modulepart=null)
+function addPUserToDate($dateid, $puserid, $absend = 0, $creatorpuserid=null, $date=null, $moduleset=null, $modulepart=null)
 {
     global $USER;
 

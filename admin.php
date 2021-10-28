@@ -47,7 +47,7 @@ switch ($action) {
             if (in_array($student, $absends)) {
                 $absend = 1;
             }
-            addPUserToDate($dateId, $student, $absend);
+            addPUserToDate($dateId, $student, $absend, $pUserId, $date, $moduleset, $modulepart);
             // delete ALL desired dates
             removeDesiredDate($modulepartid, $student);
 //            setDesiredDate($modulepartid, $student, $dateTS, $middayType);
