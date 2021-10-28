@@ -341,12 +341,13 @@ function modulepartAdminViewByDate($modulepartId, $date) {
 
         $rowsCount = 0;
         $mergedData = block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot);
+
+        $cont .= '</table>'; // we need to start new table for correct <form> working
+        $actionUrl = $CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartId.'&date='.$date.'&timeslot='.$timeslot;
+        $cont .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_BEFORE.'" method="post">';
+        $cont .= '<input type="hidden" name="action" value="saveFixedDates" />';
+        $cont .= $tableStartTemplate;
         if (count($mergedData) > 0) {
-            $cont .= '</table>'; // we need to start new table for correct <form> working
-            $actionUrl = $CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartId.'&date='.$date.'&timeslot='.$timeslot;
-            $cont .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_BEFORE.'" method="post">';
-            $cont .= '<input type="hidden" name="action" value="saveFixedDates" />';
-            $cont .= $tableStartTemplate;
 
             $cont .= '<tr><td colspan="6"><h5 class="p-1 mb-1 bg-secondary text-dark">'.$title.'</h5></td></tr>';
             $cont .= '</tr>';
@@ -388,10 +389,29 @@ function modulepartAdminViewByDate($modulepartId, $date) {
                 }
                 $cont .= '</tr>';
             }
-            $cont .= '</table>';
-            $cont .= '</form>';
-            $cont .= $tableStartTemplate;
+
+        } else {
+            // show empty (no students) from to create an empty date
+
+            $cont .= '<tr><td colspan="6"><h5 class="p-1 mb-1 bg-secondary text-dark">'.$title.'</h5></td></tr>';
+            $cont .= '</tr>';
+
+                $rowsCount++;
+                $cont .= '<tr>';
+                $cont .= '<td></td>';
+                $cont .= '<td></td>';
+                $cont .= '<td></td>';
+                $cont .= '<td></td>';
+                $cont .= '<td></td>';
+                $cont .= '<td rowspan="###FORM_ROWSPAN###"  valign="top">'.formAdminDateFixing($modulepartId, $date, $timeslot).'</td>';
+                $cont .= '</tr>';
+
         }
+
+        $cont .= '</table>';
+        $cont .= '</form>';
+        $cont .= $tableStartTemplate;
+
         $cont = str_replace('###FORM_ROWSPAN###', $rowsCount, $cont);
         return $cont;
     };
@@ -451,8 +471,8 @@ function formAdminDateFixing($modulepartId, $date, $timeslot) {
     $content .= '<td>';
     $content .= '<select id="region_'.$instanceKey.'" class="form-control" name="region">';
     $content .= '<option value="all">Alle Regionen</option>';
-    $content .= '<option value="RegionOst" '.($dateRec['region'] == 'RegionOst' ? 'selected="selected' : '').'>Ost</option>';
-    $content .= '<option value="RegionWest" '.($dateRec['region'] == 'RegionWest' ? 'selected="selected' : '').'>West</option>';
+    $content .= '<option value="RegionOst" '.(@$dateRec['region'] == 'RegionOst' ? 'selected="selected' : '').'>Ost</option>';
+    $content .= '<option value="RegionWest" '.(@$dateRec['region'] == 'RegionWest' ? 'selected="selected' : '').'>West</option>';
     $content .= '</select>';
     $content .= '</td>';
     $content .= '<td>';

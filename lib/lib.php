@@ -632,8 +632,6 @@ function block_exaplan_send_moodle_notification($notificationtype, $userfrom, $u
 function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot = 3)
 {
 
-    $data = [];
-
     $dates1 = getFixedDates(null, $modulepartId, $date, $timeslot);
     $dates2 = getDesiredDates(null, $modulepartId, $date, $timeslot);
     $dates = array_merge($dates1, $dates2);
