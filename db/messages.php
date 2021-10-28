@@ -16,6 +16,6 @@ defined('MOODLE_INTERNAL') || die();
 
 $messageproviders = array (
     // Notify student that a date has been fixed
-    'date_fixed' => array (
+    'datefixed' => array (
     ),
 );
