@@ -35,14 +35,15 @@ switch ($action) {
         $trainerId = optional_param('trainer', 0, PARAM_INT);
         $pTrainer = getPuser($trainerId)['id'];
         $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description);
+
+        $modulepart = getModulepartByModulepartid($modulepartid);
+        $moduleset = getModulesetByModulesetid($modulepart["modulesetid"]);
+
         foreach ($students as $student) {
-            addPUserToDate($dateId, $student);
+            addPUserToDate($dateId, $student, $pUserId, $date, $moduleset, $modulepart);
             // delete ALL desired dates
             removeDesiredDate($modulepartid, $student);
 //            setDesiredDate($modulepartid, $student, $dateTS, $middayType);
-
-            // create notification for users
-            block_exaplan_create_plannotification($pUserId,$student,"Termin für Modulteil ".$modulepartid." fixiert am ".$date.".");
         }
         break;
 }

@@ -201,6 +201,33 @@ function getAllModules()
 
 }
 
+function getModulepartByModulepartid($modulepartid)
+{
+    $pdo = getPdoConnect();
+    $params = array(
+        ':id' => $modulepartid,
+    );
+
+    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmoduleparts WHERE id = :id");
+    $statement->execute($params);
+    $modulepart = $statement->fetch();
+
+    return $modulepart;
+}
+
+function getModulesetByModulesetid($modulesetid){
+    $pdo = getPdoConnect();
+    $params = array(
+        ':id' => $modulesetid,
+    );
+
+    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmodulesets WHERE id = :id");
+    $statement->execute($params);
+    $moduleset = $statement->fetch();
+
+    return $moduleset;
+}
+
 function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_CONFIRMED)
 {
     global $DB, $COURSE;
@@ -242,11 +269,11 @@ function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_CONFIRMED)
                         ':puserid' => getPuser($userid)['id'],
                         ':state' => $state,
                     );
-                    $statement = $pdo->prepare("SELECT d.* 
+                    $statement = $pdo->prepare("SELECT d.*
                                                   FROM mdl_block_exaplandates d
-                                                    JOIN mdl_block_exaplanpuser_date_mm udmm ON d.id = udmm.dateid 
-                                                  WHERE d.modulepartid = :modulepartid 
-                                                        AND udmm.puserid = :puserid 
+                                                    JOIN mdl_block_exaplanpuser_date_mm udmm ON d.id = udmm.dateid
+                                                  WHERE d.modulepartid = :modulepartid
+                                                        AND udmm.puserid = :puserid
                                                         AND d.state = :state");
                     $statement->execute($params);
                     $statement->setFetchMode(PDO::FETCH_ASSOC);
@@ -274,10 +301,10 @@ function getPrefferedDate($modulepartid, $date, $timeslot, $state = 1)
 
     // get existing data for this modulepartid, date, timeslot
     $sql = "SELECT *
-              FROM mdl_block_exaplandates              
-              WHERE modulepartid = :modulepartid           
-                AND timeslot = :timeslot 
-                AND date = :date 
+              FROM mdl_block_exaplandates
+              WHERE modulepartid = :modulepartid
+                AND timeslot = :timeslot
+                AND date = :date
                 AND state = :state";
     $statement = $pdo->prepare($sql);
     $statement->setFetchMode(PDO::FETCH_ASSOC);
@@ -333,10 +360,10 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
             unset($params[':date']);
             unset($params[':state']);
             unset($params[':timeslot']); // for leave PHP warnings
-            $sql = "UPDATE mdl_block_exaplandates 
+            $sql = "UPDATE mdl_block_exaplandates
                         SET modifiedpuserid = :modifiedpuserid,
                              modifiedtimestamp = :modifiedtimestamp,
-                             location = :location, 
+                             location = :location,
                              trainerpuserid = :trainerpuserid,
                              starttime = :starttime,
                              comment = :comment
@@ -352,8 +379,8 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
         ':creatortimestamp' => $timestamp,
     ]);
 
-    $sql = "INSERT INTO mdl_block_exaplandates 
-                        (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp, location, trainerpuserid, starttime, comment) 
+    $sql = "INSERT INTO mdl_block_exaplandates
+                        (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp, location, trainerpuserid, starttime, comment)
                   VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp, :location, :trainerpuserid, :starttime, :comment);";
 //    echo "<pre>debug:<strong>lib_pdo.php:297</strong>\r\n"; print_r($params); echo '</pre>'; // !!!!!!!!!! delete it
 //    echo $sql; exit;
@@ -391,10 +418,10 @@ function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuser
 
     // get existing data for this modulepartid, date, timeslot
     $sql = "SELECT *
-              FROM mdl_block_exaplandesired              
-              WHERE modulepartid = :modulepartid           
-                AND timeslot = :timeslot 
-                AND date = :date 
+              FROM mdl_block_exaplandesired
+              WHERE modulepartid = :modulepartid
+                AND timeslot = :timeslot
+                AND date = :date
                 AND puserid = :puserid";
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
@@ -442,7 +469,7 @@ function removeDesiredDate($modulepartid, $puserid)
     return true;
 }
 
-function addPUserToDate($dateid, $puserid)
+function addPUserToDate($dateid, $puserid, $creatorpuserid=null, $date=null, $moduleset=null, $modulepart=null)
 {
     global $USER;
 
@@ -455,9 +482,9 @@ function addPUserToDate($dateid, $puserid)
 
     // get existing data for this modulepartid, date, timeslot
     $sql = "SELECT *
-              FROM mdl_block_exaplanpuser_date_mm              
-              WHERE dateid = :dateid           
-                AND puserid = :puserid 
+              FROM mdl_block_exaplanpuser_date_mm
+              WHERE dateid = :dateid
+                AND puserid = :puserid
                 ";
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
@@ -477,6 +504,12 @@ function addPUserToDate($dateid, $puserid)
     $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpuser_date_mm (dateid, puserid, creatorpuserid) VALUES (:dateid, :puserid, :creatorpuserid);");
     $statement->execute($params);
     $id = $pdo->lastInsertId();
+
+    // create notification for users
+    if($creatorpuserid && $date && $moduleset && $modulepart){
+        block_exaplan_create_plannotification($creatorpuserid,$puserid,"Termin für Modulset ".$moduleset["title"].", Modulteil ".$modulepart["title"]." fixiert für ".$date.".");
+    }
+
 
     return $id;
 }
@@ -582,8 +615,8 @@ function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $t
         return null;
     }
 
-    $sql = "SELECT *, puserid as relatedUserId, 'desired' as dateType 
-              FROM mdl_block_exaplandesired 
+    $sql = "SELECT *, puserid as relatedUserId, 'desired' as dateType
+              FROM mdl_block_exaplandesired
               WHERE " . implode(' AND ', $whereArr);
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
