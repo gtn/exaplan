@@ -40,20 +40,20 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
     
     $content .= '</div>';
     $content .= '<div class="BlockBody">';
-    $content .= '<table class="ModuleTable">';
+    $content .= '<table class="ModuleTable" border=0>';
     $content .= '<thead>';
     $content .= '<tr>';
     $content .= '<th colspan=4><div class="result-item-header">
 <div class="result-item-header-cnt">
 	
 <div class="icon">
-<img src="pix/teilnehmer.svg" height="90" width="90">
+<img src="pix/teilnehmer.svg" height="50" width="50">
 </div>
 <h5 class="item-header-title">'.$tnname.'</h5>   
 	<button type="button" class="btn btn-outline-danger">
-			Planung Präsenztermine  
+			<!--Planung Präsenztermine  -->
 	</button>
-	<h4>Symbols, Notifications,...etc.</h4>	
+	<h4><!--Symbols, Notifications,...etc.--></h4>	
 	</div>
 </div></th>';
      $content .= '</tr>';
@@ -69,7 +69,7 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
     foreach($modulesets as $moduleKey => $moduleset){
         $content .= '<tr> <td valign="top">'.$moduleset->set["title"].'</td>';
         $content .= '<td valign="top">';
-        $content .= '<table>';
+        $content .= '<table  class="tbl_modulparts">';
         $content .= '<thead>';
         $content .= '<tr>';
         foreach($moduleset->parts as $part) {
@@ -99,17 +99,23 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
             } else {
                 if (!$part['date'] || $part['date'][0]['state'] != BLOCK_EXAPLAN_DATE_CONFIRMED) {
                     // desired dates
-                    $buttonTitle = 'offen';
-                    $buttonClass = '';
+                    
                     if (getDesiredDates($pUser['id'], $part['id'])) {
-                        $buttonTitle = 'Wunschtermin';
-                        $buttonClass .= ' exaplan-date-desired ';
-                        $innerButtonClass = ' btn btn-desire ';
-                    }
-                    if ($modulepartid == $part["id"]) {
+                      $buttonTitle = 'Wunschtermin';
+                      $buttonClass = ' exaplan-date-desired ';
+                      $innerButtonClass = ' btn btn-desire ';
+                      if ($modulepartid == $part["id"]) {
                         $buttonClass .= ' exaplan-date-current-modulepart ';
-                        $innerButtonClass = ' btn btn-danger ';
+                    	}
+                    }else{
+                    	$buttonTitle = 'offen';
+	                    $buttonClass = '';
+	                    $innerButtonClass = ' btn btn-danger ';
+	                    if ($modulepartid == $part["id"]) {
+                        $buttonClass .= ' exaplan-date-current-modulepart ';
+                    	}
                     }
+                    
                     $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'&userid='.$userid.'" 
                                     role="button" 
                                     class="btn exaplan-selectable-modulepart '.$buttonClass.'"                                     
@@ -126,8 +132,8 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
                                     class="btn exaplan-date-fixed exaplan-selectable-date '.$buttonClass.'" 
                                     data-dateId="'.$part['date'][0]['id'].'" 
                                     data-modulepartId="'.$part['id'].'">
-                                '.date('d.m.Y', $part['date'][0]['date']).
-                                '</a>';
+                                 <button type="button" class=" btn btn-fix ">'.date('d.m.Y', $part['date'][0]['date']).
+                                '</button></a>';
                 }
             }
 
