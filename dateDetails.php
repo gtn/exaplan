@@ -31,7 +31,7 @@ echo '<div class="UserCalendarCard">';
 echo printUser($userid, $isadmin, $modulepartid, false, $dateId, true);
 
 echo '<br>';
-echo '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" role="button" class="btn btn-info"> back </a>';
+echo '<a href="'.$CFG->wwwroot.'/blocks/exaplan/dashboard.php" role="button" class="btn btn-info"> back to dashboard </a>';
 
 echo '</div>';
 

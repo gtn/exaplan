@@ -248,7 +248,7 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
     $modulepartName = getTableData('mdl_block_exaplanmoduleparts', $modulepartId, 'title');
     $moduleId = getTableData('mdl_block_exaplanmoduleparts', $modulepartId, 'modulesetid');
     $moduleName = getTableData('mdl_block_exaplanmodulesets', $moduleId, 'title');
-    $existingDates = getFixedDates(null, $modulepartId, null);
+    $existingDates = getFixedDates(null, $modulepartId, null, null, true);
     $content .= '<h4>Sie planen: '.$moduleName.' | '.$modulepartName.'</h4>';
     if ($existingDates) {
         $content .= '<div class="register-existing-dates">';
@@ -365,7 +365,7 @@ function modulepartAdminViewByDate($modulepartId, $date) {
 
         $cont .= '</table>'; // we need to start new table for correct <form> working
         $actionUrl = $CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartId.'&date='.$date.'&timeslot='.$timeslot;
-        $cont .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_BEFORE.'" method="post">';
+        $cont .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_BEFORE.'" method="post" autocomplete="off">';
         $cont .= '<input type="hidden" name="action" value="saveFixedDates" />';
         $cont .= $tableStartTemplate;
         if (count($mergedData) > 0) {
@@ -492,8 +492,8 @@ function formAdminDateFixing($modulepartId, $date, $timeslot) {
     $content .= '<td>';
     $content .= '<select id="region_'.$instanceKey.'" class="form-control" name="region">';
     $content .= '<option value="all">Alle Regionen</option>';
-    $content .= '<option value="RegionOst" '.(@$dateRec['region'] == 'RegionOst' ? 'selected="selected' : '').'>Ost</option>';
-    $content .= '<option value="RegionWest" '.(@$dateRec['region'] == 'RegionWest' ? 'selected="selected' : '').'>West</option>';
+    $content .= '<option value="RegionOst" '.(@$dateRec['region'] == 'RegionOst' ? 'selected="selected"' : '').'>Ost</option>';
+    $content .= '<option value="RegionWest" '.(@$dateRec['region'] == 'RegionWest' ? 'selected="selected"' : '').'>West</option>';
     $content .= '</select>';
     $content .= '</td>';
     $content .= '<td>';

@@ -47,7 +47,7 @@ switch ($action) {
             if (in_array($student, $absends)) {
                 $absend = 1;
             }
-            addPUserToDate($dateId, $student, $absend, $pUserId, $date, $moduleset, $modulepart);
+            addPUserToDate($dateId, $student, $absend, $pUserId, $date, $moduleset, $modulepart, true);
             // delete ALL desired dates
             removeDesiredDate($modulepartid, $student);
 //            setDesiredDate($modulepartid, $student, $dateTS, $middayType);
@@ -65,7 +65,7 @@ if ($isadmin) {
     echo printAdminModulepartView($modulepartid, $dateGP);
 }
 
-echo '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php" role="button" class="btn btn-default"> back </a>';
+echo '<a href="'.$CFG->wwwroot.'/blocks/exaplan/dashboard.php" role="button" class="btn btn-info"> back to dashboard </a>';
 
 echo '</div>';
 

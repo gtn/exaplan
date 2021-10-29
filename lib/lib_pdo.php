@@ -356,6 +356,7 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
 
     if ($dateRec) {
         $dateId = $dateRec['id'];
+        
         // return existing dateId. We do not need to create it
         if ($updateExisting) {
             unset($params[':modulepartid']);
@@ -368,7 +369,7 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
                              location = :location,
                              trainerpuserid = :trainerpuserid,
                              starttime = :starttime,
-                             comment = :comment
+                             comment = :comment,
                              region = :region
                         WHERE id = " . $dateId . ";";
             $statement = $pdo->prepare($sql);
@@ -474,13 +475,14 @@ function removeDesiredDate($modulepartid, $puserid)
  * @param $dateid
  * @param $puserid
  * @param int $absend
- * @param null $creatorpuserid
- * @param null $date
- * @param null $moduleset
- * @param null $modulepart
+ * @param int $creatorpuserid
+ * @param string $date
+ * @param int $moduleset
+ * @param int $modulepart
+ * @param bool $withUpdating
  * @return mixed|string
  */
-function addPUserToDate($dateid, $puserid, $absend = 0, $creatorpuserid=null, $date=null, $moduleset=null, $modulepart=null)
+function addPUserToDate($dateid, $puserid, $absend = 0, $creatorpuserid=null, $date=null, $moduleset=null, $modulepart=null, $withUpdating = false)
 {
     global $USER;
 
@@ -502,6 +504,10 @@ function addPUserToDate($dateid, $puserid, $absend = 0, $creatorpuserid=null, $d
     $existing = $statement->fetchAll();
     if ($existing) {
         // relation is already existing!
+        if ($withUpdating) {
+            $statement = $pdo->prepare("UPDATE mdl_block_exaplanpuser_date_mm SET absend = :absend;");
+            $statement->execute([':absend' => $absend]);
+        }
         return $existing[0]['id'];
     }
 
@@ -644,8 +650,9 @@ function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $t
  * @param int $modulepartid (null if needed data about all moduleparts)
  * @param string|int $date (null if for all dates)
  * @param int $timeslot midday type
+ * @param bool $withEmptyStudents true if you need also empty dates (without students)
  */
-function getFixedDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null)
+function getFixedDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null, $withEmptyStudents = false)
 {
     $pdo = getPdoConnect();
     $params = [];
@@ -674,10 +681,17 @@ function getFixedDates($puserid = null, $modulepartid = null, $date = null, $tim
         return null;
     }
 
-    $statement = $pdo->prepare("SELECT DISTINCT d.*, dumm.puserid as relatedUserId, 'fixed' as dateType
+    if ($withEmptyStudents && !$puserid) {
+        $sql = "SELECT DISTINCT d.*, 'fixed' as dateType
+                                  FROM mdl_block_exaplandates d                                    
+                                  WHERE " . implode(' AND ', $whereArr);
+    } else {
+        $sql = "SELECT DISTINCT d.*, dumm.puserid as relatedUserId, 'fixed' as dateType
                                   FROM mdl_block_exaplanpuser_date_mm dumm
                                     JOIN mdl_block_exaplandates d ON d.id = dumm.dateid
-                                  WHERE " . implode(' AND ', $whereArr));
+                                  WHERE " . implode(' AND ', $whereArr);
+    }
+    $statement = $pdo->prepare($sql);
     $statement->execute($params);
     $statement->setFetchMode(PDO::FETCH_ASSOC);
     $dates = $statement->fetchAll();
