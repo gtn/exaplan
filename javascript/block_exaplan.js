@@ -173,6 +173,11 @@ function updateAllCalendarMetadata() {
                     calendarInstance.addMetaData(date.date, metaData);
                 });
             });
+        } else {
+            // anycase hide loader!
+            allCalendars.forEach((calendarInstance) => {
+                calendarInstance.unBlurCalendar();
+            });
         }
     }
 }
