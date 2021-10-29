@@ -40,10 +40,10 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
     
     $content .= '</div>';
     $content .= '<div class="BlockBody">';
-    $content .= '<table class="ModuleTable" border=0>';
+    $content .= '<table class="mainTable" border="0">';
     $content .= '<thead>';
     $content .= '<tr>';
-    $content .= '<th colspan=4><div class="result-item-header">
+    $content .= '<th colspan="2"><div class="result-item-header">
 <div class="result-item-header-cnt">
 	
 <div class="icon">
@@ -56,17 +56,22 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
 	<h4><!--Symbols, Notifications,...etc.--></h4>	
 	</div>
 </div></th>';
-     $content .= '</tr>';
-    $content .= '<tr>';
-    $content .= '<th>Meine gebuchten Module</th>';
-    $content .= '<th>Termine</th>';
-    if ($withCalendar) {
-        $content .= '<th>' . block_exaplan_calendars_header_view($modulepartid) . '</th>';
-    }
     $content .= '</tr>';
     $content .= '</thead>';
     $content .= '<tbody>';
-    foreach($modulesets as $moduleKey => $moduleset){
+    $content .= '<tr>';
+    $content .= '<td valign="top">';
+
+    $content .= '<table class="moduleListTable" border="0">';
+    $content .= '<thead>';
+    $content .= '<tr>';
+    $content .= '<th>Meine gebuchten Module</th>';
+    $content .= '<th>Termine</th>';
+
+    $content .= '</tr>';
+    $content .= '</thead>';
+    $content .= '<tbody>';
+    foreach ($modulesets as $moduleKey => $moduleset){
         $content .= '<tr> <td valign="top">'.$moduleset->set["title"].'</td>';
         $content .= '<td valign="top">';
         $content .= '<table  class="tbl_modulparts">';
@@ -142,21 +147,30 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
         $content .= '</tbody>';
         $content .= '</table>';
         $content .= '</td>';
-        if ($withCalendar && $moduleKey == 0) {
-            $content .= '<td valign="top" rowspan="' . count($modulesets) . '">';
-            $content .= block_exaplan_calendars_view($userid, 2, false, $modulepartid);
-            $content .= '</td>';
-        }
-        if ($withDateDetails && $moduleKey == 0) {
-            $content .= '<td valign="top" rowspan="' . count($modulesets) . '">';
-            $content .= studentEventDetailsView($userid, $modulepartid, $dateId);
-            $content .= '</td>';
-        }
         $content .= '</tr>';
     }
 
     $content .= '</tbody>';
     $content .= '</table>';
+
+    $content .= '</td>';
+
+    if ($withCalendar) {
+        $content .= '<td valign="top" >';
+        $content .= block_exaplan_calendars_view($userid, 2, true, $modulepartid);
+        $content .= '</td>';
+    }
+    if ($withDateDetails) {
+        $content .= '<td valign="top" >';
+        $content .= studentEventDetailsView($userid, $modulepartid, $dateId);
+        $content .= '</td>';
+    }
+
+    $content .= '</td>';
+    $content .= '</tr>';
+    $content .= '</tbody>';
+    $content .= '</table>';
+
     $content .= '</div>';
     $content .= '</div>';
 		$content .= '</div><!-- / exaplan-result-item --->';
@@ -226,7 +240,7 @@ function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = f
     if ($withHeader) {
         $content .= '<tr>';
         $content .= '<td colspan="' . $monthsCount . '">';
-        $content .= block_exaplan_calendars_header_view($modulepartid);
+        $content .= block_exaplan_calendars_header_view($modulepartId);
         $content .= '</td>';
         $content .= '</tr>';
     };
