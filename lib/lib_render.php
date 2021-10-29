@@ -385,7 +385,7 @@ function modulepartAdminViewByDate($modulepartId, $date) {
 
         $cont .= '</table>'; // we need to start new table for correct <form> working
         $actionUrl = $CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartId.'&date='.$date.'&timeslot='.$timeslot;
-        $cont .= '<form class="small" action="'.$actionUrl.BLOCK_EXAPLAN_MIDDATE_BEFORE.'" method="post" autocomplete="off">';
+        $cont .= '<form class="small" action="'.$actionUrl.'" method="post" autocomplete="off">';
         $cont .= '<input type="hidden" name="action" value="saveFixedDates" />';
         $cont .= $tableStartTemplate;
         if (count($mergedData) > 0) {

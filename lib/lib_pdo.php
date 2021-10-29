@@ -669,6 +669,7 @@ function getFixedDates($puserid = null, $modulepartid = null, $date = null, $tim
         if (!is_int($date)) {
             $date = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
         }
+        $date = strtotime("today", $date); //same tstamp for whole day
         $params[':date'] = $date;
         $whereArr[] = ' d.date = :date ';
     }
@@ -690,6 +691,7 @@ function getFixedDates($puserid = null, $modulepartid = null, $date = null, $tim
                                   FROM mdl_block_exaplanpuser_date_mm dumm
                                     JOIN mdl_block_exaplandates d ON d.id = dumm.dateid
                                   WHERE " . implode(' AND ', $whereArr);
+
     }
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
@@ -727,4 +729,29 @@ function isPuserIsFixedForDate($puserid, $dateid, $returnData = false)
         return true;
     }
     return null;
+}
+
+/**
+ * @param int $dateId
+ */
+function getFixedPUsersForDate($dateId = null)
+{
+
+    $pdo = getPdoConnect();
+
+    $params = array(
+        ':dateid' => $dateId,
+    );
+
+    // get existing data for this modulepartid, date, timeslot
+    $sql = "SELECT *
+              FROM mdl_block_exaplanpuser_date_mm
+              WHERE dateid = :dateid
+                ";
+    $statement = $pdo->prepare($sql);
+    $statement->execute($params);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
+    $result = $statement->fetchAll();
+
+    return $result;
 }

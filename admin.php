@@ -38,11 +38,18 @@ switch ($action) {
 
         $modulepart = getModulepartByModulepartid($modulepartid);
         $moduleset = getModulesetByModulesetid($modulepart["modulesetid"]);
-
-        $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $region);
         $absends = optional_param_array('absendPuser', [], PARAM_INT);
         $absends = array_keys($absends);
+
+        $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $region);
+
+        // register / unregister students
+        $registeredUsers = getFixedPUsersForDate($dateId);
+        $registeredUsersIds = array_map(function($u) {return $u['puserid'];}, $registeredUsers);
         foreach ($students as $student) {
+            if (($key = array_search($student, $registeredUsersIds)) !== false) {
+                unset($registeredUsersIds[$key]);
+            }
             $absend = 0;
             if (in_array($student, $absends)) {
                 $absend = 1;
@@ -50,7 +57,12 @@ switch ($action) {
             addPUserToDate($dateId, $student, $absend, $pUserId, $date, $moduleset, $modulepart, true);
             // delete ALL desired dates
             removeDesiredDate($modulepartid, $student);
-//            setDesiredDate($modulepartid, $student, $dateTS, $middayType);
+        }
+        // unregister if it was unchecked
+        if ($registeredUsersIds && count($registeredUsersIds) > 0) {
+            foreach ($registeredUsersIds as $puserid) {
+                removePUserFromDate($dateId, $puserid);
+            }
         }
         break;
 }
