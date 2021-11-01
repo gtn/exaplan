@@ -65,7 +65,7 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
     $content .= '<table class="moduleListTable" border="0">';
     $content .= '<thead>';
     $content .= '<tr>';
-    $content .= '<th>Meine gebuchten Module</th>';
+    $content .= '<th>Meine Module</th>';
     $content .= '<th>Termine</th>';
 
     $content .= '</tr>';
