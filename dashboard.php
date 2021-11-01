@@ -8,7 +8,7 @@ global $CFG, $PAGE, $OUTPUT, $USER;
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('admin');
-$PAGE->set_title("Übersicht");
+$PAGE->set_title("Übersicht old, new in block_exaplan.php");
 $PAGE->set_heading("Übersicht");
 $PAGE->set_url($CFG->wwwroot.'/blocks/exaplan/dashboard.php');
 
@@ -26,7 +26,7 @@ require_login();
 echo $OUTPUT->header();
 
 echo '<div id="exaplan">';
-
+echo '<h1>####OLD version, new in block_exaplan.php####</h1>';
 //getOrCreatePuser();
 
 if ($isteacher && !$isadmin) {

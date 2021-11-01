@@ -47,7 +47,7 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
 <div class="result-item-header-cnt">
 	
 <div class="icon">
-<img src="pix/teilnehmer.svg" height="50" width="50">
+<img src="'.$CFG->wwwroot.'/blocks/exaplan/pix/teilnehmer.svg" height="50" width="50">
 </div>
 <h5 class="item-header-title">'.$tnname.'</h5>   
 	<button type="button" class="btn btn-outline-danger">
