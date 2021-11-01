@@ -415,25 +415,34 @@ function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuser
     $params = array(
         ':modulepartid' => $modulepartid,
         ':date' => $date,
-        ':timeslot' => $timeslot,
+//        ':timeslot' => $timeslot, // no timeslot checking. The pUser can have only single desired dat for any timeslot
         ':puserid' => $puserid
     );
 
     // get existing data for this modulepartid, date, timeslot
+    //    deleted: AND timeslot = :timeslot
     $sql = "SELECT *
               FROM mdl_block_exaplandesired
-              WHERE modulepartid = :modulepartid
-                AND timeslot = :timeslot
+              WHERE modulepartid = :modulepartid                
                 AND date = :date
                 AND puserid = :puserid";
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
     $dates = $statement->fetchAll();
+    $dateid = 0;
+    $addNew = false;
     if ($dates) {
+        if ($dates[0]['timeslot'] != $timeslot) {
+            // 1. delete old record with this timeslot
+            // 2. add new record with the new timeslot
+            $addNew = true;
+        }
         $statement = $pdo->prepare('DELETE FROM mdl_block_exaplandesired WHERE id = :id');
         $statement->execute([':id' => $dates[0]['id']]);
-        return 0;
     } else {
+        $addNew = true;
+    }
+    if ($addNew) {
         $params = array_merge($params, [
             ':modulepartid' => $modulepartid,
             ':date' => $date,
@@ -447,8 +456,8 @@ function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuser
         $statement = $pdo->prepare($sql);
         $statement->execute($params);
         $dateid = $pdo->lastInsertId();
-        return $dateid;
     }
+    return $dateid;
 }
 
 /**
