@@ -459,9 +459,11 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
         $content .= '<td></td>';
         $content .= '<td></td>';
         $content .= '<td></td>';
+        $content .= '<td class="timslotCheck1"></td>';
+        $content .= '<td class="timslotCheck1"></td>';
         $content .= '<td></td>';
         $content .= '<td></td>';
-        $content .= '<td rowspan="###FORM_ROWSPAN###"  valign="top">'.formAdminDateFixing($modulepartId, $date, null, $defaultRegion).'</td>';
+        $content .= '<td rowspan="###FORM_ROWSPAN###" class="mainForm" valign="top">'.formAdminDateFixing($modulepartId, $date, null, $defaultRegion).'</td>';
         $content .= '</tr>';
     }
 
