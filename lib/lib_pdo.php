@@ -289,22 +289,24 @@ function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_CONFIRMED)
     return $modulesets;
 }
 
-function getPrefferedDate($modulepartid, $date, $timeslot, $state = 1)
+function getPrefferedDate($modulepartid, $date, $timeslot = null, $state = 1)
 {
     $pdo = getPdoConnect();
 
     $params = array(
         ':modulepartid' => $modulepartid,
         ':date' => $date,
-        ':timeslot' => $timeslot,
         ':state' => $state
     );
+    if ($timeslot) {
+        $params[':timeslot'] = $timeslot;
+    }
 
     // get existing data for this modulepartid, date, timeslot
     $sql = "SELECT *
               FROM mdl_block_exaplandates
               WHERE modulepartid = :modulepartid
-                AND timeslot = :timeslot
+                ".($timeslot ? ' AND timeslot = :timeslot ' : '')."
                 AND date = :date
                 AND state = :state";
     $statement = $pdo->prepare($sql);
@@ -681,8 +683,9 @@ function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $t
  * @param string|int $date (null if for all dates)
  * @param int $timeslot midday type
  * @param bool $withEmptyStudents true if you need also empty dates (without students)
+ * @param string $region
  */
-function getFixedDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null, $withEmptyStudents = false)
+function getFixedDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null, $withEmptyStudents = false, $region = '')
 {
     $pdo = getPdoConnect();
     $params = [];
@@ -708,19 +711,42 @@ function getFixedDates($puserid = null, $modulepartid = null, $date = null, $tim
         $whereArr[] = ' d.timeslot = :timeslot ';
     }
 
+    $leftJoin = '';
+    if ($region) {
+        $leftJoin .= ' LEFT JOIN mdl_block_exaplanpusers u ON u.id = dumm.puserid ';
+        switch ($region) {
+            case 'RegionOst':
+                $whereArr[] = ' u.region = \'RegionOst\' ';
+                break;
+            case 'RegionWest':
+                $whereArr[] = ' u.region = \'RegionWest\' ';
+                break;
+            case 'all':
+            case 'online':
+                // all possible regions (or empty)
+                $whereArr[] = ' u.region IN (\'RegionOst\', \'RegionWest\', \'all\', \'\') ';
+                break;
+        }
+    }
+
     if (!count($params)) {
         return null;
     }
 
     if ($withEmptyStudents && !$puserid) {
         $sql = "SELECT DISTINCT d.*, 'fixed' as dateType
-                                  FROM mdl_block_exaplandates d                                    
-                                  WHERE " . implode(' AND ', $whereArr);
+                                  FROM mdl_block_exaplandates d                                                                   
+                                  WHERE " . implode(' AND ', $whereArr) . "
+                                  ORDER BY d.date
+                                  ";
     } else {
         $sql = "SELECT DISTINCT d.*, dumm.puserid as relatedUserId, 'fixed' as dateType
                                   FROM mdl_block_exaplanpuser_date_mm dumm
                                     JOIN mdl_block_exaplandates d ON d.id = dumm.dateid
-                                  WHERE " . implode(' AND ', $whereArr);
+                                    ".$leftJoin."
+                                  WHERE " . implode(' AND ', $whereArr) . "
+                                  ORDER BY d.date
+                                  ";
 
     }
     $statement = $pdo->prepare($sql);

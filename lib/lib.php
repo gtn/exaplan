@@ -585,7 +585,13 @@ function block_exaplan_send_moodle_notification($notificationtype, $userfrom, $u
     message_send($eventdata);
 }
 
-function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot = 3)
+/**
+ * @param int $modulepartId
+ * @param string $date
+ * @param int $timeslot
+ * @return array
+ */
+function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot = null)
 {
 
     $dates1 = getFixedDates(null, $modulepartId, $date, $timeslot);

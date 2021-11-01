@@ -345,7 +345,7 @@ function printAdminModulepartView($modulepartid, $date = '', $region = '') {
     // day ajax reloaded data (just HTML container)
     $content .= '<div id="modulepart-date-data">';
     if ($date) {
-        $content .= modulepartAdminViewByDate($modulepartid, $date);
+        $content .= modulepartAdminViewByDate($modulepartid, $date, $region);
     }
     $content .= '</div>';
 
@@ -362,6 +362,123 @@ function printAdminModulepartView($modulepartid, $date = '', $region = '') {
  * @return string
  */
 function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
+    global $CFG;
+    $content = '';
+
+    $actionUrl = $CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartId.'&date='.$date.($defaultRegion ? '&region='.$defaultRegion : '');
+    $content .= '<form class="small" action="'.$actionUrl.'" method="post" autocomplete="off">';
+    $content .= '<input type="hidden" name="action" value="saveFixedDates" />';
+    $content .= '<table class="table table-sm exaplan-adminModulepartView" border="1">';
+    // header
+    $content .= '<thead class="thead-light">';
+    $content .= '<tr>';
+    $content .= '<th>Angefragte TN: '.$date.'</th>';
+    $content .= '<th></th>';
+    $content .= '<th>Organization</th>';
+    $content .= '<th>VM</th>';
+    $content .= '<th>NM</th>';
+    $content .= '<th>TN gefehlt?</th>';
+    $content .= '<th>Bewertung o.ä.?</th>';
+    $content .= '<th class="mainForm"></th>';
+    $content .= '</tr>';
+    $content .= '</thead>';
+
+    $content .= '<tbody>';
+
+    $rowsCount = 0;
+    $mergedData = block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date);
+//    echo "<pre>debug:<strong>lib_render.php:390</strong>\r\n"; print_r($mergedData); echo '</pre>'; exit; // !!!!!!!!!! delete it
+
+    if (count($mergedData) > 0) {
+        $userMidDayTypeCheckboxTemplate = function($pUserid, $userTimeSlot, $timeslotColumn) {
+            $checked = '';
+            if ($userTimeSlot == $timeslotColumn || $userTimeSlot == BLOCK_EXAPLAN_MIDDATE_ALL) {
+                $checked = ' checked = "checked" ';
+            }
+            $content = '<input type = "checkbox" 
+                                value = "1"      
+                                id = "middayType'.$pUserid.'_'.$timeslotColumn.'"                               
+                                name = "middayType'.$timeslotColumn.'['.$pUserid.']" 
+                                '.$checked.'/>&nbsp;';
+            return $content;
+        };
+
+        foreach ($mergedData as $dKey => $dateData) {
+            $setRowHight = 20;
+            end($mergedData);
+            if ($dKey === key($mergedData)) {
+                $setRowHight = '';
+            }
+            $rowsCount++;
+            $content .= '<tr>';
+            $content .= '<td valign="top" height="'.$setRowHight.'">';
+            // fixed or desired
+            $content .= '<input type="checkbox" 
+                                value="1"      
+                                id = "fixedUser"'.$dateData['pUserData']['id'].'"                               
+                                name = "fixedPuser['.$dateData['pUserData']['id'].']" 
+                                '.($dateData['dateType'] == 'fixed' ? 'checked = "checked"' : '').'/>&nbsp;';
+            $content .= '<label for="fixedUser"'.$dateData['pUserData']['id'].'">'.@$dateData['pUserData']['firstname'].' '.@$dateData['pUserData']['lastname'].'</label>';
+            $content .= '</td>';
+            // buttons
+            $content .= '<td valign="top">'./*buttons*/'</td>';
+            // organization
+            $companyName = getTableData('mdl_block_exaplanmoodles', $dateData['pUserData']['moodleid'], 'companyname');
+            $content .= '<td valign="top">'.$companyName.'</td>';
+            // midDay type checkboxes
+            $content .= '<td valign="top" class="timslotCheck1">';
+            $content .= $userMidDayTypeCheckboxTemplate($dateData['pUserData']['id'], $dateData['timeslot'], BLOCK_EXAPLAN_MIDDATE_BEFORE);
+            $content .= '</td>';
+            $content .= '<td valign="top" class="timslotCheck2">';
+            $content .= $userMidDayTypeCheckboxTemplate($dateData['pUserData']['id'], $dateData['timeslot'], BLOCK_EXAPLAN_MIDDATE_AFTER);
+            $content .= '</td>';
+            // absend or not
+            $absend = '';
+            if ($relationData = isPuserIsFixedForDate($dateData['pUserData']['id'], $dateData['id'], true)) {
+                if ($relationData['absend']) {
+                    $absend = ' checked = "checked" ';
+                }
+            }
+            $content .= '<td valign="top">
+                        <input type="checkbox" 
+                                value="1"                                     
+                                name="absendPuser['.$dateData['pUserData']['id'].']" 
+                                '.$absend.'/></td>';
+            $content .= '<td valign="top"><!--Bewertung--></td>';
+            if ($rowsCount == 1) {
+                $content .= '<td rowspan="###FORM_ROWSPAN###" class="mainForm" valign="top">'.formAdminDateFixing($modulepartId, $date, null, $defaultRegion).'</td>';
+            }
+            $content .= '</tr>';
+        }
+    } else {
+        // show empty (no students) from to create an empty date
+        $rowsCount++;
+        $content .= '<tr>';
+        $content .= '<td></td>';
+        $content .= '<td></td>';
+        $content .= '<td></td>';
+        $content .= '<td></td>';
+        $content .= '<td></td>';
+        $content .= '<td rowspan="###FORM_ROWSPAN###"  valign="top">'.formAdminDateFixing($modulepartId, $date, null, $defaultRegion).'</td>';
+        $content .= '</tr>';
+    }
+
+    $content .= '</table>';
+    $content .= '</form>';
+
+    $content = str_replace('###FORM_ROWSPAN###', $rowsCount, $content);
+
+
+    return $content;
+}
+/**
+ * @param int $modulepartId
+ * @param string $date
+ * @param string $defaultRegion
+ * @return string
+ * @deprecated
+ */
+function modulepartAdminViewByDate_old($modulepartId, $date, $defaultRegion = '') {
     global $CFG;
     $content = '';
 
@@ -486,15 +603,15 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
  * @param string $defaultRegion
  * @return string
  */
-function formAdminDateFixing($modulepartId, $date, $timeslot, $defaultRegion = '') {
+function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultRegion = '') {
     global $CFG;
     $content = '';
     $dateTs = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
-    $instanceKey = $modulepartId.'_'.$dateTs.'_'.$timeslot;
+    $instanceKey = $modulepartId.'_'.$dateTs/*.'_'.$timeslot*/;
 
     $dateRec = getPrefferedDate($modulepartId, $dateTs, $timeslot, BLOCK_EXAPLAN_DATE_CONFIRMED);
 
-    $content .= '<input type="hidden" value="'.$timeslot.'" name="middayType" />';
+//    $content .= '<input type="hidden" value="'.$timeslot.'" name="middayType" />';
     $content .= '<input type="hidden" value="'.$date.'" name="date" />';
     $content .= '<input type="hidden" value="'.$modulepartId.'" name="mpId" />';
 
@@ -645,15 +762,25 @@ function printAdminStart()
     $content .= '<th colspan="3">Anzahl Teilnehmer angefragt:</th>';
     $content .= '</tr>';
     $content .= '<tr>';
-    $content .= '<th>Region Ost</th>';
-    $content .= '<th>Region West</th>';
-    $content .= '<th>Online</th>';
+    $content .= '<th class="regionColumn">Region Ost</th>';
+    $content .= '<th class="regionColumn">Region West</th>';
+    $content .= '<th class="regionColumn">Online</th>';
     $content .= '</tr>';
     $content .= '</thead>';
 
     $regions = ['RegionOst', 'RegionWest', 'all'];
 
     $content .= '<tbody>';
+
+    $buttonTemplate = function($modulepartid, $region, $title, $buttonClass, $date = '') {
+        global $CFG;
+        return '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartid.'&region='.$region.($date ? '&date='.date('Y-m-d', $date) : '').'" 
+                            role="button" 
+                            data-modulepartId="'.$modulepartid.'"
+                            class="btn btn-danger exaplan-admin-modulepart-button '.$buttonClass.'"
+                        > '.$title.' </a>';
+    };
+
     foreach ($modulesets as $moduleKey => $moduleset){
         $content .= '<tr> <td valign="top" rowspan="'.count($moduleset->parts).'">'.$moduleset->set["title"].'</td>';
         foreach($moduleset->parts as $partK => $part) {
@@ -662,23 +789,29 @@ function printAdminStart()
             }
             $content .= '<th>'.$part["title"].'</th>';
             foreach ($regions as $region) {
-                $content .= '<td>';
+                $content .= '<td class="regionColumn">';
                 $desiredDates = getDesiredDates(null, $part['id'], null, null, $region);
+                $fixedDates = getFixedDates(null, $part['id'], null, null, false, $region);
                 $buttonClass = '';
+                // if desired dates are existing
                 if (count($desiredDates) > 0) {
                     // get count of unique pUsers
                     $desiredDatesUsers = count(array_unique(array_column($desiredDates, 'puserid')));
-                    $title = $desiredDatesUsers.' Anfragen';
+                    $title = $desiredDatesUsers . ' Anfragen';
                     $buttonClass .= ' exaplan-date-desired ';
-                } else {
-                    $title = ' - - ';
-                    $buttonClass .= ' exaplan-date-no-desired ';
+                    $content .= $buttonTemplate($part['id'], $region, $title, $buttonClass).'&nbsp;';
                 }
-                $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$part["id"].'&region='.$region.'" 
-                            role="button" 
-                            data-modulepartId="'.$part['id'].'"
-                            class="btn btn-danger exaplan-admin-modulepart-button '.$buttonClass.'"
-                        > '.$title.' </a>';
+                // existinf fixed dates
+                if (count($fixedDates) > 0) {
+                    $buttonClass .= ' exaplan-date-fixed ';
+                    foreach ($fixedDates as $fixedDate) {
+                        $content .= $buttonTemplate($part['id'], $region, date('d.m.Y', $fixedDate['date']), $buttonClass, $fixedDate['date']).'&nbsp;';
+                    }
+                }
+                // add new fixed date
+                $title = ' - - ';
+                $buttonClass .= ' exaplan-date-no-desired ';
+                $content .= $buttonTemplate($part['id'], $region, $title, $buttonClass);
                 $content .= '</td>';
             }
             if ($partK != 0 || count($moduleset->parts) == 1) {

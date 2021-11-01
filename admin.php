@@ -25,7 +25,10 @@ switch ($action) {
     case 'saveFixedDates':
         // create 'mdl_block_exaplandates' record and relate selected students to it
         $pUserId = getPuser($userid)['id'];
-        $middayType = required_param("middayType", PARAM_INT);
+        $middayType1 = optional_param_array("middayType".BLOCK_EXAPLAN_MIDDATE_BEFORE, [], PARAM_INT);
+        $middayType1 = array_keys($middayType1);
+        $middayType2 = optional_param_array("middayType".BLOCK_EXAPLAN_MIDDATE_AFTER, [], PARAM_INT);
+        $middayType2 = array_keys($middayType2);
         $date = required_param("date", PARAM_TEXT);
         $dateTS = DateTime::createFromFormat('Y-m-d', $date)->getTimestamp();
         $students = optional_param_array('fixedPuser', [], PARAM_INT);
@@ -41,6 +44,25 @@ switch ($action) {
         $moduleset = getModulesetByModulesetid($modulepart["modulesetid"]);
         $absends = optional_param_array('absendPuser', [], PARAM_INT);
         $absends = array_keys($absends);
+
+        // get timeslot for fixed date
+        // get from selected (1, 2 or both)
+        // TODO: !!!! may be - minimal timeslot?
+        $middayTypes = [];
+        foreach ($students as $student) {
+            if (in_array($student, $middayType1)) {
+                $middayTypes[] = BLOCK_EXAPLAN_MIDDATE_BEFORE;
+            }
+            if (in_array($student, $middayType2)) {
+                $middayTypes[] = BLOCK_EXAPLAN_MIDDATE_AFTER;
+            }
+        }
+        $middayTypes = array_unique($middayTypes);
+        if (!$middayTypes || count($middayTypes) > 1) {
+            $middayType = BLOCK_EXAPLAN_MIDDATE_ALL;
+        } else {
+            $middayType = reset($middayTypes);
+        }
 
         $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $region);
 

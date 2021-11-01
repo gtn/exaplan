@@ -58,6 +58,15 @@ a.exaplan-admin-modulepart-button.exaplan-date-desired:hover {
     border-color: white;
     color: black;
 }
+a.exaplan-admin-modulepart-button.exaplan-date-fixed {
+    background-color: rgb(0, 83, 0, 1);
+    border-color: rgb(0, 83, 0, 1);
+    color: white;
+}
+a.exaplan-admin-modulepart-button.exaplan-date-fixed:hover {
+    border-color: white;
+    color: black;
+}
 a.exaplan-admin-modulepart-button.exaplan-date-no-desired {
     background-color: rgb(0, 83, 0, 1);
     border-color: rgb(0, 83, 0, 1);
@@ -203,17 +212,21 @@ table.exaplan-adminModulepartView th:nth-child(3),
 table.exaplan-adminModulepartView td:nth-child(3) {
     width: 15% !important;
 }
-table.exaplan-adminModulepartView th:nth-child(4),
-table.exaplan-adminModulepartView td:nth-child(4) {
-    width: 10% !important;
-}
-table.exaplan-adminModulepartView th:nth-child(5),
-table.exaplan-adminModulepartView td:nth-child(5) {
-    width: 10% !important;
-}
 table.exaplan-adminModulepartView th:nth-child(6),
 table.exaplan-adminModulepartView td:nth-child(6) {
+    width: 10% !important;
+}
+table.exaplan-adminModulepartView th:nth-child(7),
+table.exaplan-adminModulepartView td:nth-child(7) {
+    width: 10% !important;
+}
+table.exaplan-adminModulepartView th.mainForm,
+table.exaplan-adminModulepartView td.mainForm {
     width: 40% !important;
+}
+table.exaplan-adminModulepartView td.timslotCheck1,
+table.exaplan-adminModulepartView td.timslotCheck2 {
+    width: 15px;
 }
 
 table.exaplan-date-details-table {
@@ -441,3 +454,16 @@ body {
 #exaplan .btn {padding: .175rem .25rem;}
 #exaplan table.tbl_modulparts th{padding: 0 .25rem;}
 #exaplan table.tbl_modulparts td{padding: 0 .25rem;}
+
+#exaplan .mainTable {
+    width: 100%;
+}
+
+#exaplan .moduleListTable {
+    width: 100%;
+}
+
+#exaplan .moduleListTable th.regionColumn,
+#exaplan .moduleListTable td.regionColumn {
+    padding-left: 15px;
+}
