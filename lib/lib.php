@@ -506,9 +506,10 @@ function block_exaplan_get_calendar_data($userid)
  * @param string $dataType desired | fixed | all
  * @param int $modulepartId (null if needed data about all moduleparts)
  * @param bool $readonly whole calendar is readonly
+ * @param string $region filter by region
  * @return false|string
  */
-function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desired', $modulepartId = null, $readonly = false)
+function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desired', $modulepartId = null, $readonly = false, $region = '')
 {
 
     $data = [
@@ -517,14 +518,14 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
 
     switch ($dataType) {
         case 'desired': // only self desired dates
-            $dates = getDesiredDates($puserid, $modulepartId);
+            $dates = getDesiredDates($puserid, $modulepartId, null, null, $region);
             break;
         case 'fixed': // dates, which were fixed by admin
             $dates = getFixedDates($puserid, $modulepartId);
             break;
         case 'all': // mix of dates. needed for fill the calendar
         default:
-            $dates1 = getDesiredDates($puserid, $modulepartId);
+            $dates1 = getDesiredDates($puserid, $modulepartId, null, null, $region);
             $dates2 = getFixedDates($puserid, $modulepartId);
             $dates = array_merge($dates1, $dates2);
             break;

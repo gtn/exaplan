@@ -43,7 +43,12 @@ class block_exaplan extends block_base {
 				    }
 				} else if(!$modulepartid || $isadmin) {
 				    // only moduleparts
-				    $content.= printUser($userid, $isadmin, $modulepartid, false);
+                    if ($isadmin) {
+//                        $content .= printUser($userid, $isadmin, $modulepartid, false);
+                        $content .= printAdminStart();
+                    } else {
+                        $content .= printUser($userid, $isadmin, $modulepartid, false);
+                    }
 				
 				} else {
 				    // with calendar

@@ -74,11 +74,12 @@ switch($action) {
             echo 'This information is not for you!'; exit;
         }
         $modulepartId = required_param('mpid', PARAM_INT);
+        $region = optional_param('region', '', PARAM_TEXT);
         $date = required_param('date', PARAM_TEXT);
-        $calendarData = block_exaplan_get_data_for_calendar(null, 'all', $modulepartId);
+        $calendarData = block_exaplan_get_data_for_calendar(null, 'all', $modulepartId, false, $region);
         $result = [
             'calendarData' => $calendarData,
-            'htmlContent' => modulepartAdminViewByDate($modulepartId, $date),
+            'htmlContent' => modulepartAdminViewByDate($modulepartId, $date, $region),
         ];
         echo json_encode($result);
         exit;

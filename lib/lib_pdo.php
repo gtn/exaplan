@@ -34,18 +34,17 @@ $CFG->centraldbusername = $dbusername;
 $CFG->centraldbpassword = $dbpassword;
 // this is needed because otherwise in cron tasks $dbname etc does not exist
 
-// only for SZ developer server:
-if (isset($CFG->uniqueMoodleIdentificator) && $CFG->uniqueMoodleIdentificator == 'dfldf8dfh784hj484489045b4590tuydldfg954u4lf') {
-    $dbname = $CFG->dbname;
-    $dbusername = $CFG->dbuser;
-    $dbpassword = $CFG->dbpass;
-};
-
 
 function getPdoConnect()
 {
     global $CFG, $dbname, $dbusername, $dbpassword;
     require_once __DIR__ . '/../config.php';
+    // only for SZ developer server:
+    if (isset($CFG->uniqueMoodleIdentificator) && $CFG->uniqueMoodleIdentificator == 'dfldf8dfh784hj484489045b4590tuydldfg954u4lf') {
+        $dbname = $CFG->dbname;
+        $dbusername = $CFG->dbuser;
+        $dbpassword = $CFG->dbpass;
+    };
     try {
         $pdo = new PDO('mysql:host=localhost;dbname=' . $dbname, $dbusername, $dbpassword); // TODO: constant, global?
     } catch (Exception $e) {
@@ -183,6 +182,7 @@ function getAllModules()
 
     $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmodulesets");
     $statement->execute($params);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
     $modules = $statement->fetchAll();
 
     foreach ($modules as $module) {
@@ -193,6 +193,7 @@ function getAllModules()
         );
         $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmoduleparts WHERE modulesetid = :modulesetid");
         $statement->execute($params);
+        $statement->setFetchMode(PDO::FETCH_ASSOC);
         $moduleset->parts = $statement->fetchAll();
         $modulesets[] = $moduleset;
     }
@@ -603,38 +604,58 @@ function updateNotifications()
  * @param int $modulepartid (null if needed data about all moduleparts)
  * @param string|int $date (null if for all dates)
  * @param int $timeslot midday type
+ * @param int $region region: RegionOst, RegionWest, all
  */
-function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null)
+function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null, $region = null)
 {
     $pdo = getPdoConnect();
+    $leftJoin = '';
     $params = [];
     $whereArr = [' 1=1 '];
     if ($puserid) {
         $params[':puserid'] = $puserid;
-        $whereArr[] = ' puserid = :puserid ';
+        $whereArr[] = ' des.puserid = :puserid ';
     }
     if ($modulepartid) {
         $params[':modulepartid'] = $modulepartid;
-        $whereArr[] = ' modulepartid = :modulepartid ';
+        $whereArr[] = ' des.modulepartid = :modulepartid ';
     }
     if ($date) {
         if (!is_int($date)) {
             $date = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
         }
         $params[':date'] = $date;
-        $whereArr[] = ' date = :date ';
+        $whereArr[] = ' des.date = :date ';
     }
     if ($timeslot) {
         $params[':timeslot'] = $timeslot;
-        $whereArr[] = ' timeslot = :timeslot ';
+        $whereArr[] = ' des.timeslot = :timeslot ';
+    }
+
+    if ($region) {
+        $leftJoin .= ' LEFT JOIN mdl_block_exaplanpusers u ON u.id = des.puserid ';
+        switch ($region) {
+            case 'RegionOst':
+                $whereArr[] = ' u.region = \'RegionOst\' ';
+                break;
+            case 'RegionWest':
+                $whereArr[] = ' u.region = \'RegionWest\' ';
+                break;
+            case 'all':
+            case 'online':
+                // all possible regions (or empty)
+                $whereArr[] = ' u.region IN (\'RegionOst\', \'RegionWest\', \'all\', \'\') ';
+                break;
+        }
     }
 
     if (!count($params)) {
         return null;
     }
 
-    $sql = "SELECT *, puserid as relatedUserId, 'desired' as dateType
-              FROM mdl_block_exaplandesired
+    $sql = "SELECT des.*, des.puserid as relatedUserId, 'desired' as dateType
+              FROM mdl_block_exaplandesired des
+              ".$leftJoin."
               WHERE " . implode(' AND ', $whereArr);
     $statement = $pdo->prepare($sql);
     $statement->execute($params);

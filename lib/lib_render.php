@@ -184,9 +184,10 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
  * @param int $monthsCount
  * @param bool $withHeader
  * @param int $modulepartId
+ * @param string $region
  * @return string
  */
-function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = false, $modulepartId = null) {
+function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = false, $modulepartId = null, $region = '') {
     static $preloadinatorHtml = null;
     $content = '';
     if ($preloadinatorHtml === null) {
@@ -214,21 +215,23 @@ function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = f
             )
         );
         $content .= '<script>var calendarAjaxUrl = "'.html_entity_decode($calendarAjaxUrl).'";</script>';
-        $content .= '<script>var calendarData = ' . block_exaplan_get_data_for_calendar(getPuser($userid)['id'], 'all', null) . ';</script>';
+        $content .= '<script>var calendarData = ' . block_exaplan_get_data_for_calendar(getPuser($userid)['id'], 'all') . ';</script>';
     } else {
         if ($isAdmin) {
             // for adminview
             $content .= '<script>var isExaplanAdmin = true;</script>';
-            $calendarAjaxUrl = new moodle_url('/blocks/exaplan/ajax.php',
-                array('action' => 'adminViewModulepartDate',
-                    'mpid' => $modulepartId,
-                    'sesskey' => sesskey(),
-                )
+            $urlParams = array('action' => 'adminViewModulepartDate',
+                'mpid' => $modulepartId,
+                'sesskey' => sesskey(),
             );
+            if ($region) {
+                $urlParams['region'] = $region;
+            }
+            $calendarAjaxUrl = new moodle_url('/blocks/exaplan/ajax.php', $urlParams);
             $content .= '<script>var calendarAjaxUrl = "'.html_entity_decode($calendarAjaxUrl).'";</script>';
             if ($modulepartId) {
 //                $content .= '<script>var calendarsFrozen = true; </script>';
-                $content .= '<script>var calendarData = ' . block_exaplan_get_data_for_calendar(null, 'all', $modulepartId) . ';</script>';
+                $content .= '<script>var calendarData = ' . block_exaplan_get_data_for_calendar(null, 'all', $modulepartId, false, $region) . ';</script>';
             }
         }
     }
@@ -319,8 +322,9 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
 /**
  * @param int $modulepartid
  * @param string $date
+ * @param string $region
  */
-function printAdminModulepartView($modulepartid, $date = '') {
+function printAdminModulepartView($modulepartid, $date = '', $region = '') {
     $content = '';
     $content .= '<div class="adminModuleplanView">';
     $content .= '<table class="moduleplanView-header">';
@@ -337,7 +341,7 @@ function printAdminModulepartView($modulepartid, $date = '') {
     $content .= '</tr>';
     $content .= '</table>';
     // calendars
-    $content .= block_exaplan_calendars_view(0, 4, false, $modulepartid);
+    $content .= block_exaplan_calendars_view(0, 4, false, $modulepartid, $region);
     // day ajax reloaded data (just HTML container)
     $content .= '<div id="modulepart-date-data">';
     if ($date) {
@@ -354,9 +358,10 @@ function printAdminModulepartView($modulepartid, $date = '') {
 /**
  * @param int $modulepartId
  * @param string $date
+ * @param string $defaultRegion
  * @return string
  */
-function modulepartAdminViewByDate($modulepartId, $date) {
+function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
     global $CFG;
     $content = '';
 
@@ -377,7 +382,7 @@ function modulepartAdminViewByDate($modulepartId, $date) {
 
     $content .= '<tbody>';
 
-    $timeslotView = function($timeslot, $title) use ($modulepartId, $date, $CFG, $tableStartTemplate) {
+    $timeslotView = function($timeslot, $title) use ($modulepartId, $date, $CFG, $tableStartTemplate, $defaultRegion) {
         $cont = '';
 
         $rowsCount = 0;
@@ -426,7 +431,7 @@ function modulepartAdminViewByDate($modulepartId, $date) {
                                     '.$absend.'/></td>';
                 $cont .= '<td valign="top"><!--Bewertung--></td>';
                 if ($rowsCount == 1) {
-                    $cont .= '<td rowspan="###FORM_ROWSPAN###"  valign="top">'.formAdminDateFixing($modulepartId, $date, $timeslot).'</td>';
+                    $cont .= '<td rowspan="###FORM_ROWSPAN###"  valign="top">'.formAdminDateFixing($modulepartId, $date, $timeslot, $defaultRegion).'</td>';
                 }
                 $cont .= '</tr>';
             }
@@ -444,7 +449,7 @@ function modulepartAdminViewByDate($modulepartId, $date) {
                 $cont .= '<td></td>';
                 $cont .= '<td></td>';
                 $cont .= '<td></td>';
-                $cont .= '<td rowspan="###FORM_ROWSPAN###"  valign="top">'.formAdminDateFixing($modulepartId, $date, $timeslot).'</td>';
+                $cont .= '<td rowspan="###FORM_ROWSPAN###"  valign="top">'.formAdminDateFixing($modulepartId, $date, $timeslot, $defaultRegion).'</td>';
                 $cont .= '</tr>';
 
         }
@@ -478,9 +483,10 @@ function modulepartAdminViewByDate($modulepartId, $date) {
  * @param int $modulepartId
  * @param string $date
  * @param int $timeslot
+ * @param string $defaultRegion
  * @return string
  */
-function formAdminDateFixing($modulepartId, $date, $timeslot) {
+function formAdminDateFixing($modulepartId, $date, $timeslot, $defaultRegion = '') {
     global $CFG;
     $content = '';
     $dateTs = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
@@ -510,10 +516,14 @@ function formAdminDateFixing($modulepartId, $date, $timeslot) {
     $content .= '</select>';
     $content .= '</td>';
     $content .= '<td>';
+    $selectedRegion = $defaultRegion;
+    if (@$dateRec['region']) {
+        $selectedRegion = $dateRec['region'];
+    }
     $content .= '<select id="region_'.$instanceKey.'" class="form-control" name="region">';
     $content .= '<option value="all">Alle Regionen</option>';
-    $content .= '<option value="RegionOst" '.(@$dateRec['region'] == 'RegionOst' ? 'selected="selected"' : '').'>Ost</option>';
-    $content .= '<option value="RegionWest" '.(@$dateRec['region'] == 'RegionWest' ? 'selected="selected"' : '').'>West</option>';
+    $content .= '<option value="RegionOst" '.($selectedRegion == 'RegionOst' ? 'selected="selected"' : '').'>Ost</option>';
+    $content .= '<option value="RegionWest" '.($selectedRegion == 'RegionWest' ? 'selected="selected"' : '').'>West</option>';
     $content .= '</select>';
     $content .= '</td>';
     $content .= '<td>';
@@ -593,5 +603,102 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
 
     $content .= '</table>';
 
+    return $content;
+}
+
+function printAdminStart()
+{
+    global $CFG;
+    $content = '';
+
+    $modulesets = getAllModules();
+
+
+    $content .= '<div class="exaplan-result-item">';
+
+    $content.= '<div class="UserBlock">';
+    $content .= '<div class="BlockHeader">';
+
+    $content .= '</div>';
+    $content .= '<div class="BlockBody">';
+    $content .= '<table class="mainTable" border="0">';
+    $content .= '<thead>';
+    $content .= '<tr>';
+    $content .= '<th colspan="3">
+                    <div class="result-item-header">
+                        <div class="result-item-header-cnt">                                                    
+                            <h5 class="item-header-title">Admin dashboard</h5>   	                        	
+                        </div>
+                    </div>
+                </th>';
+    $content .= '</tr>';
+    $content .= '</thead>';
+    $content .= '<tbody>';
+    $content .= '<tr>';
+    $content .= '<td valign="top">';
+
+    $content .= '<table class="moduleListTable" border="0">';
+    $content .= '<thead>';
+    $content .= '<tr>';
+    $content .= '<th rowspan="2" valign="top">Meine Module</th>';
+    $content .= '<th rowspan="2" valign="top">Termine</th>';
+    $content .= '<th colspan="3">Anzahl Teilnehmer angefragt:</th>';
+    $content .= '</tr>';
+    $content .= '<tr>';
+    $content .= '<th>Region Ost</th>';
+    $content .= '<th>Region West</th>';
+    $content .= '<th>Online</th>';
+    $content .= '</tr>';
+    $content .= '</thead>';
+
+    $regions = ['RegionOst', 'RegionWest', 'all'];
+
+    $content .= '<tbody>';
+    foreach ($modulesets as $moduleKey => $moduleset){
+        $content .= '<tr> <td valign="top" rowspan="'.count($moduleset->parts).'">'.$moduleset->set["title"].'</td>';
+        foreach($moduleset->parts as $partK => $part) {
+            if ($partK != 0) {
+                $content .= '<tr>';
+            }
+            $content .= '<th>'.$part["title"].'</th>';
+            foreach ($regions as $region) {
+                $content .= '<td>';
+                $desiredDates = getDesiredDates(null, $part['id'], null, null, $region);
+                $buttonClass = '';
+                if (count($desiredDates) > 0) {
+                    // get count of unique pUsers
+                    $desiredDatesUsers = count(array_unique(array_column($desiredDates, 'puserid')));
+                    $title = $desiredDatesUsers.' Anfragen';
+                    $buttonClass .= ' exaplan-date-desired ';
+                } else {
+                    $title = ' - - ';
+                    $buttonClass .= ' exaplan-date-no-desired ';
+                }
+                $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$part["id"].'&region='.$region.'" 
+                            role="button" 
+                            data-modulepartId="'.$part['id'].'"
+                            class="btn btn-danger exaplan-admin-modulepart-button '.$buttonClass.'"
+                        > '.$title.' </a>';
+                $content .= '</td>';
+            }
+            if ($partK != 0 || count($moduleset->parts) == 1) {
+                $content .= '</tr>';
+            }
+        }
+
+    }
+
+    $content .= '</tbody>';
+    $content .= '</table>';
+
+    $content .= '</td></tr>';
+
+    $content .= '</tbody>';
+    $content .= '</table>'; // .mainTable
+
+
+    $content .= '</div>';
+    $content .= '</div>';
+    $content .= '</div><!-- / exaplan-result-item --->';
     return $content;
 }

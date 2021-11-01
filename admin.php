@@ -16,6 +16,7 @@ require_login();
 
 $action = optional_param("action", "", PARAM_TEXT);
 $modulepartid = optional_param("mpid", "", PARAM_INT);
+$region = optional_param("region", "", PARAM_TEXT);
 $isadmin = block_exaplan_is_admin();
 
 $userid = $USER->id;
@@ -74,7 +75,7 @@ echo '<div id="exaplan">';
 
 if ($isadmin) {
     $dateGP = optional_param('date', '', PARAM_TEXT);
-    echo printAdminModulepartView($modulepartid, $dateGP);
+    echo printAdminModulepartView($modulepartid, $dateGP, $region);
 }
 
 echo '<a href="'.$CFG->wwwroot.'/blocks/exaplan/dashboard.php" role="button" class="btn btn-info"> back to dashboard </a>';
