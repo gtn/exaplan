@@ -370,7 +370,7 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
     $actionUrl = $CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartId.'&date='.$date.($defaultRegion ? '&region='.$defaultRegion : '');
     $content .= '<form class="small" action="'.$actionUrl.'" method="post" autocomplete="off">';
     $content .= '<input type="hidden" name="action" value="saveFixedDates" />';
-    $content .= '<table class="table table-sm exaplan-adminModulepartView" border="1">';
+    $content .= '<table class="table table-sm exaplan-adminModulepartView" border="0">';
     // header
     $content .= '<thead class="thead-light">';
     $content .= '<tr>';
