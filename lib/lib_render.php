@@ -268,9 +268,9 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
 
     $content = '';
     $content .= '<div class="calendar_options">';
-    $modulepartName = getTableData('mdl_block_exaplanmoduleparts', $modulepartId, 'title');
-    $moduleId = getTableData('mdl_block_exaplanmoduleparts', $modulepartId, 'modulesetid');
-    $moduleName = getTableData('mdl_block_exaplanmodulesets', $moduleId, 'title');
+    $modulePart = getTableData('mdl_block_exaplanmoduleparts', $modulepartId);
+    $modulepartName = $modulePart['title'];
+    $moduleName = getTableData('mdl_block_exaplanmodulesets', $modulePart['modulesetid'], 'title');
     $existingDates = getFixedDates(null, $modulepartId, null, null, true);
     $content .= '<h4>Sie planen: '.$moduleName.' | '.$modulepartName.'</h4>';
     if ($existingDates) {
@@ -303,7 +303,8 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
         $content .= 'Wunschtermin wählen:';
         $content .= '</div>';
     }
-    $content .= '<div class="midday-type">
+    if ($modulePart['duration'] != 1) {
+        $content .= '<div class="midday-type">
                     <label class="midday-type-radio">
                         <input type="radio" name="midday_type" value="' . BLOCK_EXAPLAN_MIDDATE_BEFORE . '"> vormittags (8-12 Uhr)
                     </label>
@@ -314,6 +315,7 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
                         <input type="radio" name="midday_type" value="' . BLOCK_EXAPLAN_MIDDATE_ALL . '" checked="checked"> ganztags möglich
                     </label>  
                 </div>';
+    }
     $content .= '<p>Bitte markieren Sie im Kalender jeweils Ihren Wunschzeitraum</p>';
     $content .= '</div>';
     return $content;
