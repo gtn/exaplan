@@ -100,7 +100,7 @@ if ($isadmin) {
     echo printAdminModulepartView($modulepartid, $dateGP, $region);
 }
 
-echo '<a href="'.$CFG->wwwroot.'/blocks/exaplan/dashboard.php" role="button" class="btn btn-info"> back to dashboard </a>';
+echo '<a href="'.$CFG->wwwroot.'/my/" role="button" class="btn btn-info"> back to dashboard </a>';
 
 echo '</div>';
 

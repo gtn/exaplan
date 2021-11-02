@@ -625,9 +625,9 @@ function block_exaplan_get_user_regioncohort($userid)
               FROM {cohort} c
               JOIN {cohort_members} cm ON c.id = cm.cohortid
               JOIN {user} u ON cm.userid=u.id
-              WHERE (c.idnumber = "RegionOst" OR c.idnumber = "RegionWest") AND c.visible = 1';
+              WHERE (c.idnumber = "RegionOst" OR c.idnumber = "RegionWest") AND c.visible = 1 AND cm.userid=?';
 
-    if ($records = $DB->get_records_sql($sql)) {
+    if ($records = $DB->get_records_sql($sql,array($userid))) {
         foreach ($records as $record) {
             return $record->idnumber;
             break;
@@ -652,6 +652,7 @@ function block_exaplan_create_plannotification($puseridfrom = null, $puseridto =
 }
 
 function block_exaplan_get_current_user(){
+	global $saltuserstring;
 	$userid = optional_param("userid", 0, PARAM_INT);
 	if ($userid>0){
 		$pagehash=optional_param("pagehash", 0, PARAM_ALPHANUMEXT);
@@ -663,6 +664,7 @@ function block_exaplan_get_current_user(){
 }
 
 function block_exaplan_hash_current_userid($userid){
+		global $saltuserstring;
 		return md5($userid."_".$saltuserstring);
 }
 
