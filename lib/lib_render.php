@@ -121,7 +121,7 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
                     	}
                     }
                     
-                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'&userid='.$userid.'" 
+                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'&userid='.$userid.'&pagehash='.block_exaplan_hash_current_userid($userid).'" 
                                     role="button" 
                                     class="btn exaplan-selectable-modulepart '.$buttonClass.'"                                     
                                     data-modulepartId="'.$part['id'].'"

@@ -651,5 +651,20 @@ function block_exaplan_create_plannotification($puseridfrom = null, $puseridto =
     return $DB->insert_record(BLOCK_EXAPLAN_DB_PLANNOTIFICATIONS, $plannotification);
 }
 
+function block_exaplan_get_current_user(){
+	$userid = optional_param("userid", 0, PARAM_INT);
+	if ($userid>0){
+		$pagehash=optional_param("pagehash", 0, PARAM_ALPHANUMEXT);
+		if (md5($userid."_".$saltuserstring)==$pagehash) return $userid;
+		else return 0;
+	}else{
+		return 0;
+	}
+}
+
+function block_exaplan_hash_current_userid($userid){
+		return md5($userid."_".$saltuserstring);
+}
+
 
 
