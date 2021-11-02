@@ -32,6 +32,7 @@ global $CFG;
 $CFG->centraldbname = $dbname;
 $CFG->centraldbusername = $dbusername;
 $CFG->centraldbpassword = $dbpassword;
+$CFG->centralsaltuserstring = $saltuserstring;
 // this is needed because otherwise in cron tasks $dbname etc does not exist
 
 

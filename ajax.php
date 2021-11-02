@@ -18,13 +18,13 @@ $action = required_param('action', PARAM_TEXT);
 
 //require_login($course); // TODO: needed?
 $isAdmin = block_exaplan_is_admin();
-
+$userid = block_exaplan_get_current_user();
 require_sesskey();
 
 switch($action) {
     case 'addUserDisiredDate':
         // save student's selected date
-        $pUserId = getPuser($USER->id)['id'];
+        $pUserId = getPuser($userid)['id'];
       $date = optional_param('date', date('Y-m-d'), PARAM_TEXT);
       $modulepartId = required_param('modulepartId', PARAM_INT);
       $dateTS = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
@@ -35,12 +35,12 @@ switch($action) {
       }
       $middayType = optional_param('middayType', BLOCK_EXAPLAN_MIDDATE_ALL, PARAM_INT);
       $newDateId = setDesiredDate($modulepartId, $pUserId, $dateTS, $middayType, $pUserId);
-      $allUserData = block_exaplan_get_data_for_calendar(getPuser($USER->id)['id'], 'all', $modulepartId);
+      $allUserData = block_exaplan_get_data_for_calendar(getPuser($userid)['id'], 'all', $modulepartId);
       echo json_encode($allUserData);
       exit;
       break;
     case 'addUserDate': // TODO: deprecated?
-        $pUserId = getPuser($USER->id)['id'];
+        $pUserId = getPuser($userid)['id'];
 //        $dateId = required_param('dateId', PARAM_INT);
 //        $dateId = 1;
         $date = optional_param('date', date('Y-m-d'), PARAM_TEXT);
@@ -63,7 +63,7 @@ switch($action) {
                 removeDateIfNoUsers($newDateId);
             }
         }
-        $allUserData = block_exaplan_get_calendar_data(getPuser($USER->id)['id']);
+        $allUserData = block_exaplan_get_calendar_data(getPuser($userid)['id']);
         echo json_encode($allUserData);
         exit;
         break;

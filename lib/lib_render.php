@@ -211,6 +211,8 @@ function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = f
         $content .= '<script>var isExaplanAdmin = false;</script>';
         $calendarAjaxUrl = new moodle_url('/blocks/exaplan/ajax.php',
             array('action' => 'addUserDisiredDate',
+            	'userid' => $userid,
+            		'pagehash' => block_exaplan_hash_current_userid($userid),
                 'sesskey' => sesskey(),
             )
         );

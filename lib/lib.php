@@ -659,20 +659,24 @@ function block_exaplan_create_plannotification($puseridfrom = null, $puseridto =
 }
 
 function block_exaplan_get_current_user(){
-	global $saltuserstring;
+	global $saltuserstring,$CFG;
+	if (empty($saltuserstring)) $saltuserstring=$CFG->centralsaltuserstring;
 	$userid = optional_param("userid", 0, PARAM_INT);
 	if ($userid>0){
 		$pagehash=optional_param("pagehash", 0, PARAM_ALPHANUMEXT);
 		if (md5($userid."_".$saltuserstring)==$pagehash) return $userid;
-		else return 0;
+		else{ 
+        throw new moodle_exception('Ungültige Berechtigung!');
+    }
 	}else{
 		return 0;
 	}
 }
 
 function block_exaplan_hash_current_userid($userid){
-    global $saltuserstring;
-    return md5($userid."_".$saltuserstring);
+   global $saltuserstring,$CFG;
+		if (empty($saltuserstring)) $saltuserstring=$CFG->centralsaltuserstring;
+		return md5($userid."_".$saltuserstring);
 }
 
 function getTimeslotName($timeslot, $short = false) {

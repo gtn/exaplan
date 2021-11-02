@@ -22,9 +22,7 @@ $dateId = optional_param("dateid", 0, PARAM_INT);
 $date = optional_param("date", "", PARAM_TEXT);
 $timeslot = optional_param("timeslot", 0, PARAM_INT);
 $isadmin = block_exaplan_is_admin();
-$userid = optional_param("userid", 0, PARAM_INT);
-
-$curUser=block_exaplan_get_current_user();
+$userid = block_exaplan_get_current_user();
 
 switch ($action) {
     case 'registerToDate':
