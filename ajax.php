@@ -35,7 +35,7 @@ switch($action) {
       }
       $middayType = optional_param('middayType', BLOCK_EXAPLAN_MIDDATE_ALL, PARAM_INT);
       $newDateId = setDesiredDate($modulepartId, $pUserId, $dateTS, $middayType, $pUserId);
-      $allUserData = block_exaplan_get_data_for_calendar(getPuser($USER->id)['id'], 'all');
+      $allUserData = block_exaplan_get_data_for_calendar(getPuser($USER->id)['id'], 'all', $modulepartId);
       echo json_encode($allUserData);
       exit;
       break;

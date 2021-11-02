@@ -17,6 +17,8 @@ require_login();
 $action = optional_param("action", "", PARAM_TEXT);
 $modulepartid = optional_param("mpid", "", PARAM_INT);
 $region = optional_param("region", "", PARAM_TEXT);
+$dashboardType = optional_param("dashboardType", '', PARAM_TEXT);
+
 $isadmin = block_exaplan_is_admin();
 
 $userid = $USER->id;
@@ -25,12 +27,13 @@ switch ($action) {
     case 'saveFixedDates':
         // create 'mdl_block_exaplandates' record and relate selected students to it
         $pUserId = getPuser($userid)['id'];
-        $middayType1 = optional_param_array("middayType".BLOCK_EXAPLAN_MIDDATE_BEFORE, [], PARAM_INT);
-        $middayType1 = array_keys($middayType1);
-        $middayType2 = optional_param_array("middayType".BLOCK_EXAPLAN_MIDDATE_AFTER, [], PARAM_INT);
-        $middayType2 = array_keys($middayType2);
+//        $middayType1 = optional_param_array("middayType".BLOCK_EXAPLAN_MIDDATE_BEFORE, [], PARAM_INT);
+//        $middayType1 = array_keys($middayType1);
+//        $middayType2 = optional_param_array("middayType".BLOCK_EXAPLAN_MIDDATE_AFTER, [], PARAM_INT);
+//        $middayType2 = array_keys($middayType2);
         $date = required_param("date", PARAM_TEXT);
         $dateTS = DateTime::createFromFormat('Y-m-d', $date)->getTimestamp();
+        $dateTSstart = strtotime("today", $dateTS); //same tstamp for whole day
         $students = optional_param_array('fixedPuser', [], PARAM_INT);
         $students = array_keys($students);
         $location = optional_param('location', '', PARAM_TEXT);
@@ -47,21 +50,34 @@ switch ($action) {
 
         // get timeslot for fixed date
         // get from selected (1, 2 or both)
-        // TODO: !!!! may be - minimal timeslot?
+        // selected types are from database. not from html form
+        $useFormMiddateTypes = false;
         $middayTypes = [];
         foreach ($students as $student) {
-            if (in_array($student, $middayType1)) {
-                $middayTypes[] = BLOCK_EXAPLAN_MIDDATE_BEFORE;
-            }
-            if (in_array($student, $middayType2)) {
-                $middayTypes[] = BLOCK_EXAPLAN_MIDDATE_AFTER;
+            $desiredDate = getDesiredDates($student, $modulepartid, $dateTSstart);
+            if ($middayTypes) { // if this user already has not desired dates for this modulepart - it is fix date editing.
+                $useFormMiddateTypes = true;
+                $middayTypes[] = $desiredDate[0]['timeslot'];
             }
         }
-        $middayTypes = array_unique($middayTypes);
-        if (!$middayTypes || count($middayTypes) > 1) {
-            $middayType = BLOCK_EXAPLAN_MIDDATE_ALL;
+        if ($useFormMiddateTypes) {
+            // found at least one timeslot
+            $middayTypes = array_unique($middayTypes);
+            if (!$middayTypes || count($middayTypes) > 1) {
+                $middayType = BLOCK_EXAPLAN_MIDDATE_ALL;
+            } else {
+                $middayType = reset($middayTypes);
+            }
         } else {
-            $middayType = reset($middayTypes);
+            // get from existing date
+            $tempDate = getPrefferedDate($modulepartid, $dateTS);
+            if ($tempDate) {
+                // use existing timeslot
+                $middayType = $tempDate['timeslot'];
+            } else {
+                // new date. use default
+                $middayType = BLOCK_EXAPLAN_MIDDATE_ALL;
+            }
         }
 
         $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $region);
@@ -100,7 +116,7 @@ if ($isadmin) {
     echo printAdminModulepartView($modulepartid, $dateGP, $region);
 }
 
-echo '<a href="'.$CFG->wwwroot.'/my/" role="button" class="btn btn-info"> back to dashboard </a>';
+echo '<a href="'.$CFG->wwwroot.'/my/'.($dashboardType ? '?dashboardType='.$dashboardType : '').'" role="button" class="btn btn-info"> back to dashboard </a>';
 
 echo '</div>';
 

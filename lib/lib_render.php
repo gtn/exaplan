@@ -215,7 +215,7 @@ function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = f
             )
         );
         $content .= '<script>var calendarAjaxUrl = "'.html_entity_decode($calendarAjaxUrl).'";</script>';
-        $content .= '<script>var calendarData = ' . block_exaplan_get_data_for_calendar(getPuser($userid)['id'], 'all') . ';</script>';
+        $content .= '<script>var calendarData = ' . block_exaplan_get_data_for_calendar(getPuser($userid)['id'], 'all', $modulepartId) . ';</script>';
     } else {
         if ($isAdmin) {
             // for adminview
@@ -226,6 +226,9 @@ function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = f
             );
             if ($region) {
                 $urlParams['region'] = $region;
+            }
+            if ($dashboardType = optional_param('dashboardType', '', PARAM_TEXT)) {
+                $urlParams['dashboardType'] = $dashboardType;
             }
             $calendarAjaxUrl = new moodle_url('/blocks/exaplan/ajax.php', $urlParams);
             $content .= '<script>var calendarAjaxUrl = "'.html_entity_decode($calendarAjaxUrl).'";</script>';
@@ -306,13 +309,13 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
     if ($modulePart['duration'] != 1) {
         $content .= '<div class="midday-type">
                     <label class="midday-type-radio">
-                        <input type="radio" name="midday_type" value="' . BLOCK_EXAPLAN_MIDDATE_BEFORE . '"> vormittags (8-12 Uhr)
+                        <input type="radio" name="midday_type" value="' . BLOCK_EXAPLAN_MIDDATE_BEFORE . '"> '.getTimeslotName(BLOCK_EXAPLAN_MIDDATE_BEFORE).'
                     </label>
                     <label class="midday-type-radio">
-                        <input type="radio" name="midday_type" value="' . BLOCK_EXAPLAN_MIDDATE_AFTER . '"> nachmittags (13-17 Uhr)
+                        <input type="radio" name="midday_type" value="' . BLOCK_EXAPLAN_MIDDATE_AFTER . '"> '.getTimeslotName(BLOCK_EXAPLAN_MIDDATE_AFTER).'
                     </label>
                     <label class="midday-type-radio">
-                        <input type="radio" name="midday_type" value="' . BLOCK_EXAPLAN_MIDDATE_ALL . '" checked="checked"> ganztags möglich
+                        <input type="radio" name="midday_type" value="' . BLOCK_EXAPLAN_MIDDATE_ALL . '" checked="checked"> '.getTimeslotName(BLOCK_EXAPLAN_MIDDATE_ALL).'
                     </label>  
                 </div>';
     }
@@ -365,9 +368,10 @@ function printAdminModulepartView($modulepartid, $date = '', $region = '') {
  */
 function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
     global $CFG;
+    $dashboardType = optional_param('dashboardType', '', PARAM_TEXT);
     $content = '';
 
-    $actionUrl = $CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartId.'&date='.$date.($defaultRegion ? '&region='.$defaultRegion : '');
+    $actionUrl = $CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartId.'&date='.$date.($defaultRegion ? '&region='.$defaultRegion : '').($dashboardType ? 'dashboardType='.$dashboardType : '');
     $content .= '<form class="small" action="'.$actionUrl.'" method="post" autocomplete="off">';
     $content .= '<input type="hidden" name="action" value="saveFixedDates" />';
     $content .= '<table class="table table-sm exaplan-adminModulepartView" border="0">';
@@ -397,7 +401,7 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
             if ($userTimeSlot == $timeslotColumn || $userTimeSlot == BLOCK_EXAPLAN_MIDDATE_ALL) {
                 $checked = ' checked = "checked" ';
             }
-            $content = '<input type = "checkbox" 
+            $content = '<input type = "checkbox" disabled readonly onclick="return false;"
                                 value = "1"      
                                 id = "middayType'.$pUserid.'_'.$timeslotColumn.'"                               
                                 name = "middayType'.$timeslotColumn.'['.$pUserid.']" 
@@ -727,12 +731,25 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
     return $content;
 }
 
-function printAdminStart()
+function printAdminDashboard($dashboardType = 'default')
 {
-    global $CFG;
+    global $CFG, $PAGE;
     $content = '';
 
     $modulesets = getAllModules();
+
+    switch ($dashboardType) {
+        case 'inProcess':
+            $dashoboardTitle = 'Übersicht: in Bearbeitung';
+            break;
+        case 'past':
+            $dashoboardTitle = 'Übersicht: zurückliegende Termine';
+            break;
+        case 'default':
+        default:
+            $dashoboardTitle = 'Übersicht Anfragen';
+            break;
+    }
 
 
     $content .= '<div class="exaplan-result-item">';
@@ -748,7 +765,7 @@ function printAdminStart()
     $content .= '<th colspan="3">
                     <div class="result-item-header">
                         <div class="result-item-header-cnt">                                                    
-                            <h5 class="item-header-title">Admin dashboard</h5>   	                        	
+                            <h5 class="item-header-title">'.$dashoboardTitle.'</h5>   	                        	
                         </div>
                     </div>
                 </th>';
@@ -776,9 +793,9 @@ function printAdminStart()
 
     $content .= '<tbody>';
 
-    $buttonTemplate = function($modulepartid, $region, $title, $buttonClass, $date = '') {
+    $buttonTemplate = function($modulepartid, $region, $title, $buttonClass, $date = '') use ($dashboardType) {
         global $CFG;
-        return '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartid.'&region='.$region.($date ? '&date='.date('Y-m-d', $date) : '').'" 
+        return '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartid.'&region='.$region.($date ? '&date='.date('Y-m-d', $date) : '').($dashboardType ? '&dashboardType='.$dashboardType : '').'" 
                             role="button" 
                             data-modulepartId="'.$modulepartid.'"
                             class="btn btn-danger exaplan-admin-modulepart-button '.$buttonClass.'"
@@ -794,28 +811,48 @@ function printAdminStart()
             $content .= '<th>'.$part["title"].'</th>';
             foreach ($regions as $region) {
                 $content .= '<td class="regionColumn">';
-                $desiredDates = getDesiredDates(null, $part['id'], null, null, $region);
-                $fixedDates = getFixedDates(null, $part['id'], null, null, false, $region);
                 $buttonClass = '';
-                // if desired dates are existing
-                if (count($desiredDates) > 0) {
-                    // get count of unique pUsers
-                    $desiredDatesUsers = count(array_unique(array_column($desiredDates, 'puserid')));
-                    $title = $desiredDatesUsers . ' Anfragen';
-                    $buttonClass .= ' exaplan-date-desired ';
-                    $content .= $buttonTemplate($part['id'], $region, $title, $buttonClass).'&nbsp;';
+                switch ($dashboardType) {
+                    case 'inProcess':
+                        // existing fixed dates (in the future)
+                        $fixedDates = getFixedDates(null, $part['id'], null, null, false, $region, 'future');
+                        if (count($fixedDates) > 0) {
+                            $buttonClass .= ' exaplan-date-fixed ';
+                            foreach ($fixedDates as $fixedDate) {
+                                $content .= $buttonTemplate($part['id'], $region, date('d.m.Y', $fixedDate['date']), $buttonClass, $fixedDate['date']).'&nbsp;';
+                            }
+                        }
+                        // blocked
+                        // TODO
+
+                        break;
+                    case 'past':
+                        // fixed dates in past
+                        $fixedDates = getFixedDates(null, $part['id'], null, null, false, $region, 'past');
+                        if (count($fixedDates) > 0) {
+                            $buttonClass .= ' exaplan-date-fixed ';
+                            foreach ($fixedDates as $fixedDate) {
+                                $content .= $buttonTemplate($part['id'], $region, date('d.m.Y', $fixedDate['date']), $buttonClass, $fixedDate['date']).'&nbsp;';
+                            }
+                        }
+                        break;
+                    case 'default':
+                        // desired dates
+                        $desiredDates = getDesiredDates(null, $part['id'], null, null, $region);
+                        if (count($desiredDates) > 0) {
+                            // get count of unique pUsers
+                            $desiredDatesUsers = count(array_unique(array_column($desiredDates, 'puserid')));
+                            $title = $desiredDatesUsers . ' Anfragen';
+                            $buttonClass .= ' exaplan-date-desired ';
+                            $content .= $buttonTemplate($part['id'], $region, $title, $buttonClass) . '&nbsp;';
+                        }
+                        // button to add new fixed date
+                        $title = ' - - ';
+                        $buttonClass .= ' exaplan-date-no-desired ';
+                        $content .= $buttonTemplate($part['id'], $region, $title, $buttonClass);
+                        break;
                 }
-                // existinf fixed dates
-                if (count($fixedDates) > 0) {
-                    $buttonClass .= ' exaplan-date-fixed ';
-                    foreach ($fixedDates as $fixedDate) {
-                        $content .= $buttonTemplate($part['id'], $region, date('d.m.Y', $fixedDate['date']), $buttonClass, $fixedDate['date']).'&nbsp;';
-                    }
-                }
-                // add new fixed date
-                $title = ' - - ';
-                $buttonClass .= ' exaplan-date-no-desired ';
-                $content .= $buttonTemplate($part['id'], $region, $title, $buttonClass);
+
                 $content .= '</td>';
             }
             if ($partK != 0 || count($moduleset->parts) == 1) {
@@ -835,6 +872,26 @@ function printAdminStart()
 
 
     $content .= '</div>';
+
+    $content .= '<div class="BlockFooter">';
+    // buttons to dashboards
+    switch ($dashboardType) {
+        case 'inProcess':
+            $content .= '<a href="'.$PAGE->url.'?dashboardType=default" role="button" class="btn btn-info"> Übersicht Anfragen </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType=past" role="button" class="btn btn-info"> Übersicht: zurückliegende Termine </a>&nbsp;';
+            break;
+        case 'past':
+            $content .= '<a href="'.$PAGE->url.'?dashboardType=default" role="button" class="btn btn-info"> Übersicht Anfragen </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType=inProcess" role="button" class="btn btn-info"> Übersicht: in Bearbeitung </a>&nbsp;';
+            break;
+        case 'default':
+        default:
+            $content .= '<a href="'.$PAGE->url.'?dashboardType=inProcess" role="button" class="btn btn-info"> Übersicht: in Bearbeitung </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType=past" role="button" class="btn btn-info"> Übersicht: zurückliegende Termine </a>&nbsp;';
+            break;
+    }
+    $content .= '</div>';
+
     $content .= '</div>';
     $content .= '</div><!-- / exaplan-result-item --->';
     return $content;

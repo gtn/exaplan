@@ -683,9 +683,10 @@ function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $t
  * @param string|int $date (null if for all dates)
  * @param int $timeslot midday type
  * @param bool $withEmptyStudents true if you need also empty dates (without students)
+ * @param string $timeRange range in the timeline: future | past
  * @param string $region
  */
-function getFixedDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null, $withEmptyStudents = false, $region = '')
+function getFixedDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null, $withEmptyStudents = false, $region = '', $timeRange = '')
 {
     $pdo = getPdoConnect();
     $params = [];
@@ -725,6 +726,17 @@ function getFixedDates($puserid = null, $modulepartid = null, $date = null, $tim
             case 'online':
                 // all possible regions (or empty)
                 $whereArr[] = ' u.region IN (\'RegionOst\', \'RegionWest\', \'all\', \'\') ';
+                break;
+        }
+    }
+
+    if ($timeRange) {
+        switch ($timeRange) {
+            case 'future':
+                $whereArr[] = ' d.date >= '.strtotime("today", time()).' '; // today or in future
+                break;
+            case 'past':
+                $whereArr[] = ' d.date < '.strtotime("today", time()).' '; // in past
                 break;
         }
     }

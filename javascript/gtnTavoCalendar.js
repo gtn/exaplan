@@ -79,6 +79,15 @@ TavoCalendar.prototype.addMetaData = function(date, metaData) {
                     // disable all EVENTS. we need it for handle own events
                     dayWrapper.off();
                 }
+                if (!isExaplanAdmin) { // TODO: I think here is needed some additional condition in the future
+                    if (metaData.middayType) {
+                        dayWrapper.attr('data-middayType', metaData.middayType);
+                        var dateTypeMarker = $('<span class="exaplan-middayType">' + metaData.middayType + '</span>');
+                        dayWrapper.find('span.tavo-calendar__day-inner').append(dateTypeMarker);
+                        // disable all EVENTS. we need it for handle own events
+                        dayWrapper.off();
+                    }
+                }
                 if (metaData.desired) {
                     dayWrapper.addClass('exaplan-calendar-date-desired');
                 }

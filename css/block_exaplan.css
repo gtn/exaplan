@@ -137,6 +137,21 @@ a.exaplan-admin-modulepart-button.exaplan-date-no-desired:hover {
     z-index: 10000;
 }
 
+#block_exaplan_dashboard_calendar .tavo-calendar span.exaplan-middayType {
+    font-size: 8px;
+    line-height: 14px;
+    color: #008000;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #008000;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    z-index: 10000;
+}
+
 .calendar_options {
     font-size: 12px;
 }

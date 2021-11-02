@@ -507,26 +507,33 @@ function block_exaplan_get_calendar_data($userid)
  * @param int $modulepartId (null if needed data about all moduleparts)
  * @param bool $readonly whole calendar is readonly
  * @param string $region filter by region
+ * @param bool $respectModulepartForFixDates Do we need to respect modulepart for fix dates (false - possible to view fixed dates for ALL moduleparts. not only for selected)
  * @return false|string
  */
-function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desired', $modulepartId = null, $readonly = false, $region = '')
+function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desired', $modulepartId = null, $readonly = false, $region = '', $respectModulepartForFixDates = true)
 {
 
     $data = [
         'selectedDates' => []
     ];
 
+    if ($respectModulepartForFixDates) {
+        $modulepartIdforFixDates = $modulepartId;
+    } else {
+        $modulepartIdforFixDates = null;
+    }
+
     switch ($dataType) {
         case 'desired': // only self desired dates
             $dates = getDesiredDates($puserid, $modulepartId, null, null, $region);
             break;
         case 'fixed': // dates, which were fixed by admin
-            $dates = getFixedDates($puserid, $modulepartId);
+            $dates = getFixedDates($puserid, $modulepartIdforFixDates);
             break;
         case 'all': // mix of dates. needed for fill the calendar
         default:
             $dates1 = getDesiredDates($puserid, $modulepartId, null, null, $region);
-            $dates2 = getFixedDates($puserid, $modulepartId);
+            $dates2 = getFixedDates($puserid, $modulepartIdforFixDates);
             $dates = array_merge($dates1, $dates2);
             break;
     }
@@ -539,7 +546,7 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
         if (!array_key_exists($dateIndex, $selectedDates)) { // TODO: Check it if the user has fixed and desitrred the same date
             $selectedDates[$dateIndex] = [
                 'date' => $dateIndex,
-                'middayType' => $date['timeslot'],
+                'middayType' => getTimeslotName($date['timeslot'], true),
                 'usedItems' => 0,   // TODO: possible different counters: dates/moduleparts
                 'dateType' => $date['dateType'], // needed?
                 'desired' => false,
@@ -664,9 +671,17 @@ function block_exaplan_get_current_user(){
 }
 
 function block_exaplan_hash_current_userid($userid){
-		global $saltuserstring;
-		return md5($userid."_".$saltuserstring);
+    global $saltuserstring;
+    return md5($userid."_".$saltuserstring);
 }
 
+function getTimeslotName($timeslot, $short = false) {
+    $shorts = [' - no - ', 'VM', 'NM', 'G'];
+    $full = [' - not defined --', 'vormittags (8-12 Uhr)', 'nachmittags (13-17 Uhr)', 'ganztags möglich'];
+    if ($short) {
+        return $shorts[$timeslot];
+    }
+    return $full[$timeslot];
+}
 
 

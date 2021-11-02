@@ -11,54 +11,55 @@ class block_exaplan extends block_base {
         global $CFG, $PAGE, $OUTPUT, $USER;
         
 
-				$PAGE->set_url($CFG->wwwroot.'/blocks/exaplan/dashboard.php');
-				$PAGE->requires->css('/blocks/exaplan/css/block_exaplan.css', true);
-				
+//        $PAGE->set_url($CFG->wwwroot.'/blocks/exaplan/dashboard.php');
+        $PAGE->requires->css('/blocks/exaplan/css/block_exaplan.css', true);
+
         $modulepartid = optional_param("mpid", 0, PARAM_INT);
-				$isadmin = block_exaplan_is_admin();
-				$isteacher = block_exaplan_is_teacher_in_any_course();
-				
-				$userid = $USER->id;
-				
-				require_login();
-				
-				$content="";
-				//$content.=  $OUTPUT->header();
-				$content.= '<div id="exaplan">';
-				
-				if ($isteacher && !$isadmin) {
-				    $students = array();
-				    $enrolled = array();
-				    $courses = block_exaplan_get_courses();
-				    foreach( $courses as $course){
-				        $enrolled = get_enrolled_users(block_exaplan_get_context_from_courseid($course->id), 'block/exaplan:student' );
-				        $students = array_merge($students, $enrolled);
-				    }
-				    $studentids = array();
-				    foreach($students as $student){
-				        if(!in_array($student->id,$studentids)){
-				            $content.= printUser($student->id, $isadmin, $modulepartid, false);
-				            $studentids[] = $student->id;
-				        }
-				    }
-				} else if(!$modulepartid || $isadmin) {
-				    // only moduleparts
-                    if ($isadmin) {
-                        $content .= printAdminStart();
-                    } else {
-                        $content .= printUser($userid, $isadmin, $modulepartid, false);
-                    }
-				
-				} else {
-				    // with calendar
-				    $content.= printUser($userid, $isadmin, $modulepartid, true);
-				}
-				
-				$content.= '</div>';
-				
-				//$content.= $OUTPUT->footer();
-				
-				//echo $content;
+        $dashboardType = optional_param("dashboardType", 'default', PARAM_TEXT);
+        $isadmin = block_exaplan_is_admin();
+        $isteacher = block_exaplan_is_teacher_in_any_course();
+
+        $userid = $USER->id;
+
+        require_login();
+
+        $content="";
+        //$content.=  $OUTPUT->header();
+        $content.= '<div id="exaplan">';
+
+        if ($isteacher && !$isadmin) {
+            $students = array();
+            $enrolled = array();
+            $courses = block_exaplan_get_courses();
+            foreach( $courses as $course){
+                $enrolled = get_enrolled_users(block_exaplan_get_context_from_courseid($course->id), 'block/exaplan:student' );
+                $students = array_merge($students, $enrolled);
+            }
+            $studentids = array();
+            foreach($students as $student){
+                if(!in_array($student->id,$studentids)){
+                    $content.= printUser($student->id, $isadmin, $modulepartid, false);
+                    $studentids[] = $student->id;
+                }
+            }
+        } else if(!$modulepartid || $isadmin) {
+            // only moduleparts
+            if ($isadmin) {
+                $content .= printAdminDashboard($dashboardType);
+            } else {
+                $content .= printUser($userid, $isadmin, $modulepartid, false);
+            }
+
+        } else {
+            // with calendar
+            $content.= printUser($userid, $isadmin, $modulepartid, true);
+        }
+
+        $content.= '</div>';
+
+        //$content.= $OUTPUT->footer();
+
+        //echo $content;
         
         
         if ($this->content !== null) {

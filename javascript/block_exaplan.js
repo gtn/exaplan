@@ -165,10 +165,14 @@ function updateAllCalendarMetadata() {
                 allCalendars.forEach((calendarInstance) => {
                     // add only needed props to metaData
                     var metaData = {
-                        usedItems: date.usedItems,
+                        // usedItems: date.usedItems,
                         desired: date.desired,
                         fixed: date.fixed,
                         moduleparts: date.moduleparts,
+                        middayType: date.middayType,
+                    }
+                    if (typeof isExaplanAdmin !== 'undefined' && isExaplanAdmin) {
+                        metaData.usedItems = date.usedItems; // admin must see number of students for the day
                     }
                     calendarInstance.addMetaData(date.date, metaData);
                 });
