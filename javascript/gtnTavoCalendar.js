@@ -94,6 +94,9 @@ TavoCalendar.prototype.addMetaData = function(date, metaData) {
                 if (metaData.fixed) {
                     dayWrapper.addClass('exaplan-calendar-date-fixed');
                 }
+                if (metaData.blocked) {
+                    dayWrapper.addClass('exaplan-calendar-date-blocked');
+                }
                 if (metaData.moduleparts && typeof currentModulepartId != 'undefined' && currentModulepartId > 0) {
                     if (metaData.moduleparts.indexOf(currentModulepartId) == -1) {
                         // add class to mute this day

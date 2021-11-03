@@ -32,6 +32,7 @@ const BLOCK_EXAPLAN_DB_PLANNOTIFICATIONS = 'block_EXAPLANNOTIFICATIONS';
  */
 const BLOCK_EXAPLAN_DATE_PROPOSED = 1;
 const BLOCK_EXAPLAN_DATE_CONFIRMED = 2;
+const BLOCK_EXAPLAN_DATE_BLOCKED = 3;
 
 /**
  * MIDDATE TYPES
@@ -523,17 +524,27 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
         $modulepartIdforFixDates = null;
     }
 
+    $states = [BLOCK_EXAPLAN_DATE_PROPOSED, BLOCK_EXAPLAN_DATE_CONFIRMED, BLOCK_EXAPLAN_DATE_BLOCKED];
+    $withEmptyStudents = true;
+    if (!block_exaplan_is_admin()) {
+        $withEmptyStudents = false;
+        // blocked dates are not for students
+        if (($key = array_search(BLOCK_EXAPLAN_DATE_BLOCKED, $states)) !== false) {
+            unset($states[$key]);
+        }
+    }
+
     switch ($dataType) {
         case 'desired': // only self desired dates
             $dates = getDesiredDates($puserid, $modulepartId, null, null, $region);
             break;
         case 'fixed': // dates, which were fixed by admin
-            $dates = getFixedDates($puserid, $modulepartIdforFixDates);
+            $dates = getFixedDates($puserid, $modulepartIdforFixDates, null, null, $withEmptyStudents, '', '', $states);
             break;
         case 'all': // mix of dates. needed for fill the calendar
         default:
             $dates1 = getDesiredDates($puserid, $modulepartId, null, null, $region);
-            $dates2 = getFixedDates($puserid, $modulepartIdforFixDates);
+            $dates2 = getFixedDates($puserid, $modulepartIdforFixDates, null, null, $withEmptyStudents, '', '', $states);
             $dates = array_merge($dates1, $dates2);
             break;
     }
@@ -551,6 +562,7 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
                 'dateType' => $date['dateType'], // needed?
                 'desired' => false,
                 'fixed' => false,
+                'blocked' => false,
             ];
         }
         $selectedDates[$dateIndex]['usedItems'] += 1;
@@ -597,19 +609,26 @@ function block_exaplan_send_moodle_notification($notificationtype, $userfrom, $u
  * @param string $date
  * @param int $timeslot
  * @param string $region
+ * @param array $states
  * @return array
  */
-function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot = null, $region = '')
+function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot = null, $region = '', $states = [])
 {
-
-    $dates1 = getFixedDates(null, $modulepartId, $date, $timeslot);
+    $dates1 = getFixedDates(null, $modulepartId, $date, $timeslot, true, '', '', $states); // withEmptyStudents - true or false?
     $dates2 = getDesiredDates(null, $modulepartId, $date, $timeslot, $region);
     $dates = array_merge($dates1, $dates2);
 
     foreach ($dates as $k => $dateData) {
-        $pUserData = getTableData('mdl_block_exaplanpusers', $dateData['relatedUserId']);
+        if (isset($dateData['relatedUserId'])) {
+            $pUserData = getTableData('mdl_block_exaplanpusers', $dateData['relatedUserId']);
+        } else {
+            $pUserData = null;
+        }
         $dates[$k]['pUserData'] = $pUserData;
     }
+
+    // put dates with empty users list to end of the dates list
+    usort($dates, function ($a) {return ($a['pUserData'] ? -1 : 1);});
 
     return $dates;
 }
@@ -689,4 +708,12 @@ function getTimeslotName($timeslot, $short = false) {
     return $full[$timeslot];
 }
 
+function getRegionTitle($region, $short = false) {
+    $shorts = ['' => 'Online', 'all' => 'Online', 'RegionOst' => 'Ost', 'RegionWest' => 'West'];
+    $full = ['' => 'Online', 'all' => 'Online', 'RegionOst' => 'Region Ost', 'RegionWest' => 'Region West'];
+    if ($short) {
+        return $shorts[$region];
+    }
+    return $full[$region];
+}
 

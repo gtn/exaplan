@@ -39,8 +39,8 @@ switch($action) {
       echo json_encode($allUserData);
       exit;
       break;
-    case 'addUserDate': // TODO: deprecated?
-        $pUserId = getPuser($userid)['id'];
+    /*case 'addUserDate': // TODO: deprecated?
+        $pUserId = getPuser($USER->id)['id'];
 //        $dateId = required_param('dateId', PARAM_INT);
 //        $dateId = 1;
         $date = optional_param('date', date('Y-m-d'), PARAM_TEXT);
@@ -63,10 +63,10 @@ switch($action) {
                 removeDateIfNoUsers($newDateId);
             }
         }
-        $allUserData = block_exaplan_get_calendar_data(getPuser($userid)['id']);
+        $allUserData = block_exaplan_get_calendar_data(getPuser($USER->id)['id']);
         echo json_encode($allUserData);
         exit;
-        break;
+        break;*/
     case 'adminViewModulepartDate':
         // Admin: view selected date for modulepart id
         $isAdmin = block_exaplan_is_admin();

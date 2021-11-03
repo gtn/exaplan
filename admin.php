@@ -43,6 +43,18 @@ switch ($action) {
         $pTrainer = getPuser($trainerId)['id'];
         $region = optional_param('region', 'all', PARAM_TEXT);
 
+        // fixed date or blocked date
+        $state = BLOCK_EXAPLAN_DATE_PROPOSED; // never accessible?
+        $sendNotificationToStudent = true;
+        if (optional_param('date_save', '', PARAM_TEXT)) {
+            $state = BLOCK_EXAPLAN_DATE_CONFIRMED;
+        }
+        if (optional_param('date_block', '', PARAM_TEXT)) {
+            $state = BLOCK_EXAPLAN_DATE_BLOCKED;
+            $sendNotificationToStudent = false;
+        }
+
+
         $modulepart = getModulepartByModulepartid($modulepartid);
         $moduleset = getModulesetByModulesetid($modulepart["modulesetid"]);
         $absends = optional_param_array('absendPuser', [], PARAM_INT);
@@ -80,7 +92,7 @@ switch ($action) {
             }
         }
 
-        $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $region);
+        $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $region, $state);
 
         // register / unregister students
         $registeredUsers = getFixedPUsersForDate($dateId);
@@ -93,9 +105,11 @@ switch ($action) {
             if (in_array($student, $absends)) {
                 $absend = 1;
             }
-            addPUserToDate($dateId, $student, $absend, $pUserId, $date, $moduleset, $modulepart, true);
+            addPUserToDate($dateId, $student, $absend, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
             // delete ALL desired dates
-            removeDesiredDate($modulepartid, $student);
+            if ($state != BLOCK_EXAPLAN_DATE_BLOCKED) {
+                removeDesiredDate($modulepartid, $student);
+            }
         }
         // unregister if it was unchecked
         if ($registeredUsersIds && count($registeredUsersIds) > 0) {

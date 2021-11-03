@@ -168,6 +168,7 @@ function updateAllCalendarMetadata() {
                         // usedItems: date.usedItems,
                         desired: date.desired,
                         fixed: date.fixed,
+                        blocked: date.blocked,
                         moduleparts: date.moduleparts,
                         middayType: date.middayType,
                     }

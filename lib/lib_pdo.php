@@ -290,14 +290,13 @@ function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_CONFIRMED)
     return $modulesets;
 }
 
-function getPrefferedDate($modulepartid, $date, $timeslot = null, $state = 1)
+function getPrefferedDate($modulepartid, $date, $timeslot = null, $states = [])
 {
     $pdo = getPdoConnect();
 
     $params = array(
         ':modulepartid' => $modulepartid,
         ':date' => $date,
-        ':state' => $state
     );
     if ($timeslot) {
         $params[':timeslot'] = $timeslot;
@@ -308,8 +307,10 @@ function getPrefferedDate($modulepartid, $date, $timeslot = null, $state = 1)
               FROM mdl_block_exaplandates
               WHERE modulepartid = :modulepartid
                 ".($timeslot ? ' AND timeslot = :timeslot ' : '')."
-                AND date = :date
-                AND state = :state";
+                AND date = :date";
+    if ($states) {
+        $sql .= ' AND state IN ('.implode(',', $states).') ';
+    }
     $statement = $pdo->prepare($sql);
     $statement->setFetchMode(PDO::FETCH_ASSOC);
     $statement->execute($params);
@@ -335,7 +336,7 @@ function getPrefferedDate($modulepartid, $date, $timeslot = null, $state = 1)
  * @param string $region
  * @return string
  */
-function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment, $region)
+function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment, $region, $state = BLOCK_EXAPLAN_DATE_PROPOSED)
 {
     $pdo = getPdoConnect();
     $timestamp = new DateTime();
@@ -346,7 +347,7 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
         ':modulepartid' => $modulepartid,
         ':date' => $date,
         ':timeslot' => $timeslot,
-        ':state' => BLOCK_EXAPLAN_DATE_CONFIRMED,
+        ':state' => $state,
         ':modifiedpuserid' => $puserid,
         ':modifiedtimestamp' => $timestamp,
         ':location' => $location,
@@ -356,7 +357,7 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
         ':region' => trim($region),
     ];
 
-    $dateRec = getPrefferedDate($modulepartid, $date, $timeslot, BLOCK_EXAPLAN_DATE_CONFIRMED);
+    $dateRec = getPrefferedDate($modulepartid, $date, $timeslot, [$state]);
 
     if ($dateRec) {
         $dateId = $dateRec['id'];
@@ -493,9 +494,10 @@ function removeDesiredDate($modulepartid, $puserid)
  * @param int $moduleset
  * @param int $modulepart
  * @param bool $withUpdating
+ * @param bool $sendNotification
  * @return mixed|string
  */
-function addPUserToDate($dateid, $puserid, $absend = 0, $creatorpuserid=null, $date=null, $moduleset=null, $modulepart=null, $withUpdating = false)
+function addPUserToDate($dateid, $puserid, $absend = 0, $creatorpuserid=null, $date=null, $moduleset=null, $modulepart=null, $withUpdating = false, $sendNotification = true)
 {
     global $USER;
 
@@ -537,8 +539,8 @@ function addPUserToDate($dateid, $puserid, $absend = 0, $creatorpuserid=null, $d
     $id = $pdo->lastInsertId();
 
     // create notification for users
-    if($creatorpuserid && $date && $moduleset && $modulepart){
-        block_exaplan_create_plannotification($creatorpuserid,$puserid,"Termin für Modulset ".$moduleset["title"].", Modulteil ".$modulepart["title"]." fixiert für ".$date.".");
+    if ($creatorpuserid && $date && $moduleset && $modulepart && $sendNotification) {
+        block_exaplan_create_plannotification($creatorpuserid, $puserid, "Termin für Modulset ".$moduleset["title"].", Modulteil ".$modulepart["title"]." fixiert für ".$date.".");
     }
 
 
@@ -686,8 +688,10 @@ function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $t
  * @param bool $withEmptyStudents true if you need also empty dates (without students)
  * @param string $timeRange range in the timeline: future | past
  * @param string $region
+ * @param string $timeRange
+ * @param array $states
  */
-function getFixedDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null, $withEmptyStudents = false, $region = '', $timeRange = '')
+function getFixedDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null, $withEmptyStudents = false, $region = '', $timeRange = '', $states = [])
 {
     $pdo = getPdoConnect();
     $params = [];
@@ -716,19 +720,25 @@ function getFixedDates($puserid = null, $modulepartid = null, $date = null, $tim
     $leftJoin = '';
     if ($region) {
         $leftJoin .= ' LEFT JOIN mdl_block_exaplanpusers u ON u.id = dumm.puserid ';
+        $tempWhere = '';
         switch ($region) {
             case 'RegionOst':
-                $whereArr[] = ' u.region = \'RegionOst\' ';
+                $tempWhere .= ' u.region = \'RegionOst\' ';
                 break;
             case 'RegionWest':
-                $whereArr[] = ' u.region = \'RegionWest\' ';
+                $tempWhere .= ' u.region = \'RegionWest\' ';
                 break;
             case 'all':
             case 'online':
                 // all possible regions (or empty)
-                $whereArr[] = ' u.region IN (\'RegionOst\', \'RegionWest\', \'all\', \'\') ';
+                $tempWhere .= ' u.region IN (\'RegionOst\', \'RegionWest\', \'all\', \'\') ';
                 break;
         }
+        if ($withEmptyStudents) {
+            $tempWhere .= ' OR u.id IS NULL '; // if the date has not related students
+            $tempWhere = ' ( '.$tempWhere.' ) ';
+        }
+        $whereArr[] = $tempWhere;
     }
 
     if ($timeRange) {
@@ -742,18 +752,24 @@ function getFixedDates($puserid = null, $modulepartid = null, $date = null, $tim
         }
     }
 
+    if ($states) {
+        $whereArr[] = ' d.state IN ('.implode(',', $states).') ';
+    }
+
     if (!count($params)) {
         return null;
     }
 
     if ($withEmptyStudents && !$puserid) {
-        $sql = "SELECT DISTINCT d.*, 'fixed' as dateType
+        $sql = "SELECT DISTINCT d.*, dumm.puserid as relatedUserId, IF(d.state = ".BLOCK_EXAPLAN_DATE_BLOCKED.", 'blocked', 'fixed') as dateType
                                   FROM mdl_block_exaplandates d                                                                   
+                                   LEFT JOIN mdl_block_exaplanpuser_date_mm dumm ON dumm.dateid = d.id
+                                    ".$leftJoin."
                                   WHERE " . implode(' AND ', $whereArr) . "
                                   ORDER BY d.date
                                   ";
     } else {
-        $sql = "SELECT DISTINCT d.*, dumm.puserid as relatedUserId, 'fixed' as dateType
+        $sql = "SELECT DISTINCT d.*, dumm.puserid as relatedUserId, IF(d.state = ".BLOCK_EXAPLAN_DATE_BLOCKED.", 'blocked', 'fixed') as dateType
                                   FROM mdl_block_exaplanpuser_date_mm dumm
                                     JOIN mdl_block_exaplandates d ON d.id = dumm.dateid
                                     ".$leftJoin."
@@ -762,6 +778,8 @@ function getFixedDates($puserid = null, $modulepartid = null, $date = null, $tim
                                   ";
 
     }
+//    echo "<pre>debug:<strong>lib_pdo.php:779</strong>\r\n"; print_r($modulepartid); echo '</pre>'; // !!!!!!!!!! delete it
+//    echo "<pre>debug:<strong>lib_pdo.php:771</strong>\r\n"; print_r($sql); echo '</pre>'; ; // !!!!!!!!!! delete it
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
     $statement->setFetchMode(PDO::FETCH_ASSOC);
