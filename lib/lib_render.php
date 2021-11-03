@@ -394,8 +394,7 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
     $content .= '<tbody>';
 
     $rowsCount = 0;
-    $mergedData = block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date);
-//    echo "<pre>debug:<strong>lib_render.php:390</strong>\r\n"; print_r($mergedData); echo '</pre>'; exit; // !!!!!!!!!! delete it
+    $mergedData = block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, null, $defaultRegion);
 
     if (count($mergedData) > 0) {
         $userMidDayTypeCheckboxTemplate = function($pUserid, $userTimeSlot, $timeslotColumn) {

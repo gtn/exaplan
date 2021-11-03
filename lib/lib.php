@@ -596,13 +596,14 @@ function block_exaplan_send_moodle_notification($notificationtype, $userfrom, $u
  * @param int $modulepartId
  * @param string $date
  * @param int $timeslot
+ * @param string $region
  * @return array
  */
-function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot = null)
+function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot = null, $region = '')
 {
 
     $dates1 = getFixedDates(null, $modulepartId, $date, $timeslot);
-    $dates2 = getDesiredDates(null, $modulepartId, $date, $timeslot);
+    $dates2 = getDesiredDates(null, $modulepartId, $date, $timeslot, $region);
     $dates = array_merge($dates1, $dates2);
 
     foreach ($dates as $k => $dateData) {
