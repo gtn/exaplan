@@ -622,21 +622,8 @@ function block_exaplan_send_moodle_notification($notificationtype, $userfrom, $u
 function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot = null, $region = '', $states = [])
 {
     $dates1 = getFixedDatesAdvanced(null, $modulepartId, $date, $timeslot, true, '', '', $states); // withEmptyStudents - true or false?
-    $blockedExists = false;
 
-    foreach ($dates1 as $dateTemp) {
-        if (in_array($dateTemp['dateType'], ['blocked', 'fixed'])) {
-            $blockedExists = true;
-            if (@$dateTemp['relatedUserId']) {
-                $usedUsers[] = $dateTemp['relatedUserId'];
-            }
-        }
-    }
-    /*if ($blockedExists) {
-        $dates2 = [];
-    } else {*/
-        $dates2 = getDesiredDates(null, $modulepartId, $date, $timeslot, $region);
-//    }
+    $dates2 = getDesiredDates(null, $modulepartId, $date, $timeslot, $region);
 
     $dates = array_merge($dates1, $dates2);
 
