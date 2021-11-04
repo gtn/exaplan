@@ -357,7 +357,9 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
         ':region' => trim($region),
     ];
 
-    $dateRec = getPrefferedDate($modulepartid, $date, $timeslot, [$state]);
+    // do not care about timeslot and state during selecting. We must have only single record for the day+modulepart
+    $dateRec = getPrefferedDate($modulepartid, $date/*, $timeslot, [$state]*/);
+
 
     if ($dateRec) {
         $dateId = $dateRec['id'];
@@ -366,8 +368,6 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
         if ($updateExisting) {
             unset($params[':modulepartid']);
             unset($params[':date']);
-            unset($params[':state']);
-            unset($params[':timeslot']); // for leave PHP warnings
             $sql = "UPDATE mdl_block_exaplandates
                         SET modifiedpuserid = :modifiedpuserid,
                              modifiedtimestamp = :modifiedtimestamp,
@@ -375,8 +375,10 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
                              trainerpuserid = :trainerpuserid,
                              starttime = :starttime,
                              comment = :comment,
-                             region = :region
-                        WHERE id = " . $dateId . ";";
+                             region = :region,
+                             state = :state,
+                             timeslot = :timeslot
+                        WHERE id = " . intval($dateId) . ";";
             $statement = $pdo->prepare($sql);
             $statement->execute($params);
         }
@@ -691,7 +693,7 @@ function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $t
  * @param string $timeRange
  * @param array $states
  */
-function getFixedDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null, $withEmptyStudents = false, $region = '', $timeRange = '', $states = [])
+function getFixedDatesAdvanced($puserid = null, $modulepartid = null, $date = null, $timeslot = null, $withEmptyStudents = false, $region = '', $timeRange = '', $states = [])
 {
     $pdo = getPdoConnect();
     $params = [];
@@ -788,6 +790,81 @@ function getFixedDates($puserid = null, $modulepartid = null, $date = null, $tim
     return $dates;
 
 }
+
+/**
+ * @param int $modulepartid
+ * @param $date
+ * @param string $region
+ * @param string $timeRange
+ * @return array|null
+ */
+function getDatesForModulePart($modulepartid, $date = null, $region = '', $timeRange = 'future')
+{
+    $pdo = getPdoConnect();
+    $params = [];
+    $params[':modulepartid'] = $modulepartid;
+    $whereArr = [' d.modulepartid = :modulepartid '];
+    if ($date) {
+        if (!is_int($date)) {
+            $date = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
+        }
+        $date = strtotime("today", $date); //same tstamp for whole day
+        $params[':date'] = $date;
+        $whereArr[] = ' d.date = :date ';
+    }
+
+    $leftJoin = '';
+    if ($region) {
+        $leftJoin .= ' LEFT JOIN mdl_block_exaplanpusers u ON u.id = dumm.puserid ';
+        $tempWhere = '';
+        switch ($region) {
+            case 'RegionOst':
+                $tempWhere .= ' u.region = \'RegionOst\' ';
+                break;
+            case 'RegionWest':
+                $tempWhere .= ' u.region = \'RegionWest\' ';
+                break;
+            case 'all':
+            case 'online':
+                // all possible regions (or empty)
+                $tempWhere .= ' u.region IN (\'RegionOst\', \'RegionWest\', \'all\', \'\') ';
+                break;
+        }
+        $whereArr[] = $tempWhere;
+    }
+
+    if ($timeRange) {
+        switch ($timeRange) {
+            case 'future':
+                $whereArr[] = ' d.date >= '.strtotime("today", time()).' '; // today or in future
+                break;
+            case 'past':
+                $whereArr[] = ' d.date < '.strtotime("today", time()).' '; // in past
+                break;
+        }
+    }
+
+    if (!count($params)) {
+        return null;
+    }
+
+    $sql = "SELECT DISTINCT d.*, IF(d.state = ".BLOCK_EXAPLAN_DATE_BLOCKED.", 'blocked', 'fixed') as dateType
+                  FROM mdl_block_exaplandates d                                                                   
+                    LEFT JOIN mdl_block_exaplanpuser_date_mm dumm ON dumm.dateid = d.id
+                    ".$leftJoin."
+                  WHERE " . implode(' AND ', $whereArr) . "
+                  ORDER BY d.date
+    ";
+
+    $statement = $pdo->prepare($sql);
+    $statement->execute($params);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
+    $dates = $statement->fetchAll();
+
+    return $dates;
+
+}
+
 
 /**
  * @param int $puserid

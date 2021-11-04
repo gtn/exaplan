@@ -539,21 +539,25 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
             $dates = getDesiredDates($puserid, $modulepartId, null, null, $region);
             break;
         case 'fixed': // dates, which were fixed by admin
-            $dates = getFixedDates($puserid, $modulepartIdforFixDates, null, null, $withEmptyStudents, '', '', $states);
+            $dates = getFixedDatesAdvanced($puserid, $modulepartIdforFixDates, null, null, $withEmptyStudents, '', '', $states);
             break;
         case 'all': // mix of dates. needed for fill the calendar
         default:
             $dates1 = getDesiredDates($puserid, $modulepartId, null, null, $region);
-            $dates2 = getFixedDates($puserid, $modulepartIdforFixDates, null, null, $withEmptyStudents, '', '', $states);
+            $dates2 = getFixedDatesAdvanced($puserid, $modulepartIdforFixDates, null, null, $withEmptyStudents, '', '', $states);
             $dates = array_merge($dates1, $dates2);
             break;
     }
 
     // calendar used dates
+    $usersForDay = []; // to ignore the same users for the same date
     $selectedDates = [];
     foreach ($dates as $date) {
         $dateIndex = $date['date'];
         $dateIndex = date('Y-m-d', $dateIndex);
+        if (!array_key_exists($dateIndex, $usersForDay)) {
+            $usersForDay[$dateIndex] = [];
+        }
         if (!array_key_exists($dateIndex, $selectedDates)) { // TODO: Check it if the user has fixed and desitrred the same date
             $selectedDates[$dateIndex] = [
                 'date' => $dateIndex,
@@ -565,7 +569,10 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
                 'blocked' => false,
             ];
         }
-        $selectedDates[$dateIndex]['usedItems'] += 1;
+        if (@$date['relatedUserId'] && !in_array($date['relatedUserId'], $usersForDay[$dateIndex])) {
+            $usersForDay[$dateIndex][] = $date['relatedUserId'];
+            $selectedDates[$dateIndex]['usedItems'] += 1;
+        }
         $selectedDates[$dateIndex]['moduleparts'][] = $date['modulepartid'];
         $selectedDates[$dateIndex]['readonly'] = $readonly; // TODO: another rules for readonly days?
         $selectedDates[$dateIndex][$date['dateType']] = true;
@@ -614,15 +621,36 @@ function block_exaplan_send_moodle_notification($notificationtype, $userfrom, $u
  */
 function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, $timeslot = null, $region = '', $states = [])
 {
-    $dates1 = getFixedDates(null, $modulepartId, $date, $timeslot, true, '', '', $states); // withEmptyStudents - true or false?
-    $dates2 = getDesiredDates(null, $modulepartId, $date, $timeslot, $region);
+    $dates1 = getFixedDatesAdvanced(null, $modulepartId, $date, $timeslot, true, '', '', $states); // withEmptyStudents - true or false?
+    $blockedExists = false;
+
+    foreach ($dates1 as $dateTemp) {
+        if (in_array($dateTemp['dateType'], ['blocked', 'fixed'])) {
+            $blockedExists = true;
+            if (@$dateTemp['relatedUserId']) {
+                $usedUsers[] = $dateTemp['relatedUserId'];
+            }
+        }
+    }
+    /*if ($blockedExists) {
+        $dates2 = [];
+    } else {*/
+        $dates2 = getDesiredDates(null, $modulepartId, $date, $timeslot, $region);
+//    }
+
     $dates = array_merge($dates1, $dates2);
 
+    // fill user's data
+    // and ignore desired dates if this date already has fixed/blocked date (for every user)
+    $usedUsers = [];
     foreach ($dates as $k => $dateData) {
+        $pUserData = null;
         if (isset($dateData['relatedUserId'])) {
-            $pUserData = getTableData('mdl_block_exaplanpusers', $dateData['relatedUserId']);
-        } else {
-            $pUserData = null;
+            if (!in_array($dateData['relatedUserId'], $usedUsers)) {
+                // insert only first user's instance
+                $pUserData = getTableData('mdl_block_exaplanpusers', $dateData['relatedUserId']);
+                $usedUsers[] = $dateData['relatedUserId'];
+            }
         }
         $dates[$k]['pUserData'] = $pUserData;
     }
@@ -679,24 +707,29 @@ function block_exaplan_create_plannotification($puseridfrom = null, $puseridto =
 }
 
 function block_exaplan_get_current_user(){
-	global $saltuserstring,$CFG;
-	if (empty($saltuserstring)) $saltuserstring=$CFG->centralsaltuserstring;
-	$userid = optional_param("userid", 0, PARAM_INT);
-	if ($userid>0){
-		$pagehash=optional_param("pagehash", 0, PARAM_ALPHANUMEXT);
-		if (md5($userid."_".$saltuserstring)==$pagehash) return $userid;
-		else{ 
-        throw new moodle_exception('Ungültige Berechtigung!');
+	global $saltuserstring, $CFG;
+	if (empty($saltuserstring)) {
+	    $saltuserstring = $CFG->centralsaltuserstring;
     }
-	}else{
+	$userid = optional_param("userid", 0, PARAM_INT); //
+	if ($userid > 0) {
+		$pagehash = optional_param("pagehash", 0, PARAM_ALPHANUMEXT);
+		if (md5($userid."_".$saltuserstring) == $pagehash) {
+		    return $userid;
+        } else {
+            throw new moodle_exception('Ungültige Berechtigung!');
+        }
+	} else {
 		return 0;
 	}
 }
 
-function block_exaplan_hash_current_userid($userid){
-   global $saltuserstring,$CFG;
-		if (empty($saltuserstring)) $saltuserstring=$CFG->centralsaltuserstring;
-		return md5($userid."_".$saltuserstring);
+function block_exaplan_hash_current_userid($userid) {
+   global $saltuserstring, $CFG;
+    if (empty($saltuserstring)) {
+        $saltuserstring = $CFG->centralsaltuserstring;
+    }
+    return md5($userid."_".$saltuserstring);
 }
 
 function getTimeslotName($timeslot, $short = false) {

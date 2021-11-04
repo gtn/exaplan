@@ -212,7 +212,7 @@ function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = f
         $calendarAjaxUrl = new moodle_url('/blocks/exaplan/ajax.php',
             array('action' => 'addUserDisiredDate',
             	'userid' => $userid,
-            		'pagehash' => block_exaplan_hash_current_userid($userid),
+                'pagehash' => block_exaplan_hash_current_userid($userid),
                 'sesskey' => sesskey(),
             )
         );
@@ -271,12 +271,14 @@ function block_exaplan_calendars_view($userid, $monthsCount = 2, $withHeader = f
 function block_exaplan_calendars_header_view($modulepartId = 0) {
     global $CFG;
 
+    $userid = block_exaplan_get_current_user();
+
     $content = '';
     $content .= '<div class="calendar_options">';
     $modulePart = getTableData('mdl_block_exaplanmoduleparts', $modulepartId);
     $modulepartName = $modulePart['title'];
     $moduleName = getTableData('mdl_block_exaplanmodulesets', $modulePart['modulesetid'], 'title');
-    $existingDates = getFixedDates(null, $modulepartId, null, null, true, '', '', [BLOCK_EXAPLAN_DATE_PROPOSED, BLOCK_EXAPLAN_DATE_CONFIRMED]);
+    $existingDates = getFixedDatesAdvanced(null, $modulepartId, null, null, true, '', '', [BLOCK_EXAPLAN_DATE_PROPOSED, BLOCK_EXAPLAN_DATE_CONFIRMED]);
     $content .= '<h4>Sie planen: '.$moduleName.' | '.$modulepartName.'</h4>';
     if ($existingDates) {
         $content .= '<div class="register-existing-dates">';
@@ -296,7 +298,7 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
                 .($trainer ? 'Skillswork-Trainer: '.@$trainer['firstname'].' '.@$trainer['lastname'].'<br>' : '');
             $tooltips .= '</span>';
             $content .= '<td align="right"><a href="#" class="btn btn-sm exaplan-existing-date tooltipster" data-tooltip-content="#tooltipster_content'.$date['id'].'">'.date('d.m.Y', $date['date']).'</a></td>';
-            $url = $CFG->wwwroot.'/blocks/exaplan/calendar.php?action=registerToDate&mpid='.$modulepartId.'&dateid='.$date['id'];
+            $url = $CFG->wwwroot.'/blocks/exaplan/calendar.php?action=registerToDate&mpid='.$modulepartId.'&dateid='.$date['id'].'&userid='.$userid.'&pagehash='.block_exaplan_hash_current_userid($userid).'';
             $content .= '<td align="left"><a href="'.$url.'" class="btn btn-sm exaplan-register-toDate">Termin bestätigen</a></td>';
 
             $content .= '</tr>';
@@ -399,8 +401,6 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
     $rowsCount = 0;
     $mergedData = block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, null, $defaultRegion, $states);
 
-//    echo "<pre>debug:<strong>lib_render.php:399</strong>\r\n"; print_r($mergedData); echo '</pre>'; exit; // !!!!!!!!!! delete it
-
     if (count($mergedData) > 0) {
         $userMidDayTypeCheckboxTemplate = function($pUserid, $userTimeSlot, $timeslotColumn) {
             $checked = '';
@@ -428,10 +428,10 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
                 // fixed or desired
                 $content .= '<input type="checkbox" 
                                 value="1"      
-                                id = "fixedUser"' . $dateData['pUserData']['id'] . '"                               
+                                id = "fixedUser' . $dateData['pUserData']['id'] . '"                               
                                 name = "fixedPuser[' . $dateData['pUserData']['id'] . ']" 
                                 ' . (in_array($dateData['dateType'], ['fixed', 'blocked']) ? 'checked = "checked"' : '') . '/>&nbsp;';
-                $content .= '<label for="fixedUser"' . $dateData['pUserData']['id'] . '">' . @$dateData['pUserData']['firstname'] . ' ' . @$dateData['pUserData']['lastname'] . '</label>';
+                $content .= '<label for="fixedUser' . $dateData['pUserData']['id'] . '">' . @$dateData['pUserData']['firstname'] . ' ' . @$dateData['pUserData']['lastname'] . '</label>';
                 $content .= '</td>';
                 // buttons
                 $content .= '<td valign="top">' ./*buttons*/
@@ -680,7 +680,7 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
 
     $content .= '<tr>';
     $content .= '<td><input type="text" name="location" value="'.@$dateRec['location'].'" class="form-control" id="location_'.$instanceKey.'" /></td>';
-    $timeString = (@$dateRec['starttime'] ? date('h:i', @$dateRec['starttime']) : '');
+    $timeString = (@$dateRec['starttime'] ? date('H:i', @$dateRec['starttime']) : '00:00');
     $content .= '<td><input type="text" name="time" value="'.$timeString.'" class="form-control" id="time_'.$instanceKey.'" >';
     $content .= '</tr>';
 
@@ -691,7 +691,11 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
     $content .= '</tr>';
 
     $content .= '<tr>';
-    $content .= '<td align="left"><button name="date_block" class="btn btn-info" type="submit" value="date_block" >Termin blocken</button></td>';
+    $content .= '<td align="left">';
+    if (!@$dateRec['state'] || @$dateRec['state'] == BLOCK_EXAPLAN_DATE_BLOCKED) {
+        $content .= '<button name="date_block" class="btn btn-info" type="submit" value="date_block" >Termin blocken</button>';
+    }
+    $content .= '</td>';
     $content .= '<td align="right"><button name="date_save" class="btn btn-success" type="submit" value="date_save" >Kurs fixieren</button></td>';
     $content .= '</tr>';
 
@@ -833,7 +837,8 @@ function printAdminDashboard($dashboardType = 'default')
                 switch ($dashboardType) {
                     case 'inProcess':
                         // existing fixed / blocked dates (in the future)
-                        $fixedDates = getFixedDates(null, $part['id'], null, null, true, $region, 'future');
+//                        $fixedDates = getFixedDatesAdvanced(null, $part['id'], null, null, true, $region, 'future');
+                        $fixedDates = getDatesForModulePart($part['id'], null, $region, 'future');
                         if (count($fixedDates) > 0) {
                             $buttonClass .= ' exaplan-date-fixed ';
                             foreach ($fixedDates as $fixedDate) {
@@ -846,7 +851,8 @@ function printAdminDashboard($dashboardType = 'default')
                         break;
                     case 'past':
                         // fixed dates in past
-                        $fixedDates = getFixedDates(null, $part['id'], null, null, false, $region, 'past');
+//                        $fixedDates = getFixedDatesAdvanced(null, $part['id'], null, null, false, $region, 'past');
+                        $fixedDates = getDatesForModulePart($part['id'], null, $region, 'past');
                         if (count($fixedDates) > 0) {
                             $buttonClass .= ' exaplan-date-fixed ';
                             foreach ($fixedDates as $fixedDate) {
