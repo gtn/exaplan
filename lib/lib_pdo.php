@@ -490,7 +490,7 @@ function removeDesiredDate($modulepartid, $puserid)
 /**
  * @param $dateid
  * @param $puserid
- * @param int $absend
+ * @param int $absent
  * @param int $creatorpuserid
  * @param string $date
  * @param int $moduleset
@@ -499,7 +499,7 @@ function removeDesiredDate($modulepartid, $puserid)
  * @param bool $sendNotification
  * @return mixed|string
  */
-function addPUserToDate($dateid, $puserid, $absend = 0, $creatorpuserid=null, $date=null, $moduleset=null, $modulepart=null, $withUpdating = false, $sendNotification = true)
+function addPUserToDate($dateid, $puserid, $absent = 0, $creatorpuserid=null, $date=null, $moduleset=null, $modulepart=null, $withUpdating = false, $sendNotification = true)
 {
     global $USER;
 
@@ -522,8 +522,8 @@ function addPUserToDate($dateid, $puserid, $absend = 0, $creatorpuserid=null, $d
     if ($existing) {
         // relation is already existing!
         if ($withUpdating) {
-            $statement = $pdo->prepare("UPDATE mdl_block_exaplanpuser_date_mm SET absend = :absend;");
-            $statement->execute([':absend' => $absend]);
+            $statement = $pdo->prepare("UPDATE mdl_block_exaplanpuser_date_mm SET absent = :absent;");
+            $statement->execute([':absent' => $absent]);
         }
         return $existing[0]['id'];
     }
@@ -533,10 +533,10 @@ function addPUserToDate($dateid, $puserid, $absend = 0, $creatorpuserid=null, $d
     // create a new relation
     $params = array_merge($params, [
             ':creatorpuserid' => $creatorpUserid,
-            ':absend' => $absend,
+            ':absent' => $absent,
         ]
     );
-    $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpuser_date_mm (dateid, puserid, creatorpuserid, absend) VALUES (:dateid, :puserid, :creatorpuserid, :absend);");
+    $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpuser_date_mm (dateid, puserid, creatorpuserid, absent) VALUES (:dateid, :puserid, :creatorpuserid, :absent);");
     $statement->execute($params);
     $id = $pdo->lastInsertId();
 

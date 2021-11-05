@@ -454,18 +454,18 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
                 $content .= '<td valign="top" class="timeslotCheck2">';
                 $content .= $userMidDayTypeCheckboxTemplate($dateData['pUserData']['id'], $dateData['timeslot'], BLOCK_EXAPLAN_MIDDATE_AFTER);
                 $content .= '</td>';
-                // absend or not
-                $absend = '';
+                // absent or not
+                $absent = '';
                 if ($relationData = isPuserIsFixedForDate($dateData['pUserData']['id'], $dateData['id'], true)) {
-                    if ($relationData['absend']) {
-                        $absend = ' checked = "checked" ';
+                    if ($relationData['absent']) {
+                        $absent = ' checked = "checked" ';
                     }
                 }
                 $content .= '<td style="text-align: center;  vertical-align: top;">
                         <input type="checkbox" 
                                 value="1"                                     
-                                name="absendPuser[' . $dateData['pUserData']['id'] . ']" 
-                                ' . $absend . '/></td>';
+                                name="absentPuser[' . $dateData['pUserData']['id'] . ']" 
+                                ' . $absent . '/></td>';
                 $content .= '<td valign="top"><!--Bewertung--></td>';
             } else {
                 // no related students for existing fixed/blocked date
