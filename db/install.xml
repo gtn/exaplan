@@ -14,8 +14,12 @@
                        COMMENT="Description of the moduleset"/>
                 <FIELD NAME="courseidnumber" TYPE="int" LENGTH="11" NOTNULL="false" SEQUENCE="false"
                        COMMENT="mdl_course.idnumber of the referenced moodlecourse"/>
+<<<<<<< HEAD
                 <FIELD NAME="nodesireddates" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"
                        COMMENT="user can not choose desired dates"/>
+=======
+                <FIELD NAME="nodesireddates" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false" />
+>>>>>>> origin/main
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

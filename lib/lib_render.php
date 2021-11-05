@@ -104,7 +104,7 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
             } else {
                 if (!$part['date'] || $part['date'][0]['state'] != BLOCK_EXAPLAN_DATE_CONFIRMED) {
                     // desired dates
-                    
+                    $disabled = '';
                     if (getDesiredDates($pUser['id'], $part['id'])) {
                       $buttonTitle = 'Wunschtermin';
                       $buttonClass = ' exaplan-date-desired ';
@@ -112,21 +112,29 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
                       if ($modulepartid == $part["id"]) {
                         $buttonClass .= ' exaplan-date-current-modulepart ';
                     	}
-                    }else{
+                    } else {
                     	$buttonTitle = 'offen';
 	                    $buttonClass = '';
 	                    $innerButtonClass = ' btn btn-danger ';
 	                    if ($modulepartid == $part["id"]) {
-                        $buttonClass .= ' exaplan-date-current-modulepart ';
+                            $buttonClass .= ' exaplan-date-current-modulepart ';
                     	}
                     }
+                    $dateUrl = $CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'&userid='.$userid.'&pagehash='.block_exaplan_hash_current_userid($userid);
+                    if ($moduleset->set["nodesireddates"]) {
+                        // disable possibility to select desired dates (if the student already has or not)
+                        $buttonTitle = ' - - ';
+                        $buttonClass = ' exaplan-date-nodesireddates ';
+                        $dateUrl = '#';
+                        $disabled = ' disabled = "disabled" ';
+                    }
                     
-                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'&userid='.$userid.'&pagehash='.block_exaplan_hash_current_userid($userid).'" 
+                    $content .= '<a href="'.$dateUrl.'" 
                                     role="button" 
                                     class="btn exaplan-selectable-modulepart '.$buttonClass.'"                                     
                                     data-modulepartId="'.$part['id'].'"
                                     '.($modulepartid == $part["id"] ? 'data-modulepartselected="1"' : '').'
-                                > <button type="button" class="'.$innerButtonClass.'">'.$buttonTitle.'</button> </a>';
+                                > <button type="button" class="'.$innerButtonClass.'" '.$disabled.'>'.$buttonTitle.'</button> </a>';
                 } else {
                     // fixed date exists
                     $buttonClass = '';
