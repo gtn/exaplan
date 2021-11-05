@@ -19,6 +19,7 @@ $action = required_param('action', PARAM_TEXT);
 //require_login($course); // TODO: needed?
 $isAdmin = block_exaplan_is_admin();
 $userid = block_exaplan_get_current_user();
+$creatorpuserid = getPuser($USER->id)['id'];
 require_sesskey();
 
 switch($action) {
@@ -34,7 +35,7 @@ switch($action) {
         exit;
       }
       $middayType = optional_param('middayType', BLOCK_EXAPLAN_MIDDATE_ALL, PARAM_INT);
-      $newDateId = setDesiredDate($modulepartId, $pUserId, $dateTS, $middayType, $pUserId);
+      $newDateId = setDesiredDate($modulepartId, $pUserId, $dateTS, $middayType, $creatorpuserid);
       $allUserData = block_exaplan_get_data_for_calendar(getPuser($userid)['id'], 'all', $modulepartId);
       echo json_encode($allUserData);
       exit;

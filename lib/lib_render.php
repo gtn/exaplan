@@ -397,7 +397,7 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
     $content .= '<th>VM</th>';
     $content .= '<th>NM</th>';
     $content .= '<th>TN gefehlt?</th>';
-    $content .= '<th>Bewertung o.ä.?</th>';
+    $content .= '<th><!--bewertung, later --></th>';
     $content .= '<th class="mainForm"></th>';
     $content .= '</tr>';
     $content .= '</thead>';
@@ -461,7 +461,7 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
                         $absend = ' checked = "checked" ';
                     }
                 }
-                $content .= '<td valign="top">
+                $content .= '<td style="text-align: center;  vertical-align: top;">
                         <input type="checkbox" 
                                 value="1"                                     
                                 name="absendPuser[' . $dateData['pUserData']['id'] . ']" 
