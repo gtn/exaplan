@@ -141,7 +141,7 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
                     if ($modulepartid == $part["id"]) {
                         $buttonClass .= ' exaplan-date-current-modulepart ';
                     }
-                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/dateDetails.php?mpid='.$part["id"].'&dateid='.$part['date'][0]['id'].'"
+                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/dateDetails.php?mpid='.$part["id"].'&userid='.$userid.'&dateid='.$part['date'][0]['id'].'&pagehash='.block_exaplan_hash_current_userid($userid).'"
                                     class="btn exaplan-date-fixed exaplan-selectable-date '.$buttonClass.'" 
                                     data-dateId="'.$part['date'][0]['id'].'" 
                                     data-modulepartId="'.$part['id'].'">
@@ -391,7 +391,7 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
     // header
     $content .= '<thead class="thead-light">';
     $content .= '<tr>';
-    $content .= '<th>Angefragte TN: '.$date.'</th>';
+    $content .= '<th>Angefragte TN: '.german_dateformat($date).'</th>';
     $content .= '<th></th>';
     $content .= '<th>Organization</th>';
     $content .= '<th>VM</th>';
