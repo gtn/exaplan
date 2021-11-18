@@ -47,7 +47,7 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
 <div class="result-item-header-cnt">
 	
 <div class="icon">
-<img src="'.$CFG->wwwroot.'/blocks/exaplan/pix/teilnehmer.svg" height="50" width="50">
+<img style="position:absolute;left:-20px;" src="'.$CFG->wwwroot.'/blocks/exaplan/pix/teilnehmer.svg" height="50" width="50">
 </div>
 <h5 class="item-header-title">'.$tnname.'</h5>   
 	<button type="button" class="btn btn-outline-danger">
@@ -141,7 +141,7 @@ function printUser($userid, $mode = 0, $modulepartid = 0, $withCalendar = false,
                     if ($modulepartid == $part["id"]) {
                         $buttonClass .= ' exaplan-date-current-modulepart ';
                     }
-                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/dateDetails.php?mpid='.$part["id"].'&dateid='.$part['date'][0]['id'].'"
+                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/dateDetails.php?mpid='.$part["id"].'&userid='.$userid.'&dateid='.$part['date'][0]['id'].'&pagehash='.block_exaplan_hash_current_userid($userid).'"
                                     class="btn exaplan-date-fixed exaplan-selectable-date '.$buttonClass.'" 
                                     data-dateId="'.$part['date'][0]['id'].'" 
                                     data-modulepartId="'.$part['id'].'">
@@ -399,13 +399,13 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
     // header
     $content .= '<thead class="thead-light">';
     $content .= '<tr>';
-    $content .= '<th>Angefragte TN: '.$date.'</th>';
+    $content .= '<th>Angefragte TN: '.german_dateformat($date).'</th>';
     $content .= '<th></th>';
     $content .= '<th>Organization</th>';
     $content .= '<th>VM</th>';
     $content .= '<th>NM</th>';
     $content .= '<th>TN gefehlt?</th>';
-    $content .= '<th>Bewertung o.ä.?</th>';
+    $content .= '<th><!--bewertung, later --></th>';
     $content .= '<th class="mainForm"></th>';
     $content .= '</tr>';
     $content .= '</thead>';
@@ -462,18 +462,18 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
                 $content .= '<td valign="top" class="timeslotCheck2">';
                 $content .= $userMidDayTypeCheckboxTemplate($dateData['pUserData']['id'], $dateData['timeslot'], BLOCK_EXAPLAN_MIDDATE_AFTER);
                 $content .= '</td>';
-                // absend or not
-                $absend = '';
+                // absent or not
+                $absent = '';
                 if ($relationData = isPuserIsFixedForDate($dateData['pUserData']['id'], $dateData['id'], true)) {
-                    if ($relationData['absend']) {
-                        $absend = ' checked = "checked" ';
+                    if ($relationData['absent']) {
+                        $absent = ' checked = "checked" ';
                     }
                 }
-                $content .= '<td valign="top">
+                $content .= '<td style="text-align: center;  vertical-align: top;">
                         <input type="checkbox" 
                                 value="1"                                     
-                                name="absendPuser[' . $dateData['pUserData']['id'] . ']" 
-                                ' . $absend . '/></td>';
+                                name="absentPuser[' . $dateData['pUserData']['id'] . ']" 
+                                ' . $absent . '/></td>';
                 $content .= '<td valign="top"><!--Bewertung--></td>';
             } else {
                 // no related students for existing fixed/blocked date

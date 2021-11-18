@@ -1,3 +1,4 @@
+#region-main-box section.block_exaplan .card-title {display:none !important;}
 
 .exaplan-selectable-date:hover {
     background-color: #e1e1e2;
@@ -394,7 +395,7 @@ body {
 	letter-spacing: 2px;
 	word-spacing: 2px;
 	color: #2E2E2E;
-	padding-left: 75px;
+	padding: 10px 7px 0px 75px;
 }
 
 #exaplan .circleBase {
@@ -452,7 +453,7 @@ body {
 }
 
 #exaplan .exaplan-result-item {
-	margin-left: 70px;
+	margin-left: 20px;
 }
 
 .moduleListTable .exaplan-date-blocked {

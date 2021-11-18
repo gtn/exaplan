@@ -737,3 +737,6 @@ function getRegionTitle($region, $short = false) {
     return $full[$region];
 }
 
+function german_dateformat($date){
+	return date("d.m.Y", strtotime($date));
+}

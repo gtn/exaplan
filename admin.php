@@ -57,8 +57,8 @@ switch ($action) {
 
         $modulepart = getModulepartByModulepartid($modulepartid);
         $moduleset = getModulesetByModulesetid($modulepart["modulesetid"]);
-        $absends = optional_param_array('absendPuser', [], PARAM_INT);
-        $absends = array_keys($absends);
+        $absents = optional_param_array('absentPuser', [], PARAM_INT);
+        $absents = array_keys($absents);
 
         // get timeslot for fixed date
         // get from selected (1, 2 or both)
@@ -101,11 +101,11 @@ switch ($action) {
             if (($key = array_search($student, $registeredUsersIds)) !== false) {
                 unset($registeredUsersIds[$key]);
             }
-            $absend = 0;
-            if (in_array($student, $absends)) {
-                $absend = 1;
+            $absent = 0;
+            if (in_array($student, $absents)) {
+                $absent = 1;
             }
-            addPUserToDate($dateId, $student, $absend, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
+            addPUserToDate($dateId, $student, $absent, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
             // delete ALL desired dates
             if ($state != BLOCK_EXAPLAN_DATE_BLOCKED) {
                 removeDesiredDate($modulepartid, $student);
@@ -130,7 +130,7 @@ if ($isadmin) {
     echo printAdminModulepartView($modulepartid, $dateGP, $region);
 }
 
-echo '<a href="'.$CFG->wwwroot.'/my/'.($dashboardType ? '?dashboardType='.$dashboardType : '').'" role="button" class="btn btn-info"> back to dashboard </a>';
+echo '<a href="'.$CFG->wwwroot.'/my/'.($dashboardType ? '?dashboardType='.$dashboardType : '').'" role="button" class="btn btn-info"> zurück zum Dashboard </a>';
 
 echo '</div>';
 

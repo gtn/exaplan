@@ -31,7 +31,7 @@ echo '
 <div class="result-item-header-cnt">
 	
 <div class="icon">
-<img src="pix/teilnehmer.svg" height="90" width="90">
+<img src="pix/teilnehmer.svg" style="position:absolute;left=-20px;" height="90" width="90">
 </div>
 <h5 class="item-header-title">Max Musterteilnehmer</h5>   
 	<button type="button" class="btn btn-outline-danger">

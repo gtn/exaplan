@@ -55,7 +55,7 @@ if (!$modulepartid || $isadmin) {
 }
 
 echo '<br>';
-echo '<a href="'.$CFG->wwwroot.'/my/" role="button" class="btn btn-info"> back to dashboard </a>';
+echo '<a href="'.$CFG->wwwroot.'/my/" role="button" class="btn btn-info"> zurück zum Dashboard </a>';
 
 echo '</div>';
 
