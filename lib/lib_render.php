@@ -354,7 +354,15 @@ function printAdminModulepartView($modulepartid, $date = '', $region = '') {
     // header
     $content .= '<tr>';
     $content .= '<td width="25%" valign="top">'.implode('&nbsp;|&nbsp;', $titleSet).'</td>';
-    $content .= '<td width="25%" valign="top">Gesamt Teilnehmer angefragt: </td>';
+    // count of students
+    $desiredDates = getDesiredDates(null, $modulepartid, null, null, $region);
+    if (count($desiredDates) > 0) {
+        // get count of unique pUsers
+        $desiredDatesUsers = count(array_unique(array_column($desiredDates, 'puserid')));
+    } else {
+        $desiredDatesUsers = 0;
+    }
+    $content .= '<td width="25%" valign="top">Gesamt Teilnehmer angefragt: '.$desiredDatesUsers.'</td>';
     $content .= '<td width="25%" valign="top">Rest:</td>';
     $content .= '</tr>';
     $content .= '</table>';
