@@ -236,12 +236,16 @@ table.exaplan-adminModulepartView th:nth-child(3),
 table.exaplan-adminModulepartView td:nth-child(3) {
     width: 15% !important;
 }
-table.exaplan-adminModulepartView th:nth-child(6),
-table.exaplan-adminModulepartView td:nth-child(6) {
-    width: 10% !important;
+table.exaplan-adminModulepartView th:nth-child(4),
+table.exaplan-adminModulepartView td:nth-child(4) {
+    width: 15% !important;
 }
 table.exaplan-adminModulepartView th:nth-child(7),
 table.exaplan-adminModulepartView td:nth-child(7) {
+    width: 10% !important;
+}
+table.exaplan-adminModulepartView th:nth-child(8),
+table.exaplan-adminModulepartView td:nth-child(8) {
     width: 10% !important;
 }
 table.exaplan-adminModulepartView th.mainForm,

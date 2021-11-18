@@ -722,22 +722,26 @@ function getFixedDatesAdvanced($puserid = null, $modulepartid = null, $date = nu
     $leftJoin = '';
     if ($region) {
         $leftJoin .= ' LEFT JOIN mdl_block_exaplanpusers u ON u.id = dumm.puserid ';
+        $regionAddCond = ' 1 = 1 ';
         $tempWhere = '';
         switch ($region) {
             case 'RegionOst':
                 $tempWhere .= ' u.region = \'RegionOst\' ';
+                $regionAddCond = ' d.region = \'RegionOst\'';
                 break;
             case 'RegionWest':
                 $tempWhere .= ' u.region = \'RegionWest\' ';
+                $regionAddCond = ' d.region = \'RegionWest\'';
                 break;
             case 'all':
             case 'online':
                 // all possible regions (or empty)
                 $tempWhere .= ' u.region IN (\'RegionOst\', \'RegionWest\', \'all\', \'\') ';
+                $regionAddCond = ' d.region IN (\'RegionOst\', \'RegionWest\', \'all\', \'\') ';
                 break;
         }
         if ($withEmptyStudents) {
-            $tempWhere .= ' OR u.id IS NULL '; // if the date has not related students
+            $tempWhere .= ' OR (u.id IS NULL AND '.$regionAddCond.' ) '; // if the date has not related students
             $tempWhere = ' ( '.$tempWhere.' ) ';
         }
         $whereArr[] = $tempWhere;
@@ -770,6 +774,7 @@ function getFixedDatesAdvanced($puserid = null, $modulepartid = null, $date = nu
                                   WHERE " . implode(' AND ', $whereArr) . "
                                   ORDER BY d.date
                                   ";
+
     } else {
         $sql = "SELECT DISTINCT d.*, dumm.puserid as relatedUserId, IF(d.state = ".BLOCK_EXAPLAN_DATE_BLOCKED.", 'blocked', 'fixed') as dateType
                                   FROM mdl_block_exaplanpuser_date_mm dumm
