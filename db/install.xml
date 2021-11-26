@@ -75,6 +75,7 @@
                 <FIELD NAME="timeslot" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
                        COMMENT="1=Both are okay, 2=AM, 3=PM"/>
                 <FIELD NAME="puserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="disabled" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="creatorpuserid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="timestamp" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
             </FIELDS>

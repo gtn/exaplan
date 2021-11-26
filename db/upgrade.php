@@ -21,6 +21,14 @@ function xmldb_block_exaplan_upgrade($oldversion) {
     global $DB, $CFG;
     $dbman = $DB->get_manager();
     $result = true;
-
+    
+		if ($oldversion < 2021112600) {
+        $table = new xmldb_table('block_exaplandesired');
+        $field = new xmldb_field('disabled', XMLDB_TYPE_INTEGER, 1, null, null, null, '0');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_block_savepoint(true, 2021112600, 'exaplan');
+    }
     return $result;
 }
