@@ -4,7 +4,7 @@ require __DIR__.'/inc.php';
 
 global $CFG, $PAGE, $OUTPUT, $USER;
 
-
+$content = '';
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('admin');
@@ -34,31 +34,37 @@ switch ($action) {
         break;
 }
 
-echo $OUTPUT->header();
+$content .= $OUTPUT->header();
 
-echo '<div id="exaplan">';
+$content .= '<div id="exaplan">';
 
-echo '<div class="UserCalendarCard">';
+$content .= '<div class="UserCalendarCard">';
 
 if (!$modulepartid || $isadmin) {
     // only moduleparts overview
-    echo printUser($userid, $isadmin, $modulepartid, false);
+    $content .= printUser($userid, $isadmin, $modulepartid, false);
 } else {
-    if ($modulepartid && $dateId) {
-        // details of fixed modulepart
-        // TODO: delete? moved to dateDetails.php
-        echo printUser($userid, $isadmin, $modulepartid, false, $dateId, true);
+    // details of modulepart.
+    $fixedDatesExisting = getFixedDatesAdvanced(getPuser($userid)['id'], $modulepartid);
+    if ($modulepartid && $fixedDatesExisting) {
+        // If the user is seeing modulepart and in this time admin activate his to some modulepart - current links are wrong. So - redirect the student to correct link.
+        $url = new moodle_url('/blocks/exaplan/dateDetails.php', array('mpid' => $modulepartid, 'userid' => $userid, 'dateid' => $fixedDatesExisting[0]['id'], 'pagehash' => block_exaplan_hash_current_userid($userid)));
+        redirect($url, 'You already have fixed date');
+//         TODO: delete? moved to dateDetails.php
+//        echo printUser($userid, $isadmin, $modulepartid, false, $dateId, true);
     } else {
         // overview with calendar
-        echo printUser($userid, $isadmin, $modulepartid, true);
+        $content .= printUser($userid, $isadmin, $modulepartid, true);
     }
 }
 
-echo '<br>';
-echo '<a href="'.$CFG->wwwroot.'/my/" role="button" class="btn btn-info"> zurück zum Dashboard </a>';
+$content .= '<br>';
+$content .= '<a href="'.$CFG->wwwroot.'/my/" role="button" class="btn btn-info"> zurück zum Dashboard </a>';
 
-echo '</div>';
+$content .= '</div>';
 
-echo '</div>';
+$content .= '</div>';
 
-echo $OUTPUT->footer();
+$content .= $OUTPUT->footer();
+
+echo $content;

@@ -4,7 +4,7 @@ require __DIR__.'/inc.php';
 
 global $CFG, $PAGE, $OUTPUT, $USER;
 
-
+$content = '';
 
 $PAGE->set_context(context_system::instance());
 $PAGE->set_pagelayout('admin');
@@ -22,19 +22,41 @@ $isadmin = block_exaplan_is_admin();
 
 $userid = block_exaplan_get_current_user();
 
-echo $OUTPUT->header();
+$content .= $OUTPUT->header();
 
-echo '<div id="exaplan">';
+$content .= '<div id="exaplan">';
 
-echo '<div class="UserCalendarCard">';
+$content .= '<div class="UserCalendarCard">';
 
-echo printUser($userid, $isadmin, $modulepartid, false, $dateId, true);
+$redirectToCalendar = false;
+$dateDetailsExisting = false;
 
-echo '<br>';
-echo '<a href="'.$CFG->wwwroot.'/my/" role="button" class="btn btn-info"> zurück zum Dashboard </a>';
+// details of modulepart.
+$fixedDatesExisting = getFixedDatesAdvanced(getPuser($userid)['id'], $modulepartid);
+if ($modulepartid && $fixedDatesExisting) {
+    foreach($fixedDatesExisting as $dateData) {
+        if ($dateId == $dateData['id']) {
+            $dateDetailsExisting = true;
+            break;
+        }
+    }
+}
 
-echo '</div>';
+if (!$dateDetailsExisting) {
+    // If the user is seeing details of date in modulepart and in this time admin disable/activate his to some other modulepart - current links are wrong. So - redirect the student to correct link.
+    $url = new moodle_url('/blocks/exaplan/calendar.php', array('mpid' => $modulepartid, 'userid' => $userid, 'pagehash' => block_exaplan_hash_current_userid($userid)));
+    redirect($url, 'You have not fixed dates');
+}
 
-echo '</div>';
+$content .= printUser($userid, $isadmin, $modulepartid, false, $dateId, true);
 
-echo $OUTPUT->footer();
+$content .= '<br>';
+$content .= '<a href="'.$CFG->wwwroot.'/my/" role="button" class="btn btn-info"> zurück zum Dashboard </a>';
+
+$content .= '</div>';
+
+$content .= '</div>';
+
+$content .= $OUTPUT->footer();
+
+echo $content;
