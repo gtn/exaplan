@@ -106,7 +106,7 @@ switch ($action) {
                 $absent = 1;
             }
             addPUserToDate($dateId, $student, $absent, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
-            // delete ALL desired dates
+            // delete ALL other desired dates
             if ($state != BLOCK_EXAPLAN_DATE_BLOCKED) {
                 removeDesiredDate($modulepartid, $student);
             }
@@ -114,7 +114,7 @@ switch ($action) {
         // unregister if it was unchecked
         if ($registeredUsersIds && count($registeredUsersIds) > 0) {
             foreach ($registeredUsersIds as $puserid) {
-                removePUserFromDate($dateId, $puserid);
+                removePUserFromDate($dateId, $puserid, $modulepartid);
             }
         }
         break;

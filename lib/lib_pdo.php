@@ -443,6 +443,7 @@ function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuser
             // 2. add new record with the new timeslot
             $addNew = true;
         }
+        // Here is deleting of record, but not 'disabled=1' because it is decision of the student. Teh student disables this date.
         $statement = $pdo->prepare('DELETE FROM mdl_block_exaplandesired WHERE id = :id');
         $statement->execute([':id' => $dates[0]['id']]);
     } else {
@@ -482,7 +483,7 @@ function removeDesiredDate($modulepartid, $puserid)
         ':modulepartid' => $modulepartid,
         ':puserid' => $puserid,
     ];
-    $statement = $pdo->prepare('DELETE FROM mdl_block_exaplandesired WHERE modulepartid = :modulepartid AND puserid = :puserid');
+    $statement = $pdo->prepare('UPDATE mdl_block_exaplandesired SET disabled = 1 WHERE modulepartid = :modulepartid AND puserid = :puserid');
     $statement->execute($params);
     return true;
 }
@@ -549,7 +550,7 @@ function addPUserToDate($dateid, $puserid, $absent = 0, $creatorpuserid=null, $d
     return $id;
 }
 
-function removePUserFromDate($dateid, $puserid)
+function removePUserFromDate($dateid, $puserid, $modulepartid)
 {
     $pdo = getPdoConnect();
     $params = [
@@ -558,6 +559,14 @@ function removePUserFromDate($dateid, $puserid)
 //            ':creatorpuserid' => $puserid, // TODO: what if this relation was not self created?
     ];
     $statement = $pdo->prepare("DELETE FROM mdl_block_exaplanpuser_date_mm WHERE dateid = :dateid AND puserid = :puserid;");
+    $statement->execute($params);
+    // activate all disabled desired dates for the user
+    $params = [
+        ':modulepartid' => $modulepartid,
+        ':puserid' => $puserid,
+        ':date' => strtotime('today'),
+    ];
+    $statement = $pdo->prepare("UPDATE mdl_block_exaplandesired SET disabled = 0 WHERE modulepartid = :modulepartid AND puserid = :puserid AND date >= :date; ");
     $statement->execute($params);
 }
 
@@ -627,7 +636,7 @@ function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $t
     $pdo = getPdoConnect();
     $leftJoin = '';
     $params = [];
-    $whereArr = [' 1=1 '];
+    $whereArr = [' des.disabled = 0 '];
     if ($puserid) {
         $params[':puserid'] = $puserid;
         $whereArr[] = ' des.puserid = :puserid ';
