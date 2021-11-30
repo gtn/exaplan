@@ -16,6 +16,7 @@
                        COMMENT="mdl_course.idnumber of the referenced moodlecourse"/>
                 <FIELD NAME="nodesireddates" TYPE="int" LENGTH="1" NOTNULL="false" SEQUENCE="false"
                        COMMENT="user can not choose desired dates"/>
+                <FIELD NAME="isinstructor" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -51,7 +52,7 @@
                        COMMENT="not used since rework and block_exaplandesired table"/>
                 <FIELD NAME="location" TYPE="char" LENGTH="1333" NOTNULL="false" SEQUENCE="false"
                        COMMENT="Name of the location"/>
-               <FIELD NAME="region" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="region" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="comment" TYPE="text" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="starttime" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="begin of event"/>
                 <FIELD NAME="trainerpuserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
@@ -59,6 +60,8 @@
                 <FIELD NAME="creatortimestamp" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="modifiedpuserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="modifiedtimestamp" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+                <FIELD NAME="moodleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="isonline" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
