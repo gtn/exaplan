@@ -62,6 +62,8 @@
                 <FIELD NAME="modifiedtimestamp" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
                 <FIELD NAME="moodleid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="isonline" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="duration" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"
+                       COMMENT="Duration of the event"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
