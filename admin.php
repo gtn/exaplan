@@ -36,11 +36,16 @@ switch ($action) {
         $dateTSstart = strtotime("today", $dateTS); //same tstamp for whole day
         $students = optional_param_array('fixedPuser', [], PARAM_INT);
         $students = array_keys($students);
+        $moodleid = optional_param('moodleid', '', PARAM_INT);
+        $region = optional_param('region', '', PARAM_TEXT);
+        $isonline = optional_param('isonline', '', PARAM_TEXT);
         $location = optional_param('location', '', PARAM_TEXT);
         $eventTime = optional_param('time', '', PARAM_TEXT);
+        $duration = optional_param('duration', '', PARAM_TEXT);
         $description = optional_param('description', '', PARAM_TEXT);
-        $trainerId = optional_param('trainer', 0, PARAM_INT);
-        $pTrainer = getPuser($trainerId)['id'];
+//        $trainerId = optional_param('trainer', 0, PARAM_INT);
+//        $pTrainer = getPuser($trainerId)['id'];
+        $pTrainer = optional_param('trainer', 0, PARAM_INT);
         $region = optional_param('region', 'all', PARAM_TEXT);
 
         // fixed date or blocked date
@@ -92,7 +97,7 @@ switch ($action) {
             }
         }
 
-        $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $region, $state);
+        $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $region, $moodleid, $isonline, $duration, $state);
 
         // register / unregister students
         $registeredUsers = getFixedPUsersForDate($dateId);

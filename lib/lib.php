@@ -655,7 +655,7 @@ function block_exaplan_get_users_from_cohort($cohortidnumber = "SW_Trainer")
     $sql = 'SELECT u.*
               FROM {cohort} c
               JOIN {cohort_members} cm ON c.id = cm.cohortid
-              JOIN {user} u ON cm.userid=u.id
+              JOIN {user} u ON cm.userid = u.id
               WHERE c.idnumber = "' . $cohortidnumber . '" AND c.visible = 1';
     return $DB->get_records_sql($sql);
 }

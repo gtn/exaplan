@@ -334,9 +334,12 @@ function getPrefferedDate($modulepartid, $date, $timeslot = null, $states = [])
  * @param string $starttime
  * @param string $comment
  * @param string $region
+ * @param int $moodleid
+ * @param int $isonline
+ * @param string $duration
  * @return string
  */
-function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment, $region, $state = BLOCK_EXAPLAN_DATE_PROPOSED)
+function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment, $region, $moodleid = 0, $isonline = 0, $duration = '', $state = BLOCK_EXAPLAN_DATE_PROPOSED)
 {
     $pdo = getPdoConnect();
     $timestamp = new DateTime();
@@ -355,6 +358,9 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
         ':starttime' => (strtotime(date('Y-m-d', $date) . ' ' . $starttime) ?: strtotime('today midnight')), // day's midninght if no time in the form!
         ':comment' => trim($comment),
         ':region' => trim($region),
+        ':moodleid' => $moodleid,
+        ':isonline' => $isonline,
+        ':duration' => $duration,
     ];
 
     // do not care about timeslot and state during selecting. We must have only single record for the day+modulepart
@@ -377,7 +383,10 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
                              comment = :comment,
                              region = :region,
                              state = :state,
-                             timeslot = :timeslot
+                             timeslot = :timeslot,
+                             moodleid = :moodleid,
+                             isonline = :isonline,
+                             duration = :duration
                         WHERE id = " . intval($dateId) . ";";
             $statement = $pdo->prepare($sql);
             $statement->execute($params);
@@ -391,8 +400,8 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
     ]);
 
     $sql = "INSERT INTO mdl_block_exaplandates
-                        (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp, location, trainerpuserid, starttime, comment, region)
-                  VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp, :location, :trainerpuserid, :starttime, :comment, :region);";
+                        (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp, location, trainerpuserid, starttime, comment, region, moodleid, isonline, duration)
+                  VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp, :location, :trainerpuserid, :starttime, :comment, :region, :moodleid, :isonline, :duration);";
 //    echo "<pre>debug:<strong>lib_pdo.php:297</strong>\r\n"; print_r($params); echo '</pre>'; // !!!!!!!!!! delete it
 //    echo $sql; exit;
     $statement = $pdo->prepare($sql);
@@ -928,6 +937,18 @@ function getFixedPUsersForDate($dateId = null)
                 ";
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
+    $result = $statement->fetchAll();
+
+    return $result;
+}
+
+function getMoodles() {
+    $pdo = getPdoConnect();
+
+    $sql = "SELECT moodleid, companyname FROM mdl_block_exaplanmoodles";
+    $statement = $pdo->prepare($sql);
+    $statement->execute();
     $statement->setFetchMode(PDO::FETCH_ASSOC);
     $result = $statement->fetchAll();
 

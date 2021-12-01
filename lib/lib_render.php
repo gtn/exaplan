@@ -539,6 +539,15 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
     $dateTs = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
     $instanceKey = $modulepartId.'_'.$dateTs/*.'_'.$timeslot*/;
 
+    $selectboxTemplate = function($name, $items, $preselected = null) use ($instanceKey) {
+        $content = '<select id="'.$name.'_'.$instanceKey.'" class="form-control" name="'.$name.'">';
+        foreach ($items as $option) {
+            $content .= '<option value="'.$option['id'].'" '.($preselected == $option['id'] ? ' selected="selected" ' : '').'>'.$option['title'].'</option>';
+        }
+        $content .= '</select>';
+        return $content;
+    };
+
     $dateRec = getPrefferedDate($modulepartId, $dateTs, $timeslot);
 
 //    $content .= '<input type="hidden" value="'.$timeslot.'" name="middayType" />';
@@ -547,60 +556,90 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
 
     $content .= '<table class="table table-sm table-borderless" border="0">';
 
-    $content .= '<tr>';
-    $content .= '<td colspan="2"><label for="trainer_'.$instanceKey.'">Trainer:</label></td>';
-//    $content .= '<td><label for="region_'.$instanceKey.'">Region:</label></td>';
+    // moodleid
+    $content .= '<td colspan="6">';
+    $content .= '<label for="moodleid_'.$instanceKey.'">DF Ort:</label>';
+    $moodles = getMoodles();
+    $options = array_map(function ($m) {
+        return [
+            'id' => $m['moodleid'],
+            'title' => $m['companyname'],
+        ];
+    }, $moodles);
+    $options = array_merge(['-1' => ['id' => 0, 'title' => 'Öffentlich']], $options);
+    $content .= $selectboxTemplate('moodleid', $options, @$dateRec['moodleid']);
+    $content .= '</td>';
     $content .= '</tr>';
 
+    // region
     $content .= '<tr>';
-    $content .= '<td colspan="2">';
+    $content .= '<td colspan="3">';
+    $content .= '<label for="region_'.$instanceKey.'">Region:</label>';
+    $options = [
+            ['id' => 'RegionOst', 'title' => getRegionTitle('RegionOst')],
+            ['id' => 'RegionWest', 'title' => getRegionTitle('RegionWest')],
+    ];
+    $content .= $selectboxTemplate('region', $options, @$dateRec['region']);
+    $content .= '</td>';
+    // isonline
+    $content .= '<td colspan="3">';
+    $content .= '<label for="isonline_'.$instanceKey.'">DF Art:</label>';
+    $options = [
+            ['id' => '0', 'title' => 'Präsenz'],
+            ['id' => '1', 'title' => 'Online'],
+    ];
+    $content .= $selectboxTemplate('isonline', $options, @$dateRec['isonline']);
+    $content .= '</td>';
+    $content .= '</tr>';
+
+    // trainer
+    $content .= '<td colspan="6">';
+    $content .= '<label for="trainer_'.$instanceKey.'">Trainer:</label>';
     $trainers = block_exaplan_get_users_from_cohort();
-    $content .= '<select id="trainer_'.$instanceKey.'" class="form-control" name="trainer">';
-    foreach ($trainers as $trainer) {
-        $trainerPid = getPuser($trainer->id);
-        $content .= '<option value="'.$trainer->id.'" '.(@$dateRec['trainerpuserid'] == $trainerPid ? ' selected="selected" ' : '').'>'.fullname($trainer).'</option>'; // original ID (not pUser), because it is on MAIN moodle
-    }
-    $content .= '</select>';
+    $options = array_map(function ($t) {
+        return [
+            'id' => getPuser($t->id)['id'], // original ID (not pUser), because it is on MAIN moodle installation
+            'title' => fullname($t),
+        ];
+    }, $trainers);
+    $content .= $selectboxTemplate('trainer', $options, @$dateRec['trainerpuserid']);
     $content .= '</td>';
-   /* $content .= '<td>';
-    $selectedRegion = $defaultRegion;
-    if (@$dateRec['region']) {
-        $selectedRegion = $dateRec['region'];
-    }
-    $content .= '<select id="region_'.$instanceKey.'" class="form-control" name="region">';
-    $content .= '<option value="all">Alle Regionen</option>';
-    $content .= '<option value="RegionOst" '.($selectedRegion == 'RegionOst' ? 'selected="selected"' : '').'>Ost</option>';
-    $content .= '<option value="RegionWest" '.($selectedRegion == 'RegionWest' ? 'selected="selected"' : '').'>West</option>';
-    $content .= '</select>';
-    $content .= '</td>';
-    $content .= '<td>';
-    $content .= '</td>';*/
     $content .= '</tr>';
 
-    $content .= '<tr>';
-    $content .= '<td><label for="location_'.$instanceKey.'">Location:</label></td>';
-    $content .= '<td><label for="time_'.$instanceKey.'">Uhrzeit:</label></td>';
-    $content .= '</tr>';
-
-    $content .= '<tr>';
-    $content .= '<td><input type="text" name="location" value="'.@$dateRec['location'].'" class="form-control" id="location_'.$instanceKey.'" /></td>';
-    $timeString = (@$dateRec['starttime'] ? date('H:i', @$dateRec['starttime']) : '00:00');
-    $content .= '<td><input type="text" name="time" value="'.$timeString.'" class="form-control" id="time_'.$instanceKey.'" >';
-    $content .= '</tr>';
-
+    // location
     $content .= '<tr>';
     $content .= '<td colspan="2">';
+    $content .= '<label for="location_'.$instanceKey.'">Location:</label>';
+    $content .= '<input type="text" name="location" value="'.@$dateRec['location'].'" class="form-control" id="location_'.$instanceKey.'" /></td>';
+    $content .= '</td>';
+    // time
+    $timeString = (@$dateRec['starttime'] ? date('H:i', @$dateRec['starttime']) : '00:00');
+    $content .= '<td colspan="2">';
+    $content .= '<label for="time_'.$instanceKey.'">Uhrzeit:</label>';
+    $content .= '<input type="text" name="time" value="'.$timeString.'" class="form-control" id="time_'.$instanceKey.'" >';
+    $content .= '</td>';
+    // duration
+    $content .= '<td colspan="2">';
+    $content .= '<label for="duration_'.$instanceKey.'">Dauer:</label>';
+    $content .= '<input type="text" name="duration" value="'.@$dateRec['duration'].'" class="form-control" id="duration_'.$instanceKey.'" >';
+    $content .= '</td>';
+    $content .= '</tr>';
+
+    // description
+    $content .= '<tr>';
+    $content .= '<td colspan="6">';
     $content .= '<textarea name="description" id="description_'.$instanceKey.'" class="form-control" placeholder="Notiz" >'.@$dateRec['comment'].'</textarea>';
     $content .= '</td>';
     $content .= '</tr>';
 
+    // buttons
     $content .= '<tr>';
-    $content .= '<td align="left">';
+    $content .= '<td align="left" colspan="3">';
     if (!@$dateRec['state'] || @$dateRec['state'] == BLOCK_EXAPLAN_DATE_BLOCKED) {
         $content .= '<button name="date_block" class="btn btn-info" type="submit" value="date_block" >Termin blocken</button>';
     }
     $content .= '</td>';
-    $content .= '<td align="right"><button name="date_save" class="btn btn-success" type="submit" value="date_save" >Termin fixieren</button></td>';
+    $content .= '<td align="right" colspan="3"><button name="date_save" class="btn btn-success" type="submit" value="date_save" >Termin fixieren</button></td>';
     $content .= '</tr>';
 
     $content .= '</table>';
