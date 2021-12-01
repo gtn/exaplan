@@ -706,16 +706,16 @@ function printAdminDashboard($dashboardType = 'default')
     $content .= '<tr>';
     $content .= '<th rowspan="2" valign="top">Meine Module</th>';
     $content .= '<th rowspan="2" valign="top">Termine</th>';
-    $content .= '<th colspan="3">Anzahl Teilnehmer angefragt:</th>';
+    $content .= '<th colspan="1">Anzahl Teilnehmer angefragt:</th>';
     $content .= '</tr>';
-    $content .= '<tr>';
+    /*$content .= '<tr>';
     $content .= '<th class="regionColumn">'.getRegionTitle('RegionOst').'</th>';
     $content .= '<th class="regionColumn">'.getRegionTitle('RegionWest').'</th>';
     $content .= '<th class="regionColumn">'.getRegionTitle('').'</th>';
-    $content .= '</tr>';
+    $content .= '</tr>';*/
     $content .= '</thead>';
 
-    $regions = ['RegionOst', 'RegionWest', 'all'];
+    $regions = [/*'RegionOst', 'RegionWest', */'all'];
 
     $content .= '<tbody>';
 
