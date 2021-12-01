@@ -737,6 +737,15 @@ function getRegionTitle($region, $short = false) {
     return $full[$region];
 }
 
+function getIsOnlineTitle($region, $short = false) {
+    $shorts = ['0' => 'Präsenz', '1' => 'Online'];
+    $full = ['0' => 'Präsenz', '1' => 'Online'];
+    if ($short) {
+        return $shorts[$region];
+    }
+    return $full[$region];
+}
+
 function german_dateformat($date){
 	return date("d.m.Y", strtotime($date));
 }

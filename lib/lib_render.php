@@ -340,8 +340,9 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
  * @param int $modulepartid
  * @param string $date
  * @param string $region
+ * @param int $selectedDateId
  */
-function printAdminModulepartView($modulepartid, $date = '', $region = '') {
+function printAdminModulepartView($modulepartid, $date = '', $region = '', $selectedDateId = 0) {
     $content = '';
     $content .= '<div class="adminModuleplanView">';
     $content .= '<table class="moduleplanView-header">';
@@ -371,7 +372,7 @@ function printAdminModulepartView($modulepartid, $date = '', $region = '') {
     // day ajax reloaded data (just HTML container)
     $content .= '<div id="modulepart-date-data">';
     if ($date) {
-        $content .= modulepartAdminViewByDate($modulepartid, $date, $region);
+        $content .= modulepartAdminViewByDate($modulepartid, $date, $region, $selectedDateId);
     }
     $content .= '</div>';
 
@@ -385,9 +386,10 @@ function printAdminModulepartView($modulepartid, $date = '', $region = '') {
  * @param int $modulepartId
  * @param string $date
  * @param string $defaultRegion
+ * @param int $selectedDateId
  * @return string
  */
-function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
+function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $selectedDateId = 0) {
     global $CFG;
     $dashboardType = optional_param('dashboardType', '', PARAM_TEXT);
     $content = '';
@@ -406,7 +408,7 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
     $content .= '<th>VM</th>';
     $content .= '<th>NM</th>';
     $content .= '<th>TN gefehlt?</th>';
-    $content .= '<th><!--bewertung, later --></th>';
+    $content .= '<th><!-- existing fixed dates --></th>';
     $content .= '<th class="mainForm"></th>';
     $content .= '</tr>';
     $content .= '</thead>';
@@ -417,6 +419,10 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
 
     $rowsCount = 0;
     $mergedData = block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, null, $defaultRegion, $states);
+//    echo "<pre>debug:<strong>lib_render.php:422</strong>\r\n"; print_r($mergedData); echo '</pre>'; exit; // !!!!!!!!!! delete it
+
+    $studentRowFilled = false;
+    $formsShown = false;
 
     if (count($mergedData) > 0) {
         $userMidDayTypeCheckboxTemplate = function($pUserid, $userTimeSlot, $timeslotColumn) {
@@ -439,8 +445,20 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
                 $setRowHight = '';
             }
             $rowsCount++;
-            $content .= '<tr>';
-            if ($dateData['pUserData']) {
+            $studentShown = false;
+            // show user only in these cases:
+            if ($dateData['pUserData']
+                && (
+                    // 1. no selected dateID AND this user is Desired
+                    (!$selectedDateId && $dateData['dateType'] == 'desired')
+                    ||
+                    // 2. selected dateId AND (the user is desired OR related to this fixed date (or blocked))
+                    ($selectedDateId && ($dateData['dateType'] == 'desired' || ($selectedDateId == $dateData['id'] && in_array($dateData['dateType'], ['fixed', 'blocked']))))
+                )
+            ) {
+                $studentRowFilled = true;
+                $studentShown = true;
+                $content .= '<tr>';
                 $content .= '<td valign="top" height="' . $setRowHight . '">';
                 // fixed or desired
                 $content .= '<input type="checkbox" 
@@ -483,23 +501,31 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
                                 value="1"                                     
                                 name="absentPuser[' . $dateData['pUserData']['id'] . ']" 
                                 ' . $absent . '/></td>';
-                $content .= '<td valign="top"><!--Bewertung--></td>';
             } else {
                 // no related students for existing fixed/blocked date
+               /* $content .= '<td></td>';
                 $content .= '<td></td>';
                 $content .= '<td></td>';
                 $content .= '<td></td>';
                 $content .= '<td></td>';
                 $content .= '<td></td>';
-                $content .= '<td></td>';
-                $content .= '<td></td>';
+                $content .= '<td></td>';*/
             }
-            if ($rowsCount == 1) {
-                $content .= '<td rowspan="###FORM_ROWSPAN###" class="mainForm" valign="top">'.formAdminDateFixing($modulepartId, $date, null, $defaultRegion).'</td>';
+            if ($studentRowFilled && !$formsShown) {
+                $formsShown = true;
+                // existing fix dates list
+                $content .= '<td rowspan="###FORM_ROWSPAN###" class="fixedDatesList" valign="top">';
+                $content .= buttonsForExistingDates($modulepartId, $date, $selectedDateId);
+                $content .= '</td>';
+                // meta-data form
+                $content .= '<td rowspan="###FORM_ROWSPAN###" class="mainForm" valign="top">'.formAdminDateFixing($modulepartId, $date, null, $defaultRegion, $selectedDateId).'</td>';
             }
-            $content .= '</tr>';
+            if ($studentShown) {
+                $content .= '</tr>';
+            }
         }
-    } else {
+    }
+    if (!$studentRowFilled || !$formsShown) {
         // show empty (no students) form to create an empty date
         $rowsCount++;
         $content .= '<tr>';
@@ -510,7 +536,12 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
         $content .= '<td class="timeslotCheck1"></td>';
         $content .= '<td></td>';
         $content .= '<td></td>';
-        $content .= '<td rowspan="###FORM_ROWSPAN###" class="mainForm" valign="top">'.formAdminDateFixing($modulepartId, $date, null, $defaultRegion).'</td>';
+        // existing fix dates list
+        $content .= '<td rowspan="###FORM_ROWSPAN###" class="fixedDatesList" valign="top">';
+        $content .= buttonsForExistingDates($modulepartId, $date, $selectedDateId);
+        $content .= '</td>';
+        // meta-data form
+        $content .= '<td rowspan="###FORM_ROWSPAN###" class="mainForm" valign="top">'.formAdminDateFixing($modulepartId, $date, null, $defaultRegion, $selectedDateId).'</td>';
         $content .= '</tr>';
     }
 
@@ -531,9 +562,10 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '') {
  * @param string $date
  * @param int $timeslot
  * @param string $defaultRegion
+ * @param int $selectedDateId
  * @return string
  */
-function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultRegion = '') {
+function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultRegion = '', $selectedDateId = 0) {
     global $CFG;
     $content = '';
     $dateTs = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
@@ -548,9 +580,17 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
         return $content;
     };
 
-    $dateRec = getPrefferedDate($modulepartId, $dateTs, $timeslot);
+    if ($selectedDateId) {
+//        $dateRec = getPrefferedDate($modulepartId, $dateTs, $timeslot); // get fisrt
+        $dateRec = getTableData('mdl_block_exaplandates', $selectedDateId);
+    } else {
+        // empty form
+        $dateRec = [];
+    }
 
-//    $content .= '<input type="hidden" value="'.$timeslot.'" name="middayType" />';
+    if ($selectedDateId) {
+        $content .= '<input type="hidden" value="'.$selectedDateId.'" name="dateId" />';
+    }
     $content .= '<input type="hidden" value="'.$date.'" name="date" />';
     $content .= '<input type="hidden" value="'.$modulepartId.'" name="mpId" />';
 
@@ -585,8 +625,8 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
     $content .= '<td colspan="3">';
     $content .= '<label for="isonline_'.$instanceKey.'">DF Art:</label>';
     $options = [
-            ['id' => '0', 'title' => 'Präsenz'],
-            ['id' => '1', 'title' => 'Online'],
+            ['id' => '0', 'title' => getIsOnlineTitle(0)],
+            ['id' => '1', 'title' => getIsOnlineTitle(1)],
     ];
     $content .= $selectboxTemplate('isonline', $options, @$dateRec['isonline']);
     $content .= '</td>';
@@ -644,6 +684,33 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
 
     $content .= '</table>';
 
+    return $content;
+}
+
+/**
+ * @param int $modulepartId
+ * @param string $date
+ */
+function buttonsForExistingDates($modulepartId, $date, $selectedDateId) {
+    $dates = getDatesForModulePart($modulepartId, $date);
+    $content = '';
+    foreach ($dates as $fDate) {
+        $titleParts = [
+            $date,
+            getTableData('mdl_block_exaplanmoodles', $fDate['moodleid'], 'companyname'),
+            getRegionTitle($fDate['region']),
+            getIsOnlineTitle($fDate['isonline']),
+        ];
+        $titleParts = array_filter($titleParts);
+        $title = implode(' - ', $titleParts);
+        $url = new moodle_url('/blocks/exaplan/admin.php', array('mpid' => $modulepartId, 'date' => $date, 'region' => 'all', 'dateId' => $fDate['id']));
+        $content .= '<span class="exaplan-date-button-item">';
+        $content .= '<a class="btn btn-'.($fDate['dateType']=='fixed' ? 'fix' : 'blocked').' examplan-existing-date '.($selectedDateId == $fDate['id'] ?: 'examplan-existing-date-selected').'" href="'.$url.'">'.$title.'</a>';
+        $users = getFixedPUsersForDate($fDate['id']);
+        $studentsCount = count($users);
+        $content .= $studentsCount ? '<span class="countStudents">'.$studentsCount.'</span>' : '';
+        $content .= '</span>';
+    }
     return $content;
 }
 

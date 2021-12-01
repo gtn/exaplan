@@ -18,6 +18,7 @@ $action = optional_param("action", "", PARAM_TEXT);
 $modulepartid = optional_param("mpid", "", PARAM_INT);
 $region = optional_param("region", "", PARAM_TEXT);
 $dashboardType = optional_param("dashboardType", '', PARAM_TEXT);
+$dateId = optional_param("dateId", 0, PARAM_INT);
 
 $isadmin = block_exaplan_is_admin();
 
@@ -132,7 +133,7 @@ echo '<div id="exaplan">';
 
 if ($isadmin) {
     $dateGP = optional_param('date', '', PARAM_TEXT);
-    echo printAdminModulepartView($modulepartid, $dateGP, $region);
+    echo printAdminModulepartView($modulepartid, $dateGP, $region, $dateId);
 }
 
 echo '<a href="'.$CFG->wwwroot.'/my/'.($dashboardType ? '?dashboardType='.$dashboardType : '').'" role="button" class="btn btn-info"> zurück zum Dashboard </a>';

@@ -10,25 +10,25 @@
 
 a.exaplan-date-fixed.exaplan-selectable-date {
     color: green;
-   
+
 }
 a.exaplan-date-fixed.exaplan-selectable-date:hover {
-   
+
     color: black;
 }
 a.exaplan-date-fixed.exaplan-selectable-date.exaplan-date-current-modulepart {
-  
+
     color: white;
 }
 a.exaplan-selectable-modulepart {
-   
+
     color: rgba(85, 0, 0, 1);
 }
 a.exaplan-selectable-modulepart:hover {
     color: white
 }
 a.exaplan-selectable-modulepart.exaplan-date-current-modulepart {
-   
+
     color: white;
 }
 /*
@@ -301,9 +301,9 @@ table.exaplan-date-details-table td.dataContent {
 }
 /*tooltip content box*/
 /*.tooltipster-sidetip.tooltipster-light.tooltipster-exaplan .tooltipster-box {*/
-    /*background: #e1e4e6;*/
-    /*border: 1px solid #c6c6c7;*/
-    /*border-radius: 5px;*/
+/*background: #e1e4e6;*/
+/*border: 1px solid #c6c6c7;*/
+/*border-radius: 5px;*/
 /*}*/
 /*content text*/
 .tooltipster-sidetip.tooltipster-light.tooltipster-exaplan .tooltipster-content {
@@ -340,9 +340,9 @@ body {
     background-color: #fff;}
 
 #exaplan table {
-  font-family: arial, sans-serif;
-  border-collapse: collapse;
- 
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+
 }
 
 #exaplan th {
@@ -367,39 +367,39 @@ body {
 }
 
 #exaplan h3.exaplan-result-item-table {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 1rem;
-	color: #C20530;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1rem;
+    color: #C20530;
 }
 
 #exaplan h2 {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 1rem;
-	font-style: bold; 
-	color: #C20530;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1rem;
+    font-style: bold;
+    color: #C20530;
 }
 
 
 #exaplan .result-item-header-cnt {
-	display: -ms-flexbox !important;
-	display: flex;
-	-ms-flex-direction: row !important;
-	flex-direction: row;
-	-ms-flex-pack: justify !important;
-	
-	justify-content: space-between !important;
-	aalign-items:  center; /*didi, f�hrt zu herunterr�ckung vom icon*/
-  position: relative; 
+    display: -ms-flexbox !important;
+    display: flex;
+    -ms-flex-direction: row !important;
+    flex-direction: row;
+    -ms-flex-pack: justify !important;
+
+    justify-content: space-between !important;
+    aalign-items:  center; /*didi, f�hrt zu herunterr�ckung vom icon*/
+    position: relative;
 }
 
 
 #exaplan .item-header-title {
-	font-family: Arial, Helvetica, sans-serif;
-	font-size: 20px;
-	letter-spacing: 2px;
-	word-spacing: 2px;
-	color: #2E2E2E;
-	padding: 10px 7px 0px 75px;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 20px;
+    letter-spacing: 2px;
+    word-spacing: 2px;
+    color: #2E2E2E;
+    padding: 10px 7px 0px 75px;
 }
 
 #exaplan .circleBase {
@@ -411,8 +411,8 @@ body {
     width: 1rem;
     height:  1rem;
     background: #C20530;
-	display: inline-block;
-  
+    display: inline-block;
+
 }
 
 #exaplan .type2 {
@@ -424,40 +424,44 @@ body {
 
 #exaplan .btn-danger,
 #exaplan .btn-desire,
-#exaplan .btn-fix {
-	font-family: Arial;
-	color: #ffffff;
-	background: #C20530;
-	text-decoration: none;
-	border-style: none; 
-	border-radius: 4px; 
-	padding-left: 20px; 
-	padding-right: 20px; 
-	font-size: 0.6rem;
-	line-height: 1.2rem; 
+#exaplan .btn-fix,
+#exaplan .btn-blocked {
+    font-family: Arial;
+    color: #ffffff;
+    background: #C20530;
+    text-decoration: none;
+    border-style: none;
+    border-radius: 4px;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: 0.6rem;
+    line-height: 1.2rem;
 }
 #exaplan .btn-desire {
-	background: rgb(246, 184, 12, 0.25);
-	color: #000000;
+    background: rgb(246, 184, 12, 0.25);
+    color: #000000;
 }
 #exaplan .btn-fix {
-	background: rgb(0, 83, 0, 1);
-	color: #ffffff;
+    background: rgb(0, 83, 0, 1);
+    color: #ffffff;
+}
+#exaplan .btn-blocked {
+    background-color: #8CD0F2;
+    color: #253b48;
 }
 
-
 #exaplan .btn-outline-danger {
-	border-style: none;
-	background-color: #ddd;
+    border-style: none;
+    background-color: #ddd;
 }
 
 #exaplan .result-item-header {
-	background-color: #ddd;
-	min-height:50px;
+    background-color: #ddd;
+    min-height:50px;
 }
 
 #exaplan .exaplan-result-item {
-	margin-left: 20px;
+    margin-left: 20px;
 }
 
 .moduleListTable .exaplan-date-blocked {
@@ -470,21 +474,21 @@ body {
 * {box-sizing:border-box}
 
 #exaplan .result-item-header-cnt {
-  width: 100%; /* Full width */
-  background-color: #ddd; /* Grey background */
+    width: 100%; /* Full width */
+    background-color: #ddd; /* Grey background */
 }
 
 #exaplan .skills {
-  text-align: right; 
-  padding-top: 3px; 
-  padding-bottom: 3px; 
-  color: white; 
+    text-align: right;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    color: white;
 }
 
-#exaplan .html {width: 90%; background-color: #C20530;} 
-#exaplan .css {width: 80%; background-color: #C20530;} 
-#exaplan .js {width: 65%; background-color: #C20530;} 
-#exaplan .php {width: 100%; background-color: #E02061;}  
+#exaplan .html {width: 90%; background-color: #C20530;}
+#exaplan .css {width: 80%; background-color: #C20530;}
+#exaplan .js {width: 65%; background-color: #C20530;}
+#exaplan .php {width: 100%; background-color: #E02061;}
 
 #exaplan .btn {padding: .175rem .25rem;}
 #exaplan table.tbl_modulparts th{padding: 0 .25rem;}
@@ -501,4 +505,30 @@ body {
 #exaplan .moduleListTable th.regionColumn,
 #exaplan .moduleListTable td.regionColumn {
     padding-left: 15px;
+}
+
+#exaplan .exaplan-date-button-item {
+    display: inline-block;
+    position: relative;
+}
+
+#exaplan .examplan-existing-date {
+    white-space: nowrap;
+    margin-bottom: 5px;
+}
+
+#exaplan .countStudents {
+    text-align: center;
+    font-size: 10px;
+    line-height: 14px;
+    color: #008000;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #008000;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    z-index: 10000;
 }
