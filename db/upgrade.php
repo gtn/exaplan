@@ -30,5 +30,29 @@ function xmldb_block_exaplan_upgrade($oldversion) {
         }
         upgrade_block_savepoint(true, 2021112600, 'exaplan');
     }
+    if ($oldversion < 2021113000) {
+        $table = new xmldb_table('block_exaplandates');
+        $field = new xmldb_field('moodleid', XMLDB_TYPE_INTEGER, 10, null, XMLDB_NOTNULL, XMLDB_SEQUENCE, '0');
+        
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('isonline', XMLDB_TYPE_INTEGER, 1, null, null, null, '0');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('duration', XMLDB_TYPE_CHAR, '100', null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $table = new xmldb_table('block_exaplanmodulesets');
+        $field = new xmldb_field('isinstructor', XMLDB_TYPE_INTEGER, 1, null, null, null, '0');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        
+        upgrade_block_savepoint(true, 2021113000, 'exaplan');
+    }
+    
     return $result;
 }
