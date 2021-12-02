@@ -98,7 +98,7 @@ switch ($action) {
             }
         }
 
-        $dateId = setPrefferedDate(true, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $region, $moodleid, $isonline, $duration, $state);
+        $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $region, $moodleid, $isonline, $duration, $state);
 
         // register / unregister students
         $registeredUsers = getFixedPUsersForDate($dateId);
@@ -123,7 +123,9 @@ switch ($action) {
                 removePUserFromDate($dateId, $puserid, $modulepartid);
             }
         }
+        $dateId = 0; // unlink shown form from current dateId. So the admin will be able to create a new date instead of edit it
         break;
+
 }
 
 

@@ -325,6 +325,7 @@ function getPrefferedDate($modulepartid, $date, $timeslot = null, $states = [])
 
 /**
  * @param bool $updateExisting Need to update?
+ * @param int $dateId
  * @param int $modulepartid
  * @param int $puserid Puser id
  * @param int $date
@@ -339,7 +340,7 @@ function getPrefferedDate($modulepartid, $date, $timeslot = null, $states = [])
  * @param string $duration
  * @return string
  */
-function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment, $region, $moodleid = 0, $isonline = 0, $duration = '', $state = BLOCK_EXAPLAN_DATE_PROPOSED)
+function setPrefferedDate($updateExisting, $dateId = 0, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment, $region, $moodleid = 0, $isonline = 0, $duration = '', $state = BLOCK_EXAPLAN_DATE_PROPOSED)
 {
     $pdo = getPdoConnect();
     $timestamp = new DateTime();
@@ -364,11 +365,11 @@ function setPrefferedDate($updateExisting, $modulepartid, $puserid, $date, $time
     ];
 
     // do not care about timeslot and state during selecting. We must have only single record for the day+modulepart
-    $dateRec = getPrefferedDate($modulepartid, $date/*, $timeslot, [$state]*/);
+//    $dateRec = getPrefferedDate($modulepartid, $date/*, $timeslot, [$state]*/);
+    $dateRec = getTableData('mdl_block_exaplandates', $dateId);
 
 
     if ($dateRec) {
-        $dateId = $dateRec['id'];
         
         // return existing dateId. We do not need to create it
         if ($updateExisting) {
