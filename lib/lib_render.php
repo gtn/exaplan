@@ -614,12 +614,12 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
     // region
     $content .= '<tr>';
     $content .= '<td colspan="3">';
-    $content .= '<label for="region_'.$instanceKey.'">Region:</label>';
+    $content .= '<label for="dateRegion_'.$instanceKey.'">Region:</label>';
     $options = [
             ['id' => 'RegionOst', 'title' => getRegionTitle('RegionOst')],
             ['id' => 'RegionWest', 'title' => getRegionTitle('RegionWest')],
     ];
-    $content .= $selectboxTemplate('region', $options, @$dateRec['region']);
+    $content .= $selectboxTemplate('dateRegion', $options, @$dateRec['region']);
     $content .= '</td>';
     // isonline
     $content .= '<td colspan="3">';
@@ -704,8 +704,8 @@ function buttonsForExistingDates($modulepartId, $date, $selectedDateId) {
         $titleParts = array_filter($titleParts);
         $title = implode(' - ', $titleParts);
         $url = new moodle_url('/blocks/exaplan/admin.php', array('mpid' => $modulepartId, 'date' => $date, 'region' => 'all', 'dateId' => $fDate['id']));
-        $content .= '<span class="exaplan-date-button-item">';
-        $content .= '<a class="btn btn-'.($fDate['dateType']=='fixed' ? 'fix' : 'blocked').' examplan-existing-date '.($selectedDateId == $fDate['id'] ?: 'examplan-existing-date-selected').'" href="'.$url.'">'.$title.'</a>';
+        $content .= '<span class="exaplan-date-button-item '.($selectedDateId == $fDate['id'] ? 'exaplan-existing-date-selected' : '').'">';
+        $content .= '<a class="btn btn-'.($fDate['dateType']=='fixed' ? 'fix' : 'blocked').' exaplan-existing-date " href="'.$url.'">'.$title.'</a>';
         $users = getFixedPUsersForDate($fDate['id']);
         $studentsCount = count($users);
         $content .= $studentsCount ? '<span class="countStudents">'.$studentsCount.'</span>' : '';

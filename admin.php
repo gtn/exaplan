@@ -38,7 +38,6 @@ switch ($action) {
         $students = optional_param_array('fixedPuser', [], PARAM_INT);
         $students = array_keys($students);
         $moodleid = optional_param('moodleid', '', PARAM_INT);
-        $region = optional_param('region', '', PARAM_TEXT);
         $isonline = optional_param('isonline', '', PARAM_TEXT);
         $location = optional_param('location', '', PARAM_TEXT);
         $eventTime = optional_param('time', '', PARAM_TEXT);
@@ -47,7 +46,7 @@ switch ($action) {
 //        $trainerId = optional_param('trainer', 0, PARAM_INT);
 //        $pTrainer = getPuser($trainerId)['id'];
         $pTrainer = optional_param('trainer', 0, PARAM_INT);
-        $region = optional_param('region', 'all', PARAM_TEXT);
+        $dateRegion = optional_param('dateRegion', 'all', PARAM_TEXT);
 
         // fixed date or blocked date
         $state = BLOCK_EXAPLAN_DATE_PROPOSED; // never accessible?
@@ -98,7 +97,7 @@ switch ($action) {
             }
         }
 
-        $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $region, $moodleid, $isonline, $duration, $state);
+        $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, $state);
 
         // register / unregister students
         $registeredUsers = getFixedPUsersForDate($dateId);
@@ -124,6 +123,9 @@ switch ($action) {
             }
         }
         $dateId = 0; // unlink shown form from current dateId. So the admin will be able to create a new date instead of edit it
+        // redirect to admin view (without this we have wrong shown data)
+        $url = new moodle_url('/blocks/exaplan/admin.php', array('mpid' => $modulepartid, 'date' => $date, 'region' => $region, 'dashboardType' => $dashboardType));
+        redirect($url);
         break;
 
 }
