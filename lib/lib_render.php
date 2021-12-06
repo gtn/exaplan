@@ -397,11 +397,11 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
     $actionUrl = $CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$modulepartId.'&date='.$date.($defaultRegion ? '&region='.$defaultRegion : '').($dashboardType ? '&dashboardType='.$dashboardType : '');
     $content .= '<form class="small" action="'.$actionUrl.'" method="post" autocomplete="off">';
     $content .= '<input type="hidden" name="action" value="saveFixedDates" />';
-    $content .= '<table class="table table-sm exaplan-adminModulepartView" border="0">';
+    $content .= '<table class="table table-sm exaplan-adminModulepartView" border="0"';
     // header
     $content .= '<thead class="thead-light">';
     $content .= '<tr>';
-    $content .= '<th>Angefragte TN: '.german_dateformat($date).'</th>';
+    $content .= '<th>'.german_dateformat($date).'</th>';
     $content .= '<th></th>';
     $content .= '<th>Organization</th>';
     $content .= '<th>weitere Termine</th>';
@@ -423,31 +423,50 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
 
     $studentRowFilled = false;
     $formsShown = false;
+    $shownStudents = []; // is possible to have the same user for 'blocked' and 'desired' list groups
+    $defaultRowHeght = 20;
 
-    if (count($mergedData) > 0) {
-        $userMidDayTypeCheckboxTemplate = function($pUserid, $userTimeSlot, $timeslotColumn) {
-            $checked = '';
-            if ($userTimeSlot == $timeslotColumn || $userTimeSlot == BLOCK_EXAPLAN_MIDDATE_ALL) {
-                $checked = ' checked = "checked" ';
-            }
-            $content = '<input type = "checkbox" disabled readonly onclick="return false;"
+    $userMidDayTypeCheckboxTemplate = function($pUserid, $userTimeSlot, $timeslotColumn) {
+        $checked = '';
+        if ($userTimeSlot == $timeslotColumn || $userTimeSlot == BLOCK_EXAPLAN_MIDDATE_ALL) {
+            $checked = ' checked = "checked" ';
+        }
+        $content = '<input type = "checkbox" disabled readonly onclick="return false;"
                                 value = "1"      
                                 id = "middayType'.$pUserid.'_'.$timeslotColumn.'"                               
                                 name = "middayType'.$timeslotColumn.'['.$pUserid.']" 
                                 '.$checked.'/>&nbsp;';
-            return $content;
-        };
+        return $content;
+    };
+
+    $getListGroupTitle = function($dateType) {
+        switch ($dateType) {
+            case 'desired':
+                return 'Angefragte TN:';
+                break;
+            case 'fixed':
+                return 'eingeschriebene TN:';
+                break;
+            case 'blocked':
+                return 'Blocken TN:';
+                break;
+            case 'theSameModulePart':
+                return 'Gleicher Kurs, andere Termine gewünscht';
+                break;
+        }
+        return '';
+    };
+
+    if (count($mergedData) > 0) {
+        $currentUsersGroup = '--GROUP--';
 
         foreach ($mergedData as $dKey => $dateData) {
-            $setRowHight = 20;
-            end($mergedData);
-            if ($dKey === key($mergedData)) {
-                $setRowHight = '';
-            }
-            $rowsCount++;
+            $rowContent = '';
             $studentShown = false;
+
             // show user only in these cases:
             if ($dateData['pUserData']
+                && !in_array($dateData['pUserData']['id'], $shownStudents) // not shown yet
                 && (
                     // 1. no selected dateID AND this user is Desired
                     (!$selectedDateId && $dateData['dateType'] == 'desired')
@@ -456,24 +475,26 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
                     ($selectedDateId && ($dateData['dateType'] == 'desired' || ($selectedDateId == $dateData['id'] && in_array($dateData['dateType'], ['fixed', 'blocked']))))
                 )
             ) {
+                $rowsCount++;
+                $shownStudents[] = $dateData['pUserData']['id'];
                 $studentRowFilled = true;
                 $studentShown = true;
-                $content .= '<tr>';
-                $content .= '<td valign="top" height="' . $setRowHight . '">';
+                $rowContent .= '<tr>';
+                $rowContent .= '<td valign="top" height="' . $defaultRowHeght . '">';
                 // fixed or desired
-                $content .= '<input type="checkbox" 
+                $rowContent .= '<input type="checkbox" 
                                 value="1"      
                                 id = "fixedUser' . $dateData['pUserData']['id'] . '"                               
                                 name = "fixedPuser[' . $dateData['pUserData']['id'] . ']" 
                                 ' . (in_array($dateData['dateType'], ['fixed', 'blocked']) ? 'checked = "checked"' : '') . '/>&nbsp;';
-                $content .= '<label for="fixedUser' . $dateData['pUserData']['id'] . '">' . @$dateData['pUserData']['firstname'] . ' ' . @$dateData['pUserData']['lastname'] . '</label>';
-                $content .= '</td>';
+                $rowContent .= '<label for="fixedUser' . $dateData['pUserData']['id'] . '">' . @$dateData['pUserData']['firstname'] . ' ' . @$dateData['pUserData']['lastname'] . '</label>';
+                $rowContent .= '</td>';
                 // buttons
-                $content .= '<td valign="top">' ./*buttons*/
+                $rowContent .= '<td valign="top">' ./*buttons*/
                     '</td>';
                 // organization
                 $companyName = getTableData('mdl_block_exaplanmoodles', $dateData['pUserData']['moodleid'], 'companyname');
-                $content .= '<td valign="top">' . $companyName . '</td>';
+                $rowContent .= '<td valign="top">' . $companyName . '</td>';
                 // count of desired dates
                 $desiredDates = getDesiredDates($dateData['pUserData']['id'], $modulepartId, null, null, $defaultRegion);
                 if (count($desiredDates) > 0) {
@@ -481,14 +502,14 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
                 } else {
                     $desiredDatesCount = '';
                 }
-                $content .= '<td valign="top">' . $desiredDatesCount . '</td>';
+                $rowContent .= '<td valign="top">' . $desiredDatesCount . '</td>';
                 // midDay type checkboxes
-                $content .= '<td valign="top" class="timeslotCheck1">';
-                $content .= $userMidDayTypeCheckboxTemplate($dateData['pUserData']['id'], $dateData['timeslot'], BLOCK_EXAPLAN_MIDDATE_BEFORE);
-                $content .= '</td>';
-                $content .= '<td valign="top" class="timeslotCheck2">';
-                $content .= $userMidDayTypeCheckboxTemplate($dateData['pUserData']['id'], $dateData['timeslot'], BLOCK_EXAPLAN_MIDDATE_AFTER);
-                $content .= '</td>';
+                $rowContent .= '<td valign="top" class="timeslotCheck1">';
+                $rowContent .= $userMidDayTypeCheckboxTemplate($dateData['pUserData']['id'], $dateData['timeslot'], BLOCK_EXAPLAN_MIDDATE_BEFORE);
+                $rowContent .= '</td>';
+                $rowContent .= '<td valign="top" class="timeslotCheck2">';
+                $rowContent .= $userMidDayTypeCheckboxTemplate($dateData['pUserData']['id'], $dateData['timeslot'], BLOCK_EXAPLAN_MIDDATE_AFTER);
+                $rowContent .= '</td>';
                 // absent or not
                 $absent = '';
                 if ($relationData = isPuserIsFixedForDate($dateData['pUserData']['id'], $dateData['id'], true)) {
@@ -496,40 +517,44 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
                         $absent = ' checked = "checked" ';
                     }
                 }
-                $content .= '<td style="text-align: center;  vertical-align: top;">
+                $rowContent .= '<td style="text-align: center;  vertical-align: top;">
                         <input type="checkbox" 
                                 value="1"                                     
                                 name="absentPuser[' . $dateData['pUserData']['id'] . ']" 
                                 ' . $absent . '/></td>';
-            } else {
-                // no related students for existing fixed/blocked date
-               /* $content .= '<td></td>';
-                $content .= '<td></td>';
-                $content .= '<td></td>';
-                $content .= '<td></td>';
-                $content .= '<td></td>';
-                $content .= '<td></td>';
-                $content .= '<td></td>';*/
-            }
-            if ($studentRowFilled && !$formsShown) {
-                $formsShown = true;
-                // existing fix dates list
-                $content .= '<td rowspan="###FORM_ROWSPAN###" class="fixedDatesList" valign="top">';
-                $content .= buttonsForExistingDates($modulepartId, $date, $selectedDateId);
-                $content .= '</td>';
-                // meta-data form
-                $content .= '<td rowspan="###FORM_ROWSPAN###" class="mainForm" valign="top">'.formAdminDateFixing($modulepartId, $date, null, $defaultRegion, $selectedDateId).'</td>';
             }
             if ($studentShown) {
-                $content .= '</tr>';
+                $rowContent .= '</tr>';
             }
+
+            // add list's group title (for desired, fixed, blocked users)
+            if ($studentShown && $dateData['dateType'] != $currentUsersGroup) { // show header of student's group
+                $rowsCount++;
+                $oldRowContent = $rowContent;
+
+                $rowContent = '<tr><td colspan="7" height="'.$defaultRowHeght.'" class="listGroupTitle">'.$getListGroupTitle($dateData['dateType']).'</td>';
+                // add form - group title is always first, so it is here
+                if (!$formsShown) {
+                    $formsShown = true;
+                    $rowContent .= '<td rowspan="###FORM_ROWSPAN###" class="fixedDatesList" valign="top">';
+                    $rowContent .= buttonsForExistingDates($modulepartId, $date, $selectedDateId);
+                    $rowContent .= '</td>';
+                    // meta-data form
+                    $rowContent .= '<td rowspan="###FORM_ROWSPAN###" class="mainForm" valign="top">'.formAdminDateFixing($modulepartId, $date, null, $defaultRegion, $selectedDateId).'</td>';
+                }
+                $rowContent .= '</tr>';
+                $rowContent .= $oldRowContent;
+                $currentUsersGroup = $dateData['dateType'];
+            }
+
+            $content .= $rowContent;
         }
     }
     if (!$studentRowFilled || !$formsShown) {
         // show empty (no students) form to create an empty date
         $rowsCount++;
         $content .= '<tr>';
-        $content .= '<td></td>';
+        $content .= '<td height="'.$defaultRowHeght.'"></td>';
         $content .= '<td></td>';
         $content .= '<td></td>';
         $content .= '<td class="timeslotCheck1"></td>';
@@ -544,6 +569,73 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
         $content .= '<td rowspan="###FORM_ROWSPAN###" class="mainForm" valign="top">'.formAdminDateFixing($modulepartId, $date, null, $defaultRegion, $selectedDateId).'</td>';
         $content .= '</tr>';
     }
+
+    // list of DESIRED users in this modulepart, but not in this date
+    $additionalDesiredDates = getDesiredDates(null, $modulepartId, null, null, $defaultRegion);//block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId,);
+    // filter by already shown students
+    $additionalDesiredDates = array_filter($additionalDesiredDates, function($s) use ($shownStudents) {if (!in_array($s['relatedUserId'], $shownStudents)) return true; return false;});
+    if (count($additionalDesiredDates)) {
+        $rowsCount++;
+        $content .= '<tr><td colspan="7" height="'.$defaultRowHeght.'" class="listGroupTitle">'.$getListGroupTitle('theSameModulePart').'</td>';
+        foreach ($additionalDesiredDates as $dateData) {
+            $rowContent = '';
+            $setRowHight = $defaultRowHeght;
+
+            if ($dateData['relatedUserId']
+                && !in_array($dateData['relatedUserId'], $shownStudents) // not shown yet
+            ) {
+                $pUserId = $dateData['relatedUserId'];
+                $pUserData = getTableData('mdl_block_exaplanpusers', $pUserId);
+                $rowsCount++;
+                $shownStudents[] = $pUserId;
+                $rowContent .= '<tr>';
+                $rowContent .= '<td valign="top" height="' . $setRowHight . '">';
+                // fixed or desired
+                $rowContent .= '<input type="checkbox" 
+                                value="1"      
+                                id = "fixedUser' . $pUserId . '"                               
+                                name = "fixedPuser[' . $pUserId . ']" 
+                                ' . (in_array($dateData['dateType'], ['fixed', 'blocked']) ? 'checked = "checked"' : '') . '/>&nbsp;';
+                $rowContent .= '<label for="fixedUser' . $pUserId . '">' . @$pUserData['firstname'] . ' ' . @$pUserData['lastname'] . '</label>';
+                $rowContent .= '</td>';
+                // buttons
+                $rowContent .= '<td valign="top">' ./*buttons*/
+                    '</td>';
+                // organization
+                $companyName = getTableData('mdl_block_exaplanmoodles', $pUserData['moodleid'], 'companyname');
+                $rowContent .= '<td valign="top">' . $companyName . '</td>';
+                // count of desired dates
+                $desiredDates = getDesiredDates($pUserId, $modulepartId, null, null, $defaultRegion);
+                if (count($desiredDates) > 0) {
+                    $desiredDatesCount = count($desiredDates) . ' Termin' . (count($desiredDates) > 1 ? 'e' : '');
+                } else {
+                    $desiredDatesCount = '';
+                }
+                $rowContent .= '<td valign="top">' . $desiredDatesCount . '</td>';
+                // midDay type checkboxes
+                $rowContent .= '<td valign="top" class="timeslotCheck1">';
+                $rowContent .= $userMidDayTypeCheckboxTemplate($pUserId, $dateData['timeslot'], BLOCK_EXAPLAN_MIDDATE_BEFORE);
+                $rowContent .= '</td>';
+                $rowContent .= '<td valign="top" class="timeslotCheck2">';
+                $rowContent .= $userMidDayTypeCheckboxTemplate($pUserId, $dateData['timeslot'], BLOCK_EXAPLAN_MIDDATE_AFTER);
+                $rowContent .= '</td>';
+                // absent (not always)
+                $absent = '';
+                $rowContent .= '<td style="text-align: center;  vertical-align: top;">
+                        <input type="checkbox" 
+                                value="1"                                     
+                                name="absentPuser[' . $pUserId . ']" 
+                                ' . $absent . '/></td>';
+            }
+            $rowContent .= '</tr>';
+
+            $content .= $rowContent;
+        }
+    }
+
+    // special empty row (to miss row height counting)
+    $content .= '<tr><td colspan="7" class="emptyRow"></td></tr>';
+    $rowsCount++;
 
     $content .= '</table>';
     $content .= '</form>';

@@ -178,7 +178,7 @@ a.exaplan-admin-modulepart-button.exaplan-date-no-desired:hover {
     width: 16px;
     height: 16px;
     border: 1px solid #FFFFFF;
-    background-color: #3478cb;
+    background-color: #29abe2;
     border-radius: 50%;
     position: absolute;
     top: -3px;
@@ -566,15 +566,30 @@ body {
 
 #exaplan .exaplan-existing-date {
     white-space: nowrap;
-    /*margin-bottom: 5px;*/
     width: 100%;
     text-align: left;
+    background: #9CDAA4;
+    color: #ffffff;
+}
+
+#exaplan .btn-fix.exaplan-existing-date {
+    background: #9CDAA4;
+}
+#exaplan .exaplan-existing-date-selected .btn-fix.exaplan-existing-date {
+    background: #2d692d;
+}
+
+#exaplan .btn-blocked.exaplan-existing-date {
+    background: #8dd2f0;
+}
+#exaplan .exaplan-existing-date-selected .btn-blocked.exaplan-existing-date {
+    background: #29ABE2;
 }
 
 #exaplan .exaplan-existing-date-selected {
-    font-weight: bold;
-    padding: 3px;
-    border: 3px black dotted;
+    /*font-weight: bold;*/
+    /*padding: 3px;*/
+    /*border: 3px black dotted;*/
 }
 
 #exaplan .countStudents {
@@ -592,3 +607,14 @@ body {
     right: 0px;
     z-index: 10000;
 }
+
+.exaplan-adminModulepartView td.listGroupTitle {
+    color: #495057;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+}
+
+.exaplan-adminModulepartView td.emptyRow {
+    border: none;
+}
+
