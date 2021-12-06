@@ -514,6 +514,8 @@ function block_exaplan_get_calendar_data($userid)
 function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desired', $modulepartId = null, $readonly = false, $region = '', $respectModulepartForFixDates = true)
 {
 
+    $isAdmin = block_exaplan_is_admin();
+
     $data = [
         'selectedDates' => []
     ];
@@ -552,11 +554,12 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
     // calendar used dates
     $usersForDay = []; // to ignore the same users for the same date
     $selectedDates = [];
+
     foreach ($dates as $date) {
         $dateIndex = $date['date'];
         $dateIndex = date('Y-m-d', $dateIndex);
         if (!array_key_exists($dateIndex, $usersForDay)) {
-            $usersForDay[$dateIndex] = [];
+            $usersForDay[$dateIndex] = ['desired' => [], 'fixed' => [], 'blocked' => []];
         }
         if (!array_key_exists($dateIndex, $selectedDates)) { // TODO: Check it if the user has fixed and desitrred the same date
             $selectedDates[$dateIndex] = [
@@ -567,11 +570,18 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
                 'desired' => false,
                 'fixed' => false,
                 'blocked' => false,
+                'usersCount' => ['desired' => 0, 'fixed' => 0, 'blocked' => 0],
             ];
         }
-        if (@$date['relatedUserId'] && !in_array($date['relatedUserId'], $usersForDay[$dateIndex])) {
+        // count of all related users
+        /*if (@$date['relatedUserId'] && !in_array($date['relatedUserId'], $usersForDay[$dateIndex])) {
             $usersForDay[$dateIndex][] = $date['relatedUserId'];
             $selectedDates[$dateIndex]['usedItems'] += 1;
+        }*/
+        // count of desired/fixed/blocked users
+        if (@$date['relatedUserId'] && !in_array($date['relatedUserId'], $usersForDay[$dateIndex][$date['dateType']])) {
+            $usersForDay[$dateIndex][$date['dateType']][] = $date['relatedUserId'];
+            $selectedDates[$dateIndex]['usersCount'][$date['dateType']] += 1;
         }
         $selectedDates[$dateIndex]['moduleparts'][] = $date['modulepartid'];
         $selectedDates[$dateIndex]['readonly'] = $readonly; // TODO: another rules for readonly days?
@@ -625,6 +635,7 @@ function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $d
 
     $dates2 = getDesiredDates(null, $modulepartId, $date, $timeslot, $region);
 
+
     $dates = array_merge($dates1, $dates2);
 
     // fill user's data
@@ -636,7 +647,10 @@ function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $d
             if (!in_array($dateData['relatedUserId'], $usedUsers)) {
                 // insert only first user's instance
                 $pUserData = getTableData('mdl_block_exaplanpusers', $dateData['relatedUserId']);
-                $usedUsers[] = $dateData['relatedUserId'];
+                // 'blocked' dates are not disable desired dates. So, such sers can be shown again
+                if ($dateData['dateType'] != 'blocked') {
+                    $usedUsers[] = $dateData['relatedUserId'];
+                }
             }
         }
         $dates[$k]['pUserData'] = $pUserData;

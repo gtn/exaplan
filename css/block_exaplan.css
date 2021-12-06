@@ -138,6 +138,54 @@ a.exaplan-admin-modulepart-button.exaplan-date-no-desired:hover {
     z-index: 10000;
 }
 
+/* desired users */
+#block_exaplan_dashboard_calendar .tavo-calendar span.exaplan-relatedUsers-desired {
+    font-size: 10px;
+    line-height: 14px;
+    color: #FFFFFF;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #FFFFFF;
+    background-color: rgb(235, 173, 12);
+    border-radius: 50%;
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    z-index: 10000;
+}
+
+/* fixed users */
+#block_exaplan_dashboard_calendar .tavo-calendar span.exaplan-relatedUsers-fixed {
+    font-size: 10px;
+    line-height: 14px;
+    color: #FFFFFF;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #FFFFFF;
+    background-color: #008000;
+    border-radius: 50%;
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    z-index: 10000;
+}
+
+/* blocked users */
+#block_exaplan_dashboard_calendar .tavo-calendar span.exaplan-relatedUsers-blocked {
+    font-size: 10px;
+    line-height: 14px;
+    color: #FFFFFF;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #FFFFFF;
+    background-color: #3478cb;
+    border-radius: 50%;
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    z-index: 10000;
+}
+
 #block_exaplan_dashboard_calendar .tavo-calendar span.exaplan-middayType {
     font-size: 8px;
     line-height: 14px;

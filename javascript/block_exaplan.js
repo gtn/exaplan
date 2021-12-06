@@ -173,7 +173,7 @@ function updateAllCalendarMetadata() {
                         middayType: date.middayType,
                     }
                     if (typeof isExaplanAdmin !== 'undefined' && isExaplanAdmin) {
-                        metaData.usedItems = date.usedItems; // admin must see number of students for the day
+                        metaData.usersCount = date.usersCount; // admin must see number of students for the day
                     }
                     calendarInstance.addMetaData(date.date, metaData);
                 });

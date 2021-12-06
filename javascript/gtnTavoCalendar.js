@@ -79,6 +79,19 @@ TavoCalendar.prototype.addMetaData = function(date, metaData) {
                     // disable all EVENTS. we need it for handle own events
                     dayWrapper.off();
                 }
+                if (typeof metaData.usersCount === 'object') {
+                    var relTypes = ['desired', 'fixed', 'blocked'];
+                    relTypes.forEach(function (currentType) {
+                        if (metaData.usersCount.hasOwnProperty(currentType)) {
+                            if (metaData.usersCount[currentType] > 0) {
+                                var usedItemsMarker = $('<span class="exaplan-relatedUsers-'+currentType+'">' + metaData.usersCount[currentType] + '</span>');
+                                dayWrapper.find('span.tavo-calendar__day-inner').append(usedItemsMarker);
+                                // disable all EVENTS. we need it for handle own events
+                                dayWrapper.off();
+                            }
+                        };
+                    });
+                }
                 if (!isExaplanAdmin) { // TODO: I think here is needed some additional condition in the future
                     if (metaData.middayType) {
                         dayWrapper.attr('data-middayType', metaData.middayType);

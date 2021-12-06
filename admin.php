@@ -111,7 +111,7 @@ switch ($action) {
                 $absent = 1;
             }
             addPUserToDate($dateId, $student, $absent, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
-            // delete ALL other desired dates
+            // delete ALL other desired dates (not for 'blocked' dates)
             if ($state != BLOCK_EXAPLAN_DATE_BLOCKED) {
                 removeDesiredDate($modulepartid, $student);
             }
