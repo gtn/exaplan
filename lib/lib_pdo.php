@@ -669,8 +669,9 @@ function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $t
         $whereArr[] = ' des.timeslot = :timeslot ';
     }
 
+    $leftJoin .= ' LEFT JOIN mdl_block_exaplanpusers u ON u.id = des.puserid ';
+
     if ($region) {
-        $leftJoin .= ' LEFT JOIN mdl_block_exaplanpusers u ON u.id = des.puserid ';
         switch ($region) {
             case 'RegionOst':
                 $whereArr[] = ' u.region = \'RegionOst\' ';
@@ -690,7 +691,7 @@ function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $t
         return null;
     }
 
-    $sql = "SELECT des.*, des.puserid as relatedUserId, 'desired' as dateType
+    $sql = "SELECT des.*, des.puserid as relatedUserId, 'desired' as dateType, u.moodleid as pUserMoodleId
               FROM mdl_block_exaplandesired des
               ".$leftJoin."
               WHERE " . implode(' AND ', $whereArr);

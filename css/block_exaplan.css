@@ -620,6 +620,6 @@ body {
 }
 
 .exaplan-adminModulepartView td.emptyRow {
-    border: none;
+    border: none !important;
 }
 
