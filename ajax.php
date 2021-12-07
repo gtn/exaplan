@@ -24,22 +24,22 @@ require_sesskey();
 
 switch($action) {
     case 'addUserDisiredDate':
-        // save student's selected date
-        $pUserId = getPuser($userid)['id'];
-      $date = optional_param('date', date('Y-m-d'), PARAM_TEXT);
-      $modulepartId = required_param('modulepartId', PARAM_INT);
-      $dateTS = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
-      if ($dateTS < strtotime("today", time())) {
-        // selected date must be not in past
-        echo 'ERROR';
-        exit;
-      }
-      $middayType = optional_param('middayType', BLOCK_EXAPLAN_MIDDATE_ALL, PARAM_INT);
-      $newDateId = setDesiredDate($modulepartId, $pUserId, $dateTS, $middayType, $creatorpuserid);
-      $allUserData = block_exaplan_get_data_for_calendar(getPuser($userid)['id'], 'all', $modulepartId);
-      echo json_encode($allUserData);
-      exit;
-      break;
+            // save student's selected date
+            $pUserId = getPuser($userid)['id'];
+            $date = optional_param('date', date('Y-m-d'), PARAM_TEXT);
+            $modulepartId = required_param('modulepartId', PARAM_INT);
+            $dateTS = DateTime::createFromFormat('Y-m-d', $date)->setTime(0, 0)->getTimestamp();
+            if ($dateTS < strtotime("today", time())) {
+                // selected date must be not in past
+                echo 'ERROR';
+                exit;
+            }
+            $middayType = optional_param('middayType', BLOCK_EXAPLAN_MIDDATE_ALL, PARAM_INT);
+            $newDateId = setDesiredDate($modulepartId, $pUserId, $dateTS, $middayType, $creatorpuserid);
+            $allUserData = block_exaplan_get_data_for_calendar(getPuser($userid)['id'], 'all', $modulepartId);
+            echo json_encode($allUserData);
+            exit;
+            break;
     /*case 'addUserDate': // TODO: deprecated?
         $pUserId = getPuser($USER->id)['id'];
 //        $dateId = required_param('dateId', PARAM_INT);

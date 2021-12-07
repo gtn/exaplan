@@ -271,7 +271,7 @@ function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_CONFIRMED)
                         ':puserid' => getPuser($userid)['id'],
                         ':state' => $state,
                     );
-                    $statement = $pdo->prepare("SELECT d.*
+                    $statement = $pdo->prepare("SELECT d.*, udmm.absent
                                                   FROM mdl_block_exaplandates d
                                                     JOIN mdl_block_exaplanpuser_date_mm udmm ON d.id = udmm.dateid
                                                   WHERE d.modulepartid = :modulepartid
@@ -448,7 +448,9 @@ function setDesiredDate($modulepartid, $puserid, $date, $timeslot, $creatorpuser
     $dateid = 0;
     $addNew = false;
     if ($dates) {
-        if ($dates[0]['timeslot'] != $timeslot) {
+        if ($dates[0]['timeslot'] != $timeslot
+            || $dates[0]['disabled'] // if it is existing, but disabled - enable it
+        ) {
             // 1. delete old record with this timeslot
             // 2. add new record with the new timeslot
             $addNew = true;
@@ -533,7 +535,7 @@ function addPUserToDate($dateid, $puserid, $absent = 0, $creatorpuserid=null, $d
     if ($existing) {
         // relation is already existing!
         if ($withUpdating) {
-            $statement = $pdo->prepare("UPDATE mdl_block_exaplanpuser_date_mm SET absent = :absent;");
+            $statement = $pdo->prepare("UPDATE mdl_block_exaplanpuser_date_mm SET absent = :absent WHERE id = ".$existing[0]['id']);
             $statement->execute([':absent' => $absent]);
         }
         return $existing[0]['id'];
@@ -786,7 +788,10 @@ function getFixedDatesAdvanced($puserid = null, $modulepartid = null, $date = nu
     }
 
     if ($withEmptyStudents && !$puserid) {
-        $sql = "SELECT DISTINCT d.*, dumm.puserid as relatedUserId, IF(d.state = ".BLOCK_EXAPLAN_DATE_BLOCKED.", 'blocked', 'fixed') as dateType
+        $sql = "SELECT DISTINCT d.*, 
+                    dumm.puserid as relatedUserId,
+                    dumm.absent as absent,
+                    IF(d.state = ".BLOCK_EXAPLAN_DATE_BLOCKED.", 'blocked', 'fixed') as dateType
                                   FROM mdl_block_exaplandates d                                                                   
                                    LEFT JOIN mdl_block_exaplanpuser_date_mm dumm ON dumm.dateid = d.id
                                     ".$leftJoin."
@@ -795,7 +800,10 @@ function getFixedDatesAdvanced($puserid = null, $modulepartid = null, $date = nu
                                   ";
 
     } else {
-        $sql = "SELECT DISTINCT d.*, dumm.puserid as relatedUserId, IF(d.state = ".BLOCK_EXAPLAN_DATE_BLOCKED.", 'blocked', 'fixed') as dateType
+        $sql = "SELECT DISTINCT d.*, 
+                    dumm.puserid as relatedUserId,
+                    dumm.absent as absent, 
+                    IF(d.state = ".BLOCK_EXAPLAN_DATE_BLOCKED.", 'blocked', 'fixed') as dateType
                                   FROM mdl_block_exaplanpuser_date_mm dumm
                                     JOIN mdl_block_exaplandates d ON d.id = dumm.dateid
                                     ".$leftJoin."

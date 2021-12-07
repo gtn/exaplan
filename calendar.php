@@ -48,10 +48,14 @@ if (!$modulepartid || $isadmin) {
     $fixedDatesExisting = getFixedDatesAdvanced(getPuser($userid)['id'], $modulepartid);
     if ($modulepartid && $fixedDatesExisting) {
         // If the user is seeing modulepart and in this time admin activate his to some modulepart - current links are wrong. So - redirect the student to correct link.
-        $url = new moodle_url('/blocks/exaplan/dateDetails.php', array('mpid' => $modulepartid, 'userid' => $userid, 'dateid' => $fixedDatesExisting[0]['id'], 'pagehash' => block_exaplan_hash_current_userid($userid)));
-        redirect($url, 'You already have fixed date');
-//         TODO: delete? moved to dateDetails.php
-//        echo printUser($userid, $isadmin, $modulepartid, false, $dateId, true);
+
+        // if no seleced dateId and fixedDate is 'absent' - no redirecting!
+        if (!$dateId && $fixedDatesExisting[0]['absent']) {
+            $content .= printUser($userid, $isadmin, $modulepartid, true);
+        } else {
+            $url = new moodle_url('/blocks/exaplan/dateDetails.php', array('mpid' => $modulepartid, 'userid' => $userid, 'dateid' => $fixedDatesExisting[0]['id'], 'pagehash' => block_exaplan_hash_current_userid($userid)));
+            redirect($url, 'You already have fixed date');
+        }
     } else {
         // overview with calendar
         $content .= printUser($userid, $isadmin, $modulepartid, true);

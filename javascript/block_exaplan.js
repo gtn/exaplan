@@ -97,6 +97,7 @@ function selectedDateSendAjax(calEvent, monthCalendar) {
             url: ajaxUrl,
             cache: false
         }).done(function (result) {
+            console.log('block_exaplan.js:100');console.log(result);// !!!!!!!!!! delete it
             calendarData = JSON.parse(result);
             updateCalendarSelectedDates();
             updateAllCalendarMetadata();

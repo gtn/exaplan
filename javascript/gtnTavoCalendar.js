@@ -2,9 +2,17 @@
 (function(dayClick) {
     TavoCalendar.prototype.dayClick = function() {
 
-        this.blurCalendar();
-
         lastCalendarSelectedDate = arguments[0];
+        // YYYY-MM-DD
+        var format = 'YYYY-MM-DD';
+        var calendar_moment = new moment(lastCalendarSelectedDate, format).startOf('day');
+        var curr_moment = new moment().startOf('day');
+
+        // blur calendars only if selected date is not in the past
+        if (calendar_moment >= curr_moment) {
+            this.blurCalendar();
+        }
+
         lastCalendarSelectedDay = $(arguments[1]).clone().find(':not(.tavo-calendar__day-inner)').remove().end().text(); // not the best way, but works
 
         this.elements.wrapper.dispatchEvent(new Event('calendar-select-before'))
@@ -20,10 +28,17 @@
 
 
 TavoCalendar.prototype.blurCalendar = function() {
-    var calendarElement = this.elements.wrapper;
-    $(calendarElement).addClass('exaplan-celendar-blured');
-    var spinner = $('<div class="exaplan_loader"></div>');
-    $(calendarElement).before(spinner);
+    // blur calendar only selected day is not in the past
+    // YYYY-MM-DD
+    var format = 'YYYY-MM-DD';
+    var calendar_moment = new moment(lastCalendarSelectedDate, format).startOf('day');
+    var curr_moment = new moment().startOf('day');
+    if (calendar_moment >= curr_moment) {
+        var calendarElement = this.elements.wrapper;
+        $(calendarElement).addClass('exaplan-celendar-blured');
+        var spinner = $('<div class="exaplan_loader"></div>');
+        $(calendarElement).before(spinner);
+    }
 
 }
 TavoCalendar.prototype.unBlurCalendar = function() {
