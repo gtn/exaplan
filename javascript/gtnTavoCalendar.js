@@ -99,6 +99,7 @@ TavoCalendar.prototype.addMetaData = function(date, metaData) {
                     relTypes.forEach(function (currentType) {
                         if (metaData.usersCount.hasOwnProperty(currentType)) {
                             if (metaData.usersCount[currentType] > 0) {
+                                dayWrapper.attr('data-has' + currentType + 'Students', 1);
                                 var usedItemsMarker = $('<span class="exaplan-relatedUsers-'+currentType+'">' + metaData.usersCount[currentType] + '</span>');
                                 dayWrapper.find('span.tavo-calendar__day-inner').append(usedItemsMarker);
                                 // disable all EVENTS. we need it for handle own events

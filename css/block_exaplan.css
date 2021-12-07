@@ -269,6 +269,13 @@ a.exaplan-admin-modulepart-button.exaplan-date-no-desired:hover {
     color: #ffffff;
 }
 
+/* if at least one student is related - grey background*/
+#block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day[data-hasdesiredStudents = "1"] span.tavo-calendar__day-inner,
+#block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day[data-hasfixedStudents = "1"] span.tavo-calendar__day-inner,
+#block_exaplan_dashboard_calendar .tavo-calendar .tavo-calendar__day[data-hasblockedStudents = "1"] span.tavo-calendar__day-inner {
+    background-color: #cccccc !important;
+}
+
 .adminModuleplanView #block_exaplan_dashboard_calendar {
     margin-bottom: 25px;
 }
