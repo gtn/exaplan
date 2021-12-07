@@ -436,8 +436,17 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
     $states = [BLOCK_EXAPLAN_DATE_PROPOSED, BLOCK_EXAPLAN_DATE_CONFIRMED, BLOCK_EXAPLAN_DATE_BLOCKED];
 
     $rowsCount = 0;
+    $studentFilters = [];
+
+    // if dateId selected - use its moodle ID as a filter for desired users
+    if ($selectedDateId) {
+        $selectedDateData = getTableData('mdl_block_exaplandates', $selectedDateId);
+        if ($selectedDateData['moodleid']) {
+            $studentFilters['moodleid'] = $selectedDateData['moodleid'];
+        }
+    }
+
     $mergedData = block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $date, null, $defaultRegion, $states);
-//    echo "<pre>debug:<strong>lib_render.php:422</strong>\r\n"; print_r($mergedData); echo '</pre>'; exit; // !!!!!!!!!! delete it
 
     $studentRowFilled = false;
     $formsShown = false;
@@ -482,7 +491,8 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
             $rowContent = '';
             $studentShown = false;
 
-            // show user only in these cases:
+            // needs to show or not
+            $studentNeedsToBeShown = false;
             if ($dateData['pUserData']
                 && !in_array($dateData['pUserData']['id'], $shownStudents) // not shown yet
                 && (
@@ -493,6 +503,18 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
                     ($selectedDateId && ($dateData['dateType'] == 'desired' || ($selectedDateId == $dateData['id'] && in_array($dateData['dateType'], ['fixed', 'blocked']))))
                 )
             ) {
+                $studentNeedsToBeShown = true;
+            }
+            // additional filters, regarding selected dateId
+            if ($selectedDateId && $studentFilters) { 
+                $studentNeedsToBeShown = false;
+                if ($dateData['pUserData'] && $dateData['pUserData']['moodleid'] == $studentFilters['moodleid']) {
+                    $studentNeedsToBeShown = true;
+                }
+            }
+
+            // show user only in these cases:
+            if ($studentNeedsToBeShown) {
                 $rowsCount++;
                 $shownStudents[] = $dateData['pUserData']['id'];
                 $studentRowFilled = true;
@@ -589,7 +611,7 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
     }
 
     // list of DESIRED users in this modulepart, but not in this date
-    $additionalDesiredDates = getDesiredDates(null, $modulepartId, null, null, $defaultRegion);//block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId,);
+    $additionalDesiredDates = getDesiredDates(null, $modulepartId, null, null, $defaultRegion);
     // filter by already shown students
     $additionalDesiredDates = array_filter($additionalDesiredDates, function($s) use ($shownStudents) {if (!in_array($s['relatedUserId'], $shownStudents)) return true; return false;});
     if (count($additionalDesiredDates)) {
@@ -599,11 +621,25 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
             $rowContent = '';
             $setRowHight = $defaultRowHeght;
 
-            if ($dateData['relatedUserId']
-                && !in_array($dateData['relatedUserId'], $shownStudents) // not shown yet
+            $pUserId = $dateData['relatedUserId'];
+            $pUserData = getTableData('mdl_block_exaplanpusers', $pUserId);
+
+            // needs to show or not
+            $studentNeedsToBeShown = false;
+            if ($pUserId
+                && !in_array($pUserId, $shownStudents) // not shown yet
             ) {
-                $pUserId = $dateData['relatedUserId'];
-                $pUserData = getTableData('mdl_block_exaplanpusers', $pUserId);
+                $studentNeedsToBeShown = true;
+            }
+            // additional filters, regarding selected dateId
+            if ($selectedDateId && $studentFilters) {
+                $studentNeedsToBeShown = false;
+                if ($pUserData && $pUserData['moodleid'] == $studentFilters['moodleid']) {
+                    $studentNeedsToBeShown = true;
+                }
+            }
+
+            if ($studentNeedsToBeShown) {
                 $rowsCount++;
                 $shownStudents[] = $pUserId;
                 $rowContent .= '<tr>';
@@ -663,6 +699,8 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
 
     return $content;
 }
+
+
 
 
 /**
