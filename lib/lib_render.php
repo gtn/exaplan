@@ -707,8 +707,9 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
     $rowsCount = 0;
     $usersDataColumns = 7;
 
-    $listGroupTitle = function($title) use ($usersDataColumns) {
-        return '<tr><td colspan="'.$usersDataColumns.'" height="20" class="listGroupTitle">' . $title . '</td>';
+    $listGroupTitle = function($listId, $title) use ($usersDataColumns, $CFG) {
+        $selectAllButton = '<img data-listId="'.$listId.'" class="selectAllicon" src="'.$CFG->wwwroot.'/blocks/exaplan/pix/selectAll.png" title="select all in this list" '.($listId == 'mainList' ? 'data-selected="1"' : '').'/>';
+        return '<tr><td data-listId="'.$listId.'" colspan="'.$usersDataColumns.'" height="20" class="listGroupTitle">' . $selectAllButton . ' '.$title . '</td>';
     };
 
     $getListGroupTitle = function($dateType) {
@@ -739,14 +740,14 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
     // header
     $content .= '<thead class="thead-light">';
     $content .= '<tr>';
-    $content .= '<th>'.german_dateformat($date).'</th>';
-    $content .= '<th></th>';
-    $content .= '<th>Organization</th>';
-    $content .= '<th>weitere Termine</th>';
-    $content .= '<th>VM</th>';
-    $content .= '<th>NM</th>';
-    $content .= '<th>TN gefehlt?</th>';
-    $content .= '<th><!-- existing fixed dates --></th>';
+    $content .= '<th class="studentNameColumn">'.german_dateformat($date).'</th>';
+    $content .= '<th class="iconButtonsColumn"></th>';
+    $content .= '<th class="organizationColumn">Organization</th>';
+    $content .= '<th class="desiredDatesColumn">weitere Termine</th>';
+    $content .= '<th class="timeslotCheck'.BLOCK_EXAPLAN_MIDDATE_BEFORE.'">VM</th>';
+    $content .= '<th class="timeslotCheck'.BLOCK_EXAPLAN_MIDDATE_AFTER.'">NM</th>';
+    $content .= '<th class="absentColumn">TN gefehlt?</th>';
+    $content .= '<th class="fixedDatesList"><!-- existing fixed dates --></th>';
     $content .= '<th class="mainForm"></th>';
     $content .= '</tr>';
     $content .= '</thead>';
@@ -794,13 +795,13 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
         $studentFilters['moodleid'] = $dateData['moodleid'];
         $students = getFixedPUsersForDate($selectedDateId);
         if ($students && count($students)) {
-            $content .= $listGroupTitle($getListGroupTitle($dateData['state']));
+            $content .= $listGroupTitle('mainList', $getListGroupTitle($dateData['state']));
             $rowsCount++;
             foreach ($students as $pUserRelation) {
                 $pUserId = $pUserRelation['puserid'];
                 $pUserData = getTableData('mdl_block_exaplanpusers', $pUserId);
                 $shownStudents[] = $pUserId;
-                $content .= rowForStudentInFormAdminDateFixing($pUserData, $dateData, true, $modulepartId, $defaultRegion); // always selected students
+                $content .= rowForStudentInFormAdminDateFixing($pUserData, $dateData, true, $modulepartId, $defaultRegion, 'mainList'); // always selected students
                 $rowsCount++;
             }
         }
@@ -809,13 +810,13 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
     $desiredDates = getDesiredDates(null, $modulepartId, $date, null, $defaultRegion);
     $desiredDates = $filterDesiredDates($desiredDates, $shownStudents, $studentFilters);
     if ($desiredDates && count($desiredDates) > 0) {
-        $content .= $listGroupTitle($getListGroupTitle('desired'));
+        $content .= $listGroupTitle('desiredList', $getListGroupTitle('desired'));
         $rowsCount++;
         foreach ($desiredDates as $dateData) {
             $pUserId = $dateData['relatedUserId'];
             $shownStudents[] = $pUserId;
             $pUserData = getTableData('mdl_block_exaplanpusers', $pUserId);
-            $content .= rowForStudentInFormAdminDateFixing($pUserData, $dateData, false, $modulepartId, $defaultRegion);
+            $content .= rowForStudentInFormAdminDateFixing($pUserData, $dateData, false, $modulepartId, $defaultRegion, 'desiredList');
             $rowsCount++;
         }
     }
@@ -823,15 +824,21 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
     $desiredDates = getDesiredDates(null, $modulepartId, null, null, $defaultRegion);
     $desiredDates = $filterDesiredDates($desiredDates, $shownStudents, $studentFilters);
     if ($desiredDates && count($desiredDates) > 0) {
-        $content .= $listGroupTitle($getListGroupTitle('theSameModulePart'));
+        $content .= $listGroupTitle('desiredOtherList', $getListGroupTitle('theSameModulePart'));
         $rowsCount++;
         foreach ($desiredDates as $dateData) {
             $pUserId = $dateData['relatedUserId'];
             $shownStudents[] = $pUserId;
             $pUserData = getTableData('mdl_block_exaplanpusers', $pUserId);
-            $content .= rowForStudentInFormAdminDateFixing($pUserData, $dateData, false, $modulepartId, $defaultRegion);
+            $content .= rowForStudentInFormAdminDateFixing($pUserData, $dateData, false, $modulepartId, $defaultRegion, 'desiredOtherList');
             $rowsCount++;
         }
+    }
+
+    // bulk functions
+    if ($selectedDateId) {
+        $content .= adminBulkFunctionsFormPart($usersDataColumns);
+        $rowsCount++;
     }
 
     // special empty row (to miss row height counting. Last row will have flexible height)
@@ -846,26 +853,29 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
     return $content;
 }
 
-function rowForStudentInFormAdminDateFixing($pUserData, $dateData, $pUserSelected, $modulepartId, $defaultRegion) {
+function rowForStudentInFormAdminDateFixing($pUserData, $dateData, $pUserSelected, $modulepartId, $defaultRegion, $listId) {
     $pUserId = $pUserData['id'];
     $content = '';
     $defaultRowHeght = 20;
 
-    $content .= '<tr>';
-    $content .= '<td valign="top" height="' . $defaultRowHeght . '">';
+    $content .= '<tr data-listId="'.$listId.'">';
+    $content .= '<td valign="top" height="' . $defaultRowHeght . '" class="studentNameColumn">';
     // fixed or desired
+    $content .= '<label for="fixedUser' . $pUserId . '">';
     $content .= '<input type="checkbox" 
-                                value="1"      
+                                value="1"    
+                                class="fixedPuserCheckbox"  
                                 id = "fixedUser' . $pUserId . '"                               
                                 name = "fixedPuser[' . $pUserId . ']" 
                                 ' . ($pUserSelected ? 'checked = "checked"' : '') . '/>&nbsp;';
-    $content .= '<label for="fixedUser' . $pUserId . '">' .$pUserData['firstname'].' '.$pUserData['lastname'] . '</label>';
+    $content .= $pUserData['firstname'].' '.$pUserData['lastname'] . '</label>';
+//    $content .= '<label for="fixedUser' . $pUserId . '">' .$pUserData['firstname'].' '.$pUserData['lastname'] . '</label>';
     $content .= '</td>';
     // buttons
-    $content .= '<td valign="top">' ./* icon buttons*/ '</td>';
+    $content .= '<td valign="top" class="iconButtonsColumn">' ./* icon buttons*/ '</td>';
     // organization
     $companyName = getTableData('mdl_block_exaplanmoodles', $pUserData['moodleid'], 'companyname');
-    $content .= '<td valign="top">' . $companyName . '</td>';
+    $content .= '<td valign="top" class="organizationColumn">' . $companyName . '</td>';
     // count of desired dates
     $desiredDates = getDesiredDates($pUserId, $modulepartId, null, null, $defaultRegion);
     if (count($desiredDates) > 0) {
@@ -873,7 +883,7 @@ function rowForStudentInFormAdminDateFixing($pUserData, $dateData, $pUserSelecte
     } else {
         $desiredDatesCount = '';
     }
-    $content .= '<td valign="top">' . $desiredDatesCount . '</td>';
+    $content .= '<td valign="top" class="desiredDatesColumn">' . $desiredDatesCount . '</td>';
     // midDay type checkboxes
     $content .= '<td valign="top" class="timeslotCheck'.BLOCK_EXAPLAN_MIDDATE_BEFORE.'">';
     $content .= '<input type="checkbox" disabled readonly onclick="return false;"
@@ -897,7 +907,7 @@ function rowForStudentInFormAdminDateFixing($pUserData, $dateData, $pUserSelecte
             $absent = ' checked = "checked" ';
         }
     }
-    $content .= '<td style="text-align: center;  vertical-align: top;">
+    $content .= '<td style="text-align: center;  vertical-align: top;" class="absentColumn">
                         <input type="checkbox" 
                                 value="1"                                     
                                 name="absentPuser[' . $pUserId . ']" 
@@ -1033,11 +1043,40 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
         $content .= '<button name="date_block" class="btn btn-info" type="submit" value="date_block" >Termin blocken</button>';
     }
     $content .= '</td>';
-    $content .= '<td align="right" colspan="3"><button name="date_save" class="btn btn-success" type="submit" value="date_save" >Termin fixieren</button></td>';
+    $content .= '<td align="right" colspan="3"><button name="date_save" class="btn btn-success" type="submit" value="date_save" >Änderung speichern</button></td>';
     $content .= '</tr>';
 
     $content .= '</table>';
 
+    return $content;
+}
+
+function adminBulkFunctionsFormPart($usersDataColumns) {
+    $content = '';
+    $content .= '<tr><td colspan="' . $usersDataColumns . '" class="bulkFunctions">';
+    $content .= '<table class="bulkFunctionsForm" border="0">';
+    $content .= '<tr>';
+    $content .= '<td align="right">mit ausgewähtlen TN:</td>';
+    $content .= '<td>';
+    $bulkFunctions = [
+        '' => 'Aktion auswählen',
+        'studentsAdd' => 'TN hinzufügen',
+        'studentsRemove' => 'TN entfernen',
+        'sendMessage' => 'Nachricht senden',
+    ];
+    $content .= '<select id="bulk_function" class="form-control" name="bulk_function">';
+    foreach ($bulkFunctions as $value => $title) {
+        $content .= '<option value="'.$value.'">'.$title.'</option>';
+    }
+    $content .= '</select>';
+    $content .= '</td>';
+    $content .= '<td align="left" width="15%"><button name="bulk_go" class="btn btn-info" type="submit" value="bulk_go" >go!</button></td>';
+    $content .= '</tr>';
+    $content .= '<tr id="bulkMessage" style="display: none;">';
+    $content .= '<td align="right">Nachricht:</td>';
+    $content .= '<td colspan="2"><textarea name="bulk_message" id="bulk_message" class="form-control" placeholder="" ></textarea></td>';
+    $content .= '</tr>';
+    $content .= '</table>';
     return $content;
 }
 

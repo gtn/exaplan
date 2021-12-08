@@ -284,37 +284,37 @@ table.exaplan-adminModulepartView {
     width: 100%;
 }
 
-table.exaplan-adminModulepartView th:nth-child(1),
-table.exaplan-adminModulepartView td:nth-child(1) {
+table.exaplan-adminModulepartView th.studentNameColumn,
+table.exaplan-adminModulepartView td.studentNameColumn {
     width: 15% !important;
 }
-table.exaplan-adminModulepartView th:nth-child(2),
-table.exaplan-adminModulepartView td:nth-child(2) {
+table.exaplan-adminModulepartView th.iconButtonsColumn,
+table.exaplan-adminModulepartView td.iconButtonsColumn {
     width: 10% !important;
 }
-table.exaplan-adminModulepartView th:nth-child(3),
-table.exaplan-adminModulepartView td:nth-child(3) {
+table.exaplan-adminModulepartView th.organizationColumn,
+table.exaplan-adminModulepartView td.organizationColumn {
     width: 15% !important;
 }
-table.exaplan-adminModulepartView th:nth-child(4),
-table.exaplan-adminModulepartView td:nth-child(4) {
+table.exaplan-adminModulepartView th.desiredDatesColumn,
+table.exaplan-adminModulepartView td.desiredDatesColumn {
     width: 15% !important;
 }
-table.exaplan-adminModulepartView th:nth-child(7),
-table.exaplan-adminModulepartView td:nth-child(7) {
+table.exaplan-adminModulepartView td.timeslotCheck1,
+table.exaplan-adminModulepartView td.timeslotCheck2 {
+    width: 15px;
+}
+table.exaplan-adminModulepartView th.absentColumn,
+table.exaplan-adminModulepartView td.absentColumn {
     width: 10% !important;
 }
-table.exaplan-adminModulepartView th:nth-child(8),
-table.exaplan-adminModulepartView td:nth-child(8) {
+table.exaplan-adminModulepartView th.fixedDatesList,
+table.exaplan-adminModulepartView td.fixedDatesList {
     width: 10% !important;
 }
 table.exaplan-adminModulepartView th.mainForm,
 table.exaplan-adminModulepartView td.mainForm {
     width: 40% !important;
-}
-table.exaplan-adminModulepartView td.timeslotCheck1,
-table.exaplan-adminModulepartView td.timeslotCheck2 {
-    width: 15px;
 }
 
 table.exaplan-date-details-table {
@@ -630,3 +630,21 @@ body {
     border: none !important;
 }
 
+.bulkFunctionsForm {
+    width: 100%;
+    background-color: rgb(41, 171, 226, 0.05);
+}
+.bulkFunctionsForm td {
+    border: none;
+    vertical-align: middle;
+}
+
+.selectAllicon {
+    opacity: 0.25;
+    cursor: pointer;
+    margin-right: 3px;
+    width: 16px;
+}
+.selectAllicon:hover {
+    opacity: 0.5;
+}

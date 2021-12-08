@@ -65,63 +65,109 @@ switch ($action) {
         $absents = optional_param_array('absentPuser', [], PARAM_INT);
         $absents = array_keys($absents);
 
-        // get timeslot for fixed date
-        // get from selected (1, 2 or both)
-        // selected types are from database. not from html form
-        $useFormMiddateTypes = false;
-        $middayTypes = [];
-        foreach ($students as $student) {
-            $desiredDate = getDesiredDates($student, $modulepartid, $dateTSstart);
-            if ($middayTypes) { // if this user already has not desired dates for this modulepart - it is fix date editing.
-                $useFormMiddateTypes = true;
-                $middayTypes[] = $desiredDate[0]['timeslot'];
-            }
+        $isBulkAction = false;
+        if ($bulkGo = optional_param('bulk_go', '', PARAM_TEXT)) {
+            $isBulkAction = true;
         }
-        if ($useFormMiddateTypes) {
-            // found at least one timeslot
-            $middayTypes = array_unique($middayTypes);
-            if (!$middayTypes || count($middayTypes) > 1) {
-                $middayType = BLOCK_EXAPLAN_MIDDATE_ALL;
-            } else {
-                $middayType = reset($middayTypes);
+
+        if ($isBulkAction && $dateId) {
+            $dateData = getTableData('mdl_block_exaplandates', $dateId);
+            $bulkAction = required_param('bulk_function', PARAM_TEXT);
+            switch ($bulkAction) {
+                case 'studentsAdd':
+                    if ($students && count($students)) {
+                        foreach ($students as $student) {
+                            $absent = 0;
+                            if (in_array($student, $absents)) {
+                                $absent = 1;
+                            }
+                            addPUserToDate($dateId, $student, $absent, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
+                            // delete (disable) ALL other desired dates (not for 'blocked' dates)
+                            if ($dateData['state'] != BLOCK_EXAPLAN_DATE_BLOCKED) {
+                                removeDesiredDate($modulepartid, $student);
+                            }
+                        }
+                    }
+                    break;
+                case 'studentsRemove':
+                    if ($students && count($students)) {
+                        foreach ($students as $student) {
+                            removePUserFromDate($dateId, $student, $modulepartid);
+                        }
+                    }
+                    break;
+                case 'sendMessage':
+                    $bulkMessage = optional_param('bulk_message', '', PARAM_TEXT);
+                    if ($bulkMessage && $students && count($students)) {
+                        foreach ($students as $student) {
+                            block_exaplan_create_plannotification($pUserId, $student, $bulkMessage);
+                        }
+                    }
+                    break;
             }
         } else {
-            // get from existing date
-            $tempDate = getPrefferedDate($modulepartid, $dateTS);
-            if ($tempDate) {
-                // use existing timeslot
-                $middayType = $tempDate['timeslot'];
+            // get timeslot for fixed date
+            // get from selected (1, 2 or both)
+            // selected types are from database. not from html form
+            $useFormMiddateTypes = false;
+            $middayTypes = [];
+            foreach ($students as $student) {
+                $desiredDate = getDesiredDates($student, $modulepartid, $dateTSstart);
+                if ($middayTypes) { // if this user already has not desired dates for this modulepart - it is fix date editing.
+                    $useFormMiddateTypes = true;
+                    $middayTypes[] = $desiredDate[0]['timeslot'];
+                }
+            }
+            if ($useFormMiddateTypes) {
+                // found at least one timeslot
+                $middayTypes = array_unique($middayTypes);
+                if (!$middayTypes || count($middayTypes) > 1) {
+                    $middayType = BLOCK_EXAPLAN_MIDDATE_ALL;
+                } else {
+                    $middayType = reset($middayTypes);
+                }
             } else {
-                // new date. use default
-                $middayType = BLOCK_EXAPLAN_MIDDATE_ALL;
+                // get from existing date
+                $tempDate = getPrefferedDate($modulepartid, $dateTS);
+                if ($tempDate) {
+                    // use existing timeslot
+                    $middayType = $tempDate['timeslot'];
+                } else {
+                    // new date. use default
+                    $middayType = BLOCK_EXAPLAN_MIDDATE_ALL;
+                }
+            }
+
+            $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, $state);
+
+            // update students only for 'fixed dates'
+            if ($state == BLOCK_EXAPLAN_DATE_CONFIRMED) {
+                // register / unregister students
+                $registeredUsers = getFixedPUsersForDate($dateId);
+                $registeredUsersIds = array_map(function ($u) {
+                    return $u['puserid'];
+                }, $registeredUsers);
+                foreach ($students as $student) {
+                    if (($key = array_search($student, $registeredUsersIds)) !== false) {
+                        unset($registeredUsersIds[$key]);
+                    }
+                    $absent = 0;
+                    if (in_array($student, $absents)) {
+                        $absent = 1;
+                    }
+                    addPUserToDate($dateId, $student, $absent, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
+                    // delete ALL other desired dates (not for 'blocked' dates)
+                    removeDesiredDate($modulepartid, $student);
+                }
+                // unregister if it was unchecked
+                if ($registeredUsersIds && count($registeredUsersIds) > 0) {
+                    foreach ($registeredUsersIds as $puserid) {
+                        removePUserFromDate($dateId, $puserid, $modulepartid);
+                    }
+                }
             }
         }
 
-        $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, $state);
-
-        // register / unregister students
-        $registeredUsers = getFixedPUsersForDate($dateId);
-        $registeredUsersIds = array_map(function($u) {return $u['puserid'];}, $registeredUsers);
-        foreach ($students as $student) {
-            if (($key = array_search($student, $registeredUsersIds)) !== false) {
-                unset($registeredUsersIds[$key]);
-            }
-            $absent = 0;
-            if (in_array($student, $absents)) {
-                $absent = 1;
-            }
-            addPUserToDate($dateId, $student, $absent, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
-            // delete ALL other desired dates (not for 'blocked' dates)
-            if ($state != BLOCK_EXAPLAN_DATE_BLOCKED) {
-                removeDesiredDate($modulepartid, $student);
-            }
-        }
-        // unregister if it was unchecked
-        if ($registeredUsersIds && count($registeredUsersIds) > 0) {
-            foreach ($registeredUsersIds as $puserid) {
-                removePUserFromDate($dateId, $puserid, $modulepartid);
-            }
-        }
         $dateId = 0; // unlink shown form from current dateId. So the admin will be able to create a new date instead of edit it
         // redirect to admin view (without this we have wrong shown data)
         $url = new moodle_url('/blocks/exaplan/admin.php', array('mpid' => $modulepartid, 'date' => $date, 'region' => $region, 'dashboardType' => $dashboardType));

@@ -263,6 +263,28 @@ $(function () {
         });
     }
 
+    // bulk action selected
+    $('body').on('change', '[name="bulk_function"]', function (e) {
+        var selectedAction = $(this).val();
+        if (selectedAction == 'sendMessage') {
+            $('#bulkMessage').show();
+        } else {
+            $('#bulkMessage').hide();
+        }
+    });
+
+    // select all students in the sublist
+    $('body').on('click', '.selectAllicon', function (e) {
+        var currState = $(this).attr('data-selected');
+        var currSubList = $(this).attr('data-listId');
+        if (typeof currState === 'undefined' || currState == 0) {
+            $('tr[data-listId="'+currSubList+'"] .fixedPuserCheckbox:checkbox').prop('checked', true);
+            $(this).attr('data-selected', 1);
+        } else {
+            $('tr[data-listId="'+currSubList+'"] .fixedPuserCheckbox:checkbox').prop('checked', false);
+            $(this).attr('data-selected', 0);
+        }
+    });
 
 });
 
