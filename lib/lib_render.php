@@ -836,8 +836,8 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
     }
 
     // bulk functions
-    if ($selectedDateId) {
-        $content .= adminBulkFunctionsFormPart($usersDataColumns);
+    if ($selectedDateId ) {
+        $content .= adminBulkFunctionsFormPart($usersDataColumns, $selectedDateId);
         $rowsCount++;
     }
 
@@ -854,6 +854,8 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
 }
 
 function rowForStudentInFormAdminDateFixing($pUserData, $dateData, $pUserSelected, $modulepartId, $defaultRegion, $listId) {
+    global $CFG;
+
     $pUserId = $pUserData['id'];
     $content = '';
     $defaultRowHeght = 20;
@@ -904,16 +906,18 @@ function rowForStudentInFormAdminDateFixing($pUserData, $dateData, $pUserSelecte
     $absent = '';
     if ($relationData = isPuserIsFixedForDate($pUserId, $dateData['id'], true)) {
         if ($relationData['absent']) {
-            $absent = ' checked = "checked" ';
+            $absent = '<img class="absentStudent" src="'.$CFG->wwwroot.'/blocks/exaplan/pix/absent.png" title="TN gefehlt" />';
+//            $absent = ' checked = "checked" ';
         }
     }
-    $content .= '<td style="text-align: center;  vertical-align: top;" class="absentColumn">
-                        <input type="hidden" value="0" name="absentPuser[' . $pUserId . ']" />
+    $content .= '<td style="text-align: center;  vertical-align: top;" class="absentColumn">';
+    $content .= $absent;
+/*    $content .= '<input type="hidden" value="0" name="absentPuser[' . $pUserId . ']" />
                         <input type="checkbox" 
                                 value="1"                                     
                                 name="absentPuser[' . $pUserId . ']" 
-                                ' . $absent . '/>
-                </td>';
+                                ' . $absent . '/>'*/;
+    $content .= '</td>';
 
     $content .= '</tr>';
 
@@ -1041,13 +1045,13 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
     $content .= '<tr>';
     $content .= '<td align="left" colspan="3">';
     if (!@$dateRec['state'] || @$dateRec['state'] == BLOCK_EXAPLAN_DATE_BLOCKED) {
-        $content .= '<button name="date_block" class="btn btn-info" type="submit" value="date_block" >Termin blocken</button>';
+        $content .= '<button name="date_block" class="btn btn-info btn-date-block" type="submit" value="date_block" >Termin blocken</button>';
     }
     $content .= '</td>';
     $content .= '<td align="right" colspan="3">';
     if (!$dateRec || $dateRec['state'] != BLOCK_EXAPLAN_DATE_CANCELED) {
         // do not show save buttons for canceled date
-        $content .= '<button name="date_save" class="btn btn-success" type="submit" value="date_save" >Änderung speichern</button>';
+        $content .= '<button name="date_save" class="btn btn-success btn-date-save" type="submit" value="date_save" >Änderung speichern</button>';
     }
     $content .= '</td>';
     $content .= '</tr>';
@@ -1058,10 +1062,15 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
         $content .= '<td align="left" colspan="3">';
         $content .= '</td>';
         $cancelButtonTitle = 'Termin absagen';
+        $buttonDisabled = '';
         if ($dateRec['state'] == BLOCK_EXAPLAN_DATE_BLOCKED) {
             $cancelButtonTitle = 'Blockierung aufheben';
+        } elseif ($dateRec['state'] == BLOCK_EXAPLAN_DATE_CANCELED) {
+            $cancelButtonTitle = 'Termin abgesagt';
+            $buttonDisabled = ' disabled = "disabled" ';
         }
-        $content .= '<td align="right" colspan="3"><button name="date_cancel" class="btn btn-default btn-date-cancel" type="submit" value="date_cancel">'.$cancelButtonTitle.'</button></td>';
+        $content .= '<td align="right" colspan="3">';
+        $content .= '<button name="date_cancel" class="btn btn-default btn-date-cancel" type="submit" value="date_cancel" '.$buttonDisabled.'>'.$cancelButtonTitle.'</button></td>';
         $content .= '</tr>';
     }
 
@@ -1070,9 +1079,9 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
     return $content;
 }
 
-function adminBulkFunctionsFormPart($usersDataColumns) {
+function adminBulkFunctionsFormPart($usersDataColumnsCount, $dateId) {
     $content = '';
-    $content .= '<tr><td colspan="' . $usersDataColumns . '" class="bulkFunctions">';
+    $content .= '<tr><td colspan="' . $usersDataColumnsCount . '" class="bulkFunctions">';
     $content .= '<table class="bulkFunctionsForm" border="0">';
     $content .= '<tr>';
     $content .= '<td align="right">mit ausgewähtlen TN:</td>';
@@ -1081,15 +1090,23 @@ function adminBulkFunctionsFormPart($usersDataColumns) {
         '' => 'Aktion auswählen',
         'studentsAdd' => 'TN hinzufügen',
         'studentsRemove' => 'TN entfernen',
+        'studentsAbsent' => 'TN gefehlt',
         'sendMessage' => 'Nachricht senden',
     ];
+    $dateData = getTableData('mdl_block_exaplandates', $dateId);
+    // hide some actions for date states
+    if ($dateData['state'] != BLOCK_EXAPLAN_DATE_FIXED) {
+        unset($bulkFunctions['studentsAdd']);
+        unset($bulkFunctions['studentsRemove']);
+        unset($bulkFunctions['studentsAbsent']);
+    }
     $content .= '<select id="bulk_function" class="form-control" name="bulk_function">';
     foreach ($bulkFunctions as $value => $title) {
         $content .= '<option value="'.$value.'">'.$title.'</option>';
     }
     $content .= '</select>';
     $content .= '</td>';
-    $content .= '<td align="left" width="15%"><button name="bulk_go" class="btn btn-info" type="submit" value="bulk_go" >go!</button></td>';
+    $content .= '<td align="left" width="15%"><button name="bulk_go" class="btn btn-info btn-bulkaction-go" type="submit" value="bulk_go" >go!</button></td>';
     $content .= '</tr>';
     $content .= '<tr id="bulkMessage" style="display: none;">';
     $content .= '<td align="right">Nachricht:</td>';
@@ -1323,17 +1340,17 @@ function printAdminDashboard($dashboardType = 'default')
     // buttons to dashboards
     switch ($dashboardType) {
         case 'inProcess':
-            $content .= '<a href="'.$PAGE->url.'?dashboardType=default" role="button" class="btn btn-info"> Übersicht Anfragen </a>&nbsp;';
-            $content .= '<a href="'.$PAGE->url.'?dashboardType=past" role="button" class="btn btn-info"> Übersicht: zurückliegende Termine </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType=default" role="button" class="btn btn-info btn-to-dashboard"> Übersicht Anfragen </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType=past" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: zurückliegende Termine </a>&nbsp;';
             break;
         case 'past':
-            $content .= '<a href="'.$PAGE->url.'?dashboardType=default" role="button" class="btn btn-info"> Übersicht Anfragen </a>&nbsp;';
-            $content .= '<a href="'.$PAGE->url.'?dashboardType=inProcess" role="button" class="btn btn-info"> Übersicht: in Bearbeitung </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType=default" role="button" class="btn btn-info btn-to-dashboard"> Übersicht Anfragen </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType=inProcess" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: in Bearbeitung </a>&nbsp;';
             break;
         case 'default':
         default:
-            $content .= '<a href="'.$PAGE->url.'?dashboardType=inProcess" role="button" class="btn btn-info"> Übersicht: in Bearbeitung </a>&nbsp;';
-            $content .= '<a href="'.$PAGE->url.'?dashboardType=past" role="button" class="btn btn-info"> Übersicht: zurückliegende Termine </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType=inProcess" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: in Bearbeitung </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType=past" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: zurückliegende Termine </a>&nbsp;';
             break;
     }
     $content .= '</div>';

@@ -307,6 +307,7 @@ table.exaplan-adminModulepartView td.timeslotCheck2 {
 table.exaplan-adminModulepartView th.absentColumn,
 table.exaplan-adminModulepartView td.absentColumn {
     width: 10% !important;
+    text-align: center !important;
 }
 table.exaplan-adminModulepartView th.fixedDatesList,
 table.exaplan-adminModulepartView td.fixedDatesList {
@@ -486,10 +487,14 @@ body {
 #exaplan .btn-desired,
 #exaplan .btn-fixed,
 #exaplan .btn-blocked,
-#exaplan .btn-canceled {
+#exaplan .btn-canceled,
+#exaplan .btn-date-save,
+#exaplan .btn-date-block,
+#exaplan .btn-date-cancel,
+#exaplan .btn-bulkaction-go,
+#exaplan .btn-to-dashboard,
+.block_exaplan .btn-to-dashboard {
     font-family: Arial;
-    color: #ffffff;
-    background: #C20530;
     text-decoration: none;
     border-style: none;
     border-radius: 4px;
@@ -497,6 +502,15 @@ body {
     padding-right: 20px;
     font-size: 0.6rem;
     line-height: 1.2rem;
+}
+
+#exaplan .btn-danger,
+#exaplan .btn-desired,
+#exaplan .btn-fixed,
+#exaplan .btn-blocked,
+#exaplan .btn-canceled {
+    color: #ffffff;
+    background: #C20530;
 }
 #exaplan .btn-desired {
     background: rgb(246, 184, 12, 0.25);

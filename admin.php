@@ -66,7 +66,7 @@ switch ($action) {
 
         $modulepart = getModulepartByModulepartid($modulepartid);
         $moduleset = getModulesetByModulesetid($modulepart["modulesetid"]);
-        $absents = optional_param_array('absentPuser', [], PARAM_INT);
+//        $absents = optional_param_array('absentPuser', [], PARAM_INT);
 //        $absents = array_keys($absents);
 
         $isBulkAction = false;
@@ -81,10 +81,7 @@ switch ($action) {
                 case 'studentsAdd':
                     if ($students && count($students)) {
                         foreach ($students as $student) {
-                            $absent = 0;
-                            if (array_key_exists($student, $absents) && $absents[$student]) {
-                                $absent = 1;
-                            }
+                            $absent = 0; // add with absent = 0
                             addPUserToDate($dateId, $student, $absent, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
                             // delete (disable) ALL other desired dates (not for 'blocked' dates)
                             if ($dateData['state'] != BLOCK_EXAPLAN_DATE_BLOCKED) {
@@ -97,6 +94,20 @@ switch ($action) {
                     if ($students && count($students)) {
                         foreach ($students as $student) {
                             removePUserFromDate($dateId, $student, $modulepartid);
+                            // send messages
+                            $pUserData = getTableData('mdl_block_exaplanpusers', $student);
+                            $text = 'Lieber '.$pUserData['firstname'].', du wurdest im Kurs '.getFixedDateTitle($dateId).' ausgetragen. Bitte mach jetzt folgendes:';
+                            block_exaplan_create_plannotification($pUserId, $student, $text);
+                        }
+                    }
+                    break;
+                case 'studentsAbsent':
+                    // if the user is not linked yet to this date - it will be linked now and setted up absent = 1
+                    if ($students && count($students)) {
+                        $sendNotificationToStudent = false; // TODO: message?
+                        foreach ($students as $student) {
+                            $absent = 1;
+                            addPUserToDate($dateId, $student, $absent, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
                         }
                     }
                     break;
@@ -156,6 +167,10 @@ switch ($action) {
                         }, $registeredUsers);
                         foreach ($registeredUsersIds as $studentId) {
                             removePUserFromDate($dateId, $studentId, $modulepartid);
+                            // send messages
+                            $pUserData = getTableData('mdl_block_exaplanpusers', $studentId);
+                            $text = 'Lieber '.$pUserData['firstname'].', leider wurde der Kurs '.getFixedDateTitle($dateId).' abgesagt. Deine Planung ist noch da, bitte plane den Rest neu.';
+                            block_exaplan_create_plannotification($pUserId, $studentId, $text);
                         }
                         // set 'canceled'
                         $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, BLOCK_EXAPLAN_DATE_CANCELED);
@@ -170,17 +185,33 @@ switch ($action) {
 
             // update students only for 'fixed dates'
             // from now working with users moved into bulk functions
-            // But kept ABSENT updating!!!
+            // But kept ABSENT updating!!! <- disabled again :-)
             if ($state == BLOCK_EXAPLAN_DATE_FIXED) {
                 $registeredUsers = getFixedPUsersForDate($dateId);
-                $registeredUsersIds = array_map(function ($u) {
+                /*$registeredUsersIds = array_map(function ($u) {
                     return $u['puserid'];
                 }, $registeredUsers);
                 foreach ($absents as $sId => $absentVal) {
                     // change absent only for already registered users
                     if (in_array($sId, $registeredUsersIds)) {
-                        addPUserToDate($dateId, $sId, $absentVal, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
+                        addPUserToDate($dateId, $sId, $absentVal, $pUserId, $date, $moduleset, $modulepart, true, false);
                     }
+                }*/
+                $dateData = getTableData('mdl_block_exaplandates', $dateId);
+                // send messages to students
+                foreach ($registeredUsers as $registeredStudent) {
+                    $pUserData = getTableData('mdl_block_exaplanpusers', $registeredStudent['puserid']);
+                    $trainerData = getTableData('mdl_block_exaplanpusers', $dateData['trainerpuserid']);
+                    $text = 'Lieber '.$pUserData['firstname'].', der Kurs '.getFixedDateTitle($dateId).' hat sich geändert, hier sind die neuen Kursdaten: '."\r\n".
+                        'DF Ort: '.getTableData('mdl_block_exaplanmoodles', $dateData['moodleid'], 'companyname')."\r\n".
+                        'Region: '.getRegionTitle($dateData['region'])."\r\n".
+                        'DF Art: '.getIsOnlineTitle($dateData['isonline'])."\r\n".
+                        'Trainer: '.$trainerData['firstname'].' '.$trainerData['lastname']."\r\n".
+                        'Location: '.$dateData['location']."\r\n".
+                        'Uhrzeit: '.date('H:i', $dateData['starttime'])."\r\n".
+                        'Dauer: '.$dateData['duration']."\r\n".
+                        'Notiz: '.$dateData['comment']."\r\n";
+                    block_exaplan_create_plannotification($pUserId, $registeredStudent['puserid'], $text);
                 }
             }
             /*if ($state == BLOCK_EXAPLAN_DATE_CONFIRMED) {
@@ -232,7 +263,7 @@ if ($isadmin) {
     echo printAdminModulepartView($modulepartid, $dateGP, $region, $dateId);
 }
 
-echo '<a href="'.$CFG->wwwroot.'/my/'.($dashboardType ? '?dashboardType='.$dashboardType : '').'" role="button" class="btn btn-info"> zurück zum Dashboard </a>';
+echo '<a href="'.$CFG->wwwroot.'/my/'.($dashboardType ? '?dashboardType='.$dashboardType : '').'" role="button" class="btn btn-info btn-to-dashboard"> zurück zum Dashboard </a>';
 
 echo '</div>';
 

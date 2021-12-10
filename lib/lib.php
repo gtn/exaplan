@@ -753,13 +753,13 @@ function getRegionTitle($region, $short = false) {
     return $full[$region];
 }
 
-function getIsOnlineTitle($region, $short = false) {
+function getIsOnlineTitle($type, $short = false) {
     $shorts = ['0' => 'Präsenz', '1' => 'Online'];
     $full = ['0' => 'Präsenz', '1' => 'Online'];
     if ($short) {
-        return $shorts[$region];
+        return @$shorts[$type];
     }
-    return $full[$region];
+    return @$full[$type];
 }
 
 function german_dateformat($date){
@@ -774,4 +774,14 @@ function getDateStateCodeByIndex($index) {
         BLOCK_EXAPLAN_DATE_CANCELED => 'canceled',
     ];
     return @$states[$index];
+}
+
+// combine diff data to get fixed date title
+function getFixedDateTitle($dateId) {
+    $title = '';
+    $dateData = getTableData('mdl_block_exaplandates', $dateId);
+    $title .= date('Y-m-d', $dateData['date']).': ';
+    $title .= getTableData('mdl_block_exaplanmoodles', $dateData['moodleid'], 'companyname');
+
+    return $title;
 }

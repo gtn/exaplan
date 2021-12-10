@@ -555,7 +555,10 @@ function addPUserToDate($dateid, $puserid, $absent = 0, $creatorpuserid=null, $d
 
     // create notification for users
     if ($creatorpuserid && $date && $moduleset && $modulepart && $sendNotification) {
-        block_exaplan_create_plannotification($creatorpuserid, $puserid, "Termin für Modulset ".$moduleset["title"].", Modulteil ".$modulepart["title"]." fixiert für ".$date.".");
+        $pUserData = getTableData('mdl_block_exaplanpusers', $puserid);
+        $dateData = getTableData('mdl_block_exaplandates', $dateid);
+        $text = 'Lieber '.$pUserData['firstname'].', du wurdest im Kurs '.getFixedDateTitle($dateid).' eingetragen: Dein Kurs findet am '.date('Y-m-d', $dateData['date']).' '.date('H:i', $dateData['starttime']).' statt';
+        block_exaplan_create_plannotification($creatorpuserid, $puserid, $text);
     }
 
 

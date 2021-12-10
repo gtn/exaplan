@@ -63,7 +63,7 @@ if (!$modulepartid || $isadmin) {
 }
 
 $content .= '<br>';
-$content .= '<a href="'.$CFG->wwwroot.'/my/" role="button" class="btn btn-info"> zurück zum Dashboard </a>';
+$content .= '<a href="'.$CFG->wwwroot.'/my/" role="button" class="btn btn-info btn-to-dashboard"> zurück zum Dashboard </a>';
 
 $content .= '</div>';
 
