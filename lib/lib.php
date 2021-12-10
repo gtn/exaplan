@@ -30,9 +30,10 @@ const BLOCK_EXAPLAN_DB_PLANNOTIFICATIONS = 'block_EXAPLANNOTIFICATIONS';
 /**
  * DATE STATES
  */
-const BLOCK_EXAPLAN_DATE_PROPOSED = 1;
-const BLOCK_EXAPLAN_DATE_CONFIRMED = 2;
+const BLOCK_EXAPLAN_DATE_DESIRED = 1;
+const BLOCK_EXAPLAN_DATE_FIXED = 2;
 const BLOCK_EXAPLAN_DATE_BLOCKED = 3;
+const BLOCK_EXAPLAN_DATE_CANCELED = 4;
 
 /**
  * MIDDATE TYPES
@@ -349,7 +350,7 @@ function block_exaplan_confirm_date($dateid)
     }
 
     $date = $DB->get_record(BLOCK_EXAPLAN_DB_DATES, array('id' => $dateid));
-    $date->state = BLOCK_EXAPLAN_DATE_CONFIRMED;
+    $date->state = BLOCK_EXAPLAN_DATE_FIXED;
 
     return $DB->update_record(BLOCK_EXAPLAN_DB_DATES, $date);
 }
@@ -526,7 +527,7 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
         $modulepartIdforFixDates = null;
     }
 
-    $states = [BLOCK_EXAPLAN_DATE_PROPOSED, BLOCK_EXAPLAN_DATE_CONFIRMED, BLOCK_EXAPLAN_DATE_BLOCKED];
+    $states = [BLOCK_EXAPLAN_DATE_DESIRED, BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED];
     $withEmptyStudents = true;
     if (!block_exaplan_is_admin()) {
         $withEmptyStudents = false;
@@ -556,6 +557,7 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
     $selectedDates = [];
 
     foreach ($dates as $date) {
+        $dateTypeCode = getDateStateCodeByIndex($date['dateType']);
         $dateIndex = $date['date'];
         $dateIndex = date('Y-m-d', $dateIndex);
         if (!array_key_exists($dateIndex, $usersForDay)) {
@@ -566,7 +568,7 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
                 'date' => $dateIndex,
                 'middayType' => getTimeslotName($date['timeslot'], true),
                 'usedItems' => 0,   // TODO: possible different counters: dates/moduleparts
-                'dateType' => $date['dateType'], // needed?
+                'dateType' => $dateTypeCode, // needed?
                 'desired' => false,
                 'fixed' => false,
                 'blocked' => false,
@@ -579,13 +581,13 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
             $selectedDates[$dateIndex]['usedItems'] += 1;
         }*/
         // count of desired/fixed/blocked users
-        if (@$date['relatedUserId'] && !in_array($date['relatedUserId'], $usersForDay[$dateIndex][$date['dateType']])) {
-            $usersForDay[$dateIndex][$date['dateType']][] = $date['relatedUserId'];
-            $selectedDates[$dateIndex]['usersCount'][$date['dateType']] += 1;
+        if (@$date['relatedUserId'] && !in_array($date['relatedUserId'], $usersForDay[$dateIndex][$dateTypeCode])) {
+            $usersForDay[$dateIndex][$dateTypeCode][] = $date['relatedUserId'];
+            $selectedDates[$dateIndex]['usersCount'][$dateTypeCode] += 1;
         }
         $selectedDates[$dateIndex]['moduleparts'][] = $date['modulepartid'];
         $selectedDates[$dateIndex]['readonly'] = $readonly; // TODO: another rules for readonly days?
-        $selectedDates[$dateIndex][$date['dateType']] = true;
+        $selectedDates[$dateIndex][$dateTypeCode] = true;
     }
 
     $selectedDates = array_values($selectedDates); // clean keys. needed for correct JS function later
@@ -648,7 +650,7 @@ function block_exaplan_get_admindata_for_modulepartid_and_date($modulepartId, $d
                 // insert only first user's instance
                 $pUserData = getTableData('mdl_block_exaplanpusers', $dateData['relatedUserId']);
                 // 'blocked' dates are not disable desired dates. So, such sers can be shown again
-                if ($dateData['dateType'] != 'blocked') {
+                if ($dateData['dateType'] != BLOCK_EXAPLAN_DATE_BLOCKED) {
                     $usedUsers[] = $dateData['relatedUserId'];
                 }
             }
@@ -762,4 +764,14 @@ function getIsOnlineTitle($region, $short = false) {
 
 function german_dateformat($date){
 	return date("d.m.Y", strtotime($date));
+}
+
+function getDateStateCodeByIndex($index) {
+    $states = [
+        BLOCK_EXAPLAN_DATE_DESIRED => 'desired',
+        BLOCK_EXAPLAN_DATE_FIXED => 'fixed',
+        BLOCK_EXAPLAN_DATE_BLOCKED => 'blocked',
+        BLOCK_EXAPLAN_DATE_CANCELED => 'canceled',
+    ];
+    return @$states[$index];
 }

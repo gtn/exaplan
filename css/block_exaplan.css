@@ -483,9 +483,10 @@ body {
 }
 
 #exaplan .btn-danger,
-#exaplan .btn-desire,
-#exaplan .btn-fix,
-#exaplan .btn-blocked {
+#exaplan .btn-desired,
+#exaplan .btn-fixed,
+#exaplan .btn-blocked,
+#exaplan .btn-canceled {
     font-family: Arial;
     color: #ffffff;
     background: #C20530;
@@ -497,17 +498,21 @@ body {
     font-size: 0.6rem;
     line-height: 1.2rem;
 }
-#exaplan .btn-desire {
+#exaplan .btn-desired {
     background: rgb(246, 184, 12, 0.25);
     color: #000000;
 }
-#exaplan .btn-fix {
+#exaplan .btn-fixed {
     background: rgb(0, 83, 0, 1);
     color: #ffffff;
 }
 #exaplan .btn-blocked {
     background-color: #8CD0F2;
     color: #253b48;
+}
+#exaplan .btn-canceled {
+    background: #666666;
+    color: #ffffff;
 }
 
 #exaplan .btn-outline-danger {
@@ -580,14 +585,14 @@ body {
     white-space: nowrap;
     width: 100%;
     text-align: left;
-    background: #9CDAA4;
+    /*background: #9CDAA4;*/
     color: #ffffff;
 }
 
-#exaplan .btn-fix.exaplan-existing-date {
+#exaplan .btn-fixed.exaplan-existing-date {
     background: #9CDAA4;
 }
-#exaplan .exaplan-existing-date-selected .btn-fix.exaplan-existing-date {
+#exaplan .exaplan-existing-date-selected .btn-fixed.exaplan-existing-date {
     background: #2d692d;
 }
 
@@ -596,6 +601,13 @@ body {
 }
 #exaplan .exaplan-existing-date-selected .btn-blocked.exaplan-existing-date {
     background: #29ABE2;
+}
+
+#exaplan .btn-canceled.exaplan-existing-date {
+    background: #bbbbbb;
+}
+#exaplan .exaplan-existing-date-selected .btn-canceled.exaplan-existing-date {
+    background: #666666;
 }
 
 #exaplan .exaplan-existing-date-selected {
@@ -647,4 +659,8 @@ body {
 }
 .selectAllicon:hover {
     opacity: 0.5;
+}
+
+.exaplan-adminModulepartView .btn-date-cancel {
+    background-color: #bbbbbb !important;
 }

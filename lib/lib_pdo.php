@@ -230,7 +230,7 @@ function getModulesetByModulesetid($modulesetid){
     return $moduleset;
 }
 
-function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_CONFIRMED)
+function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_FIXED)
 {
     global $DB, $COURSE;
 
@@ -340,7 +340,7 @@ function getPrefferedDate($modulepartid, $date, $timeslot = null, $states = [])
  * @param string $duration
  * @return string
  */
-function setPrefferedDate($updateExisting, $dateId = 0, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment, $region, $moodleid = 0, $isonline = 0, $duration = '', $state = BLOCK_EXAPLAN_DATE_PROPOSED)
+function setPrefferedDate($updateExisting, $dateId = 0, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment, $region, $moodleid = 0, $isonline = 0, $duration = '', $state = BLOCK_EXAPLAN_DATE_DESIRED)
 {
     $pdo = getPdoConnect();
     $timestamp = new DateTime();
@@ -691,7 +691,7 @@ function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $t
         return null;
     }
 
-    $sql = "SELECT des.*, des.puserid as relatedUserId, 'desired' as dateType, u.moodleid as pUserMoodleId
+    $sql = "SELECT des.*, des.puserid as relatedUserId, '".BLOCK_EXAPLAN_DATE_DESIRED."' as dateType, u.moodleid as pUserMoodleId
               FROM mdl_block_exaplandesired des
               ".$leftJoin."
               WHERE " . implode(' AND ', $whereArr);
@@ -792,24 +792,24 @@ function getFixedDatesAdvanced($puserid = null, $modulepartid = null, $date = nu
         $sql = "SELECT DISTINCT d.*, 
                     dumm.puserid as relatedUserId,
                     dumm.absent as absent,
-                    IF(d.state = ".BLOCK_EXAPLAN_DATE_BLOCKED.", 'blocked', 'fixed') as dateType
-                                  FROM mdl_block_exaplandates d                                                                   
-                                   LEFT JOIN mdl_block_exaplanpuser_date_mm dumm ON dumm.dateid = d.id
-                                    ".$leftJoin."
-                                  WHERE " . implode(' AND ', $whereArr) . "
-                                  ORDER BY d.date
+                    d.state dateType
+                  FROM mdl_block_exaplandates d                                                                   
+                   LEFT JOIN mdl_block_exaplanpuser_date_mm dumm ON dumm.dateid = d.id
+                    ".$leftJoin."
+                  WHERE " . implode(' AND ', $whereArr) . "
+                  ORDER BY d.date
                                   ";
 
     } else {
         $sql = "SELECT DISTINCT d.*, 
                     dumm.puserid as relatedUserId,
                     dumm.absent as absent, 
-                    IF(d.state = ".BLOCK_EXAPLAN_DATE_BLOCKED.", 'blocked', 'fixed') as dateType
-                                  FROM mdl_block_exaplanpuser_date_mm dumm
-                                    JOIN mdl_block_exaplandates d ON d.id = dumm.dateid
-                                    ".$leftJoin."
-                                  WHERE " . implode(' AND ', $whereArr) . "
-                                  ORDER BY d.date
+                    d.state as dateType
+                  FROM mdl_block_exaplanpuser_date_mm dumm
+                    JOIN mdl_block_exaplandates d ON d.id = dumm.dateid
+                    ".$leftJoin."
+                  WHERE " . implode(' AND ', $whereArr) . "
+                  ORDER BY d.date
                                   ";
 
     }
@@ -881,7 +881,7 @@ function getDatesForModulePart($modulepartid, $date = null, $region = '', $timeR
         return null;
     }
 
-    $sql = "SELECT DISTINCT d.*, IF(d.state = ".BLOCK_EXAPLAN_DATE_BLOCKED.", 'blocked', 'fixed') as dateType
+    $sql = "SELECT DISTINCT d.*, d.state as dateType
                   FROM mdl_block_exaplandates d                                                                   
                     LEFT JOIN mdl_block_exaplanpuser_date_mm dumm ON dumm.dateid = d.id
                     ".$leftJoin."
@@ -963,4 +963,8 @@ function getMoodles() {
     $result = $statement->fetchAll();
 
     return $result;
+}
+
+function getFixedDateState($dateId) {
+    return getTableData('mdl_block_exaplandates', $dateId, 'state');
 }

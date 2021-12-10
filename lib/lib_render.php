@@ -105,14 +105,14 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                             > '.$title.' </a>';
             } else {
                 if (!$part['date']  // no any date yet
-                    || !in_array($part['date'][0]['state'], [BLOCK_EXAPLAN_DATE_CONFIRMED, BLOCK_EXAPLAN_DATE_BLOCKED]) // only desired dates
+                    || !in_array($part['date'][0]['state'], [BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED]) // only desired dates
                 ) {
                     // desired dates
                     $disabled = '';
                     if (getDesiredDates($pUser['id'], $part['id'])) {
                       $buttonTitle = 'Wunschtermin';
                       $buttonClass = ' exaplan-date-desired ';
-                      $innerButtonClass = ' btn btn-desire ';
+                      $innerButtonClass = ' btn btn-desired ';
                       if ($modulepartid == $part["id"]) {
                         $buttonClass .= ' exaplan-date-current-modulepart ';
                     	}
@@ -150,7 +150,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                                     class="btn exaplan-date-fixed exaplan-selectable-date '.$buttonClass.'" 
                                     data-dateId="'.$part['date'][0]['id'].'" 
                                     data-modulepartId="'.$part['id'].'">
-                                 <button type="button" class=" btn btn-fix ">'.date('d.m.Y', $part['date'][0]['date']).
+                                 <button type="button" class=" btn btn-fixed ">'.date('d.m.Y', $part['date'][0]['date']).
                                 '</button></a>';
                     // 'absent' date
                     if (@$part['date'][0]['absent']) {
@@ -304,7 +304,7 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
     $modulePart = getTableData('mdl_block_exaplanmoduleparts', $modulepartId);
     $modulepartName = $modulePart['title'];
     $moduleName = getTableData('mdl_block_exaplanmodulesets', $modulePart['modulesetid'], 'title');
-    $existingDates = getFixedDatesAdvanced(null, $modulepartId, null, null, true, '', '', [BLOCK_EXAPLAN_DATE_PROPOSED, BLOCK_EXAPLAN_DATE_CONFIRMED]);
+    $existingDates = getFixedDatesAdvanced(null, $modulepartId, null, null, true, '', '', [BLOCK_EXAPLAN_DATE_DESIRED, BLOCK_EXAPLAN_DATE_FIXED]);
     $content .= '<h4>Sie planen: '.$moduleName.' | '.$modulepartName.'</h4>';
     if ($existingDates) {
         $content .= '<div class="register-existing-dates">';
@@ -433,7 +433,7 @@ function modulepartAdminViewByDate_OLD($modulepartId, $date, $defaultRegion = ''
 
     $content .= '<tbody>';
 
-    $states = [BLOCK_EXAPLAN_DATE_PROPOSED, BLOCK_EXAPLAN_DATE_CONFIRMED, BLOCK_EXAPLAN_DATE_BLOCKED];
+    $states = [BLOCK_EXAPLAN_DATE_DESIRED, BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED];
 
     $rowsCount = 0;
     $studentFilters = [];
@@ -466,8 +466,8 @@ function modulepartAdminViewByDate_OLD($modulepartId, $date, $defaultRegion = ''
         return $content;
     };
 
-    $getListGroupTitle = function($dateType) {
-        switch ($dateType) {
+    $getListGroupTitle = function($dateTypeCode) {
+        switch ($dateTypeCode) {
             case 'desired':
                 return 'Angefragte TN:';
                 break;
@@ -497,10 +497,10 @@ function modulepartAdminViewByDate_OLD($modulepartId, $date, $defaultRegion = ''
                 && !in_array($dateData['pUserData']['id'], $shownStudents) // not shown yet
                 && (
                     // 1. no selected dateID AND this user is Desired
-                    (!$selectedDateId && $dateData['dateType'] == 'desired')
+                    (!$selectedDateId && $dateData['dateType'] == BLOCK_EXAPLAN_DATE_DESIRED)
                     ||
                     // 2. selected dateId AND (the user is desired OR related to this fixed date (or blocked))
-                    ($selectedDateId && ($dateData['dateType'] == 'desired' || ($selectedDateId == $dateData['id'] && in_array($dateData['dateType'], ['fixed', 'blocked']))))
+                    ($selectedDateId && ($dateData['dateType'] == BLOCK_EXAPLAN_DATE_DESIRED || ($selectedDateId == $dateData['id'] && in_array($dateData['dateType'], [BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED]))))
                 )
             ) {
                 $studentNeedsToBeShown = true;
@@ -526,7 +526,7 @@ function modulepartAdminViewByDate_OLD($modulepartId, $date, $defaultRegion = ''
                                 value="1"      
                                 id = "fixedUser' . $dateData['pUserData']['id'] . '"                               
                                 name = "fixedPuser[' . $dateData['pUserData']['id'] . ']" 
-                                ' . (in_array($dateData['dateType'], ['fixed', 'blocked']) ? 'checked = "checked"' : '') . '/>&nbsp;';
+                                ' . (in_array($dateData['dateType'], [BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED]) ? 'checked = "checked"' : '') . '/>&nbsp;';
                 $rowContent .= '<label for="fixedUser' . $dateData['pUserData']['id'] . '">' . @$dateData['pUserData']['firstname'] . ' ' . @$dateData['pUserData']['lastname'] . '</label>';
                 $rowContent .= '</td>';
                 // buttons
@@ -572,7 +572,7 @@ function modulepartAdminViewByDate_OLD($modulepartId, $date, $defaultRegion = ''
                 $rowsCount++;
                 $oldRowContent = $rowContent;
 
-                $rowContent = '<tr><td colspan="7" height="'.$defaultRowHeght.'" class="listGroupTitle">'.$getListGroupTitle($dateData['dateType']).'</td>';
+                $rowContent = '<tr><td colspan="7" height="'.$defaultRowHeght.'" class="listGroupTitle">'.$getListGroupTitle(getDateStateCodeByIndex($dateData['dateType'])).'</td>';
                 // add form - group title is always first, so it is here
                 if (!$formsShown) {
                     $formsShown = true;
@@ -649,7 +649,7 @@ function modulepartAdminViewByDate_OLD($modulepartId, $date, $defaultRegion = ''
                                 value="1"      
                                 id = "fixedUser' . $pUserId . '"                               
                                 name = "fixedPuser[' . $pUserId . ']" 
-                                ' . (in_array($dateData['dateType'], ['fixed', 'blocked']) ? 'checked = "checked"' : '') . '/>&nbsp;';
+                                ' . (in_array($dateData['dateType'], [BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED]) ? 'checked = "checked"' : '') . '/>&nbsp;';
                 $rowContent .= '<label for="fixedUser' . $pUserId . '">' . @$pUserData['firstname'] . ' ' . @$pUserData['lastname'] . '</label>';
                 $rowContent .= '</td>';
                 // buttons
@@ -715,11 +715,11 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
     $getListGroupTitle = function($dateType) {
         switch ($dateType) {
             case 'desired':
-            case BLOCK_EXAPLAN_DATE_PROPOSED:
+            case BLOCK_EXAPLAN_DATE_DESIRED:
                 return 'Angefragte TN:';
                 break;
             case 'fixed':
-            case BLOCK_EXAPLAN_DATE_CONFIRMED:
+            case BLOCK_EXAPLAN_DATE_FIXED:
                 return 'eingeschriebene TN:';
                 break;
             case 'blocked':
@@ -1044,8 +1044,26 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
         $content .= '<button name="date_block" class="btn btn-info" type="submit" value="date_block" >Termin blocken</button>';
     }
     $content .= '</td>';
-    $content .= '<td align="right" colspan="3"><button name="date_save" class="btn btn-success" type="submit" value="date_save" >Änderung speichern</button></td>';
+    $content .= '<td align="right" colspan="3">';
+    if (!$dateRec || $dateRec['state'] != BLOCK_EXAPLAN_DATE_CANCELED) {
+        // do not show save buttons for canceled date
+        $content .= '<button name="date_save" class="btn btn-success" type="submit" value="date_save" >Änderung speichern</button>';
+    }
+    $content .= '</td>';
     $content .= '</tr>';
+
+    // buttons. second row
+    if ($selectedDateId) {
+        $content .= '<tr>';
+        $content .= '<td align="left" colspan="3">';
+        $content .= '</td>';
+        $cancelButtonTitle = 'Termin absagen';
+        if ($dateRec['state'] == BLOCK_EXAPLAN_DATE_BLOCKED) {
+            $cancelButtonTitle = 'Blockierung aufheben';
+        }
+        $content .= '<td align="right" colspan="3"><button name="date_cancel" class="btn btn-default btn-date-cancel" type="submit" value="date_cancel">'.$cancelButtonTitle.'</button></td>';
+        $content .= '</tr>';
+    }
 
     $content .= '</table>';
 
@@ -1099,7 +1117,7 @@ function buttonsForExistingDates($modulepartId, $date, $selectedDateId) {
         $title = implode(' - ', $titleParts);
         $url = new moodle_url('/blocks/exaplan/admin.php', array('mpid' => $modulepartId, 'date' => $date, 'region' => 'all', 'dateId' => $fDate['id']));
         $content .= '<span class="exaplan-date-button-item '.($selectedDateId == $fDate['id'] ? 'exaplan-existing-date-selected' : '').'">';
-        $content .= '<a class="btn btn-'.($fDate['dateType']=='fixed' ? 'fix' : 'blocked').' exaplan-existing-date " href="'.$url.'">'.$title.'</a>';
+        $content .= '<a class="btn btn-'.getDateStateCodeByIndex($fDate['dateType']).' exaplan-existing-date " href="'.$url.'">'.$title.'</a>';
         $users = getFixedPUsersForDate($fDate['id']);
         $studentsCount = count($users);
         $content .= $studentsCount ? '<span class="countStudents">'.$studentsCount.'</span>' : '';
@@ -1246,7 +1264,7 @@ function printAdminDashboard($dashboardType = 'default')
                         if (count($fixedDates) > 0) {
                             $buttonClass .= ' exaplan-date-fixed ';
                             foreach ($fixedDates as $fixedDate) {
-                                if ($fixedDate['dateType'] == 'blocked') {
+                                if ($fixedDate['dateType'] == BLOCK_EXAPLAN_DATE_BLOCKED) {
                                     $buttonClass = ' exaplan-date-blocked ';
                                 }
                                 $content .= $buttonTemplate($part['id'], $region, date('d.m.Y', $fixedDate['date']), $buttonClass, $fixedDate['date']).'&nbsp;';

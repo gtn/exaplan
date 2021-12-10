@@ -49,13 +49,17 @@ switch ($action) {
         $dateRegion = optional_param('dateRegion', 'all', PARAM_TEXT);
 
         // fixed date or blocked date
-        $state = BLOCK_EXAPLAN_DATE_PROPOSED; // never accessible?
+        $state = BLOCK_EXAPLAN_DATE_DESIRED; // old. never accessible?
         $sendNotificationToStudent = true;
         if (optional_param('date_save', '', PARAM_TEXT)) {
-            $state = BLOCK_EXAPLAN_DATE_CONFIRMED;
+            $state = BLOCK_EXAPLAN_DATE_FIXED;
         }
         if (optional_param('date_block', '', PARAM_TEXT)) {
             $state = BLOCK_EXAPLAN_DATE_BLOCKED;
+            $sendNotificationToStudent = false;
+        }
+        if (optional_param('date_cancel', '', PARAM_TEXT)) {
+            $state = BLOCK_EXAPLAN_DATE_CANCELED;
             $sendNotificationToStudent = false;
         }
 
@@ -138,12 +142,36 @@ switch ($action) {
                 }
             }
 
-            $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, $state);
+            if ($state == BLOCK_EXAPLAN_DATE_CANCELED) {
+                // if we set 'canceled' state:
+                // - set state for fixed date
+                // - remove blocked date at all
+                if ($dateId) {
+                    $dateState = getFixedDateState($dateId);
+                    if ($dateState == BLOCK_EXAPLAN_DATE_FIXED) {
+                        // unlink students
+                        $registeredUsers = getFixedPUsersForDate($dateId);
+                        $registeredUsersIds = array_map(function ($u) {
+                            return $u['puserid'];
+                        }, $registeredUsers);
+                        foreach ($registeredUsersIds as $studentId) {
+                            removePUserFromDate($dateId, $studentId, $modulepartid);
+                        }
+                        // set 'canceled'
+                        $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, BLOCK_EXAPLAN_DATE_CANCELED);
+                    } else if ($dateState == BLOCK_EXAPLAN_DATE_BLOCKED) {
+                        removeDateIfNoUsers($dateId);
+                    }
+                }
+            } else {
+                // create/update date record
+                $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, $state);
+            }
 
             // update students only for 'fixed dates'
             // from now working with users moved into bulk functions
             // But kept ABSENT updating!!!
-            if ($state == BLOCK_EXAPLAN_DATE_CONFIRMED) {
+            if ($state == BLOCK_EXAPLAN_DATE_FIXED) {
                 $registeredUsers = getFixedPUsersForDate($dateId);
                 $registeredUsersIds = array_map(function ($u) {
                     return $u['puserid'];
