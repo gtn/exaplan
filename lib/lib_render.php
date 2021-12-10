@@ -801,7 +801,7 @@ function modulepartAdminViewByDate($modulepartId, $date, $defaultRegion = '', $s
                 $pUserId = $pUserRelation['puserid'];
                 $pUserData = getTableData('mdl_block_exaplanpusers', $pUserId);
                 $shownStudents[] = $pUserId;
-                $content .= rowForStudentInFormAdminDateFixing($pUserData, $dateData, true, $modulepartId, $defaultRegion, 'mainList'); // always selected students
+                $content .= rowForStudentInFormAdminDateFixing($pUserData, $dateData, false, $modulepartId, $defaultRegion, 'mainList'); // always selected students
                 $rowsCount++;
             }
         }
@@ -908,6 +908,7 @@ function rowForStudentInFormAdminDateFixing($pUserData, $dateData, $pUserSelecte
         }
     }
     $content .= '<td style="text-align: center;  vertical-align: top;" class="absentColumn">
+                        <input type="hidden" value="0" name="absentPuser[' . $pUserId . ']" />
                         <input type="checkbox" 
                                 value="1"                                     
                                 name="absentPuser[' . $pUserId . ']" 

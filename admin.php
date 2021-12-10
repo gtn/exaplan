@@ -63,7 +63,7 @@ switch ($action) {
         $modulepart = getModulepartByModulepartid($modulepartid);
         $moduleset = getModulesetByModulesetid($modulepart["modulesetid"]);
         $absents = optional_param_array('absentPuser', [], PARAM_INT);
-        $absents = array_keys($absents);
+//        $absents = array_keys($absents);
 
         $isBulkAction = false;
         if ($bulkGo = optional_param('bulk_go', '', PARAM_TEXT)) {
@@ -78,7 +78,7 @@ switch ($action) {
                     if ($students && count($students)) {
                         foreach ($students as $student) {
                             $absent = 0;
-                            if (in_array($student, $absents)) {
+                            if (array_key_exists($student, $absents) && $absents[$student]) {
                                 $absent = 1;
                             }
                             addPUserToDate($dateId, $student, $absent, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
@@ -141,7 +141,21 @@ switch ($action) {
             $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, $state);
 
             // update students only for 'fixed dates'
+            // from now working with users moved into bulk functions
+            // But kept ABSENT updating!!!
             if ($state == BLOCK_EXAPLAN_DATE_CONFIRMED) {
+                $registeredUsers = getFixedPUsersForDate($dateId);
+                $registeredUsersIds = array_map(function ($u) {
+                    return $u['puserid'];
+                }, $registeredUsers);
+                foreach ($absents as $sId => $absentVal) {
+                    // change absent only for already registered users
+                    if (in_array($sId, $registeredUsersIds)) {
+                        addPUserToDate($dateId, $sId, $absentVal, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
+                    }
+                }
+            }
+            /*if ($state == BLOCK_EXAPLAN_DATE_CONFIRMED) {
                 // register / unregister students
                 $registeredUsers = getFixedPUsersForDate($dateId);
                 $registeredUsersIds = array_map(function ($u) {
@@ -165,12 +179,16 @@ switch ($action) {
                         removePUserFromDate($dateId, $puserid, $modulepartid);
                     }
                 }
-            }
+            }*/
+            $dateId = 0; // unlink shown form from current dateId. So the admin will be able to create a new date instead of edit it
         }
 
-        $dateId = 0; // unlink shown form from current dateId. So the admin will be able to create a new date instead of edit it
         // redirect to admin view (without this we have wrong shown data)
-        $url = new moodle_url('/blocks/exaplan/admin.php', array('mpid' => $modulepartid, 'date' => $date, 'region' => $region, 'dashboardType' => $dashboardType));
+        $params = array('mpid' => $modulepartid, 'date' => $date, 'region' => $region, 'dashboardType' => $dashboardType);
+        if ($dateId) {
+            $params['dateId'] = $dateId;
+        }
+        $url = new moodle_url('/blocks/exaplan/admin.php', $params);
         redirect($url);
         break;
 
