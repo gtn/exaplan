@@ -430,11 +430,6 @@ function block_exaplan_init_js_css($courseid = 0)
     // loader
     $PAGE->requires->css('/blocks/exaplan/css/loader.css');
 
-    // jsCalendar
-//    $PAGE->requires->css('/blocks/exaplan/css/jsCalendar.css');
-//    $PAGE->requires->js("/blocks/exaplan/javascript/jsCalendar.js", true);
-//    $PAGE->requires->js("/blocks/exaplan/javascript/locale/jsCalendar/jsCalendar.lang.de.js", true);
-
     // main block JS
     $PAGE->requires->js("/blocks/exaplan/javascript/block_exaplan.js", true);
 
@@ -780,10 +775,15 @@ function getDateStateCodeByIndex($index) {
 function getFixedDateTitle($dateId) {
     $title = '';
     $dateData = getTableData('mdl_block_exaplandates', $dateId);
-    $title .= date('Y-m-d', $dateData['date']).': ';
+    $title .= date('Y-m-d', $dateData['date']);
     $modulePart = getModulepartByModulepartid($dateData['modulepartid']);
     $moduleSet = getModulesetByModulesetid($modulePart['modulesetid']);
-    $title .= $moduleSet['title'].' - '.$modulePart['title'];
+    if ($moduleSet['title']) {
+        $title .= ': '.$moduleSet['title'];
+    }
+    if ($modulePart['title']) {
+        $title .= ' - '.$modulePart['title'];
+    }
 
     return $title;
 }
