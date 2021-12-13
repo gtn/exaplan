@@ -212,6 +212,7 @@ function getModulepartByModulepartid($modulepartid)
 
     $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmoduleparts WHERE id = :id");
     $statement->execute($params);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
     $modulepart = $statement->fetch();
 
     return $modulepart;
@@ -225,6 +226,7 @@ function getModulesetByModulesetid($modulesetid){
 
     $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmodulesets WHERE id = :id");
     $statement->execute($params);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
     $moduleset = $statement->fetch();
 
     return $moduleset;

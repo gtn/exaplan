@@ -146,16 +146,17 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                     if ($dateId && $modulepartid == $part["id"]) {
                         $buttonClass .= ' exaplan-date-current-modulepart ';
                     }
+                    // 'absent' date
+                    if (@$part['date'][0]['absent']) {
+                        $absentHas = true;
+                        $buttonClass .= ' exaplan-date-absent ';
+                    }
                     $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/dateDetails.php?mpid='.$part["id"].'&userid='.$userid.'&dateid='.$part['date'][0]['id'].'&pagehash='.block_exaplan_hash_current_userid($userid).'"
                                     class="btn exaplan-date-fixed exaplan-selectable-date '.$buttonClass.'" 
                                     data-dateId="'.$part['date'][0]['id'].'" 
                                     data-modulepartId="'.$part['id'].'">
                                  <button type="button" class=" btn btn-fixed ">'.date('d.m.Y', $part['date'][0]['date']).
                                 '</button></a>';
-                    // 'absent' date
-                    if (@$part['date'][0]['absent']) {
-                        $absentHas = true;
-                    }
                 }
             }
             // add possibility to add new desired dates if the student has absent fixed date
@@ -1051,7 +1052,7 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
     $content .= '<td align="right" colspan="3">';
     if (!$dateRec || $dateRec['state'] != BLOCK_EXAPLAN_DATE_CANCELED) {
         // do not show save buttons for canceled date
-        if ($selectedDateId) {$btntxt="Änderung speichern";} else{$btntxt="'Termin fixieren";};
+        if ($selectedDateId) {$btntxt="Änderung speichern";} else{$btntxt="Termin fixieren";};
         $content .= '<button name="date_save" class="btn btn-success btn-date-save" type="submit" value="date_save" >'.$btntxt.'</button>';
     }
     $content .= '</td>';

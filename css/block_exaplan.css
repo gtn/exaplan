@@ -10,18 +10,15 @@
 
 a.exaplan-date-fixed.exaplan-selectable-date {
     color: green;
-
 }
 a.exaplan-date-fixed.exaplan-selectable-date:hover {
-
     color: black;
 }
 a.exaplan-date-fixed.exaplan-selectable-date.exaplan-date-current-modulepart {
-
     color: white;
 }
-a.exaplan-selectable-modulepart {
 
+a.exaplan-selectable-modulepart {
     color: rgba(85, 0, 0, 1);
 }
 a.exaplan-selectable-modulepart:hover {
@@ -520,6 +517,9 @@ body {
     background: rgb(0, 83, 0, 1);
     color: #ffffff;
 }
+#exaplan .exaplan-date-absent .btn-fixed {
+    background: #C20530;
+}
 #exaplan .btn-blocked {
     background-color: #8CD0F2;
     color: #253b48;
@@ -528,6 +528,7 @@ body {
     background: #666666;
     color: #ffffff;
 }
+
 
 #exaplan .btn-outline-danger {
     border-style: none;
@@ -654,6 +655,10 @@ body {
 
 .exaplan-adminModulepartView td.emptyRow {
     border: none !important;
+}
+
+tr[data-listid="mainList"] td {
+    background-color: #F5FAF5;
 }
 
 .bulkFunctionsForm {

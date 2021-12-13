@@ -781,7 +781,9 @@ function getFixedDateTitle($dateId) {
     $title = '';
     $dateData = getTableData('mdl_block_exaplandates', $dateId);
     $title .= date('Y-m-d', $dateData['date']).': ';
-    $title .= getTableData('mdl_block_exaplanmoodles', $dateData['moodleid'], 'companyname');
+    $modulePart = getModulepartByModulepartid($dateData['modulepartid']);
+    $moduleSet = getModulesetByModulesetid($modulePart['modulesetid']);
+    $title .= $moduleSet['title'].' - '.$modulePart['title'];
 
     return $title;
 }

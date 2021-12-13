@@ -180,13 +180,24 @@ switch ($action) {
                 }
             } else {
                 // create/update date record
+                $selectedDateId = $dateId;
                 $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, $state);
+                // if it is a new date record - add seelected students
+                if ($state == BLOCK_EXAPLAN_DATE_FIXED && $selectedDateId != $dateId) { // creating of new FIXED date (only fixed)
+                    if ($students && count($students)) {
+                        foreach ($students as $student) {
+                            addPUserToDate($dateId, $student, 0, $pUserId, $date, $moduleset, $modulepartid, true, $sendNotificationToStudent);
+                            removeDesiredDate($modulepartid, $student);
+                        }
+                    }
+                }
+
             }
 
-            // update students only for 'fixed dates'
-            // from now working with users moved into bulk functions
-            // But kept ABSENT updating!!! <- disabled again :-)
+            // add selected users inly during creating of NEW fixed date
+            // for existing dates - this action moved to bulk actions
             if ($state == BLOCK_EXAPLAN_DATE_FIXED) {
+                // change exists fixed date:
                 $registeredUsers = getFixedPUsersForDate($dateId);
                 /*$registeredUsersIds = array_map(function ($u) {
                     return $u['puserid'];
@@ -202,15 +213,15 @@ switch ($action) {
                 foreach ($registeredUsers as $registeredStudent) {
                     $pUserData = getTableData('mdl_block_exaplanpusers', $registeredStudent['puserid']);
                     $trainerData = getTableData('mdl_block_exaplanpusers', $dateData['trainerpuserid']);
-                    $text = 'Lieber '.$pUserData['firstname'].', der Kurs '.getFixedDateTitle($dateId).' hat sich geändert, hier sind die neuen Kursdaten: '."\r\n".
-                        'DF Ort: '.getTableData('mdl_block_exaplanmoodles', $dateData['moodleid'], 'companyname')."\r\n".
-                        'Region: '.getRegionTitle($dateData['region'])."\r\n".
-                        'DF Art: '.getIsOnlineTitle($dateData['isonline'])."\r\n".
-                        'Trainer: '.$trainerData['firstname'].' '.$trainerData['lastname']."\r\n".
-                        'Location: '.$dateData['location']."\r\n".
-                        'Uhrzeit: '.date('H:i', $dateData['starttime'])."\r\n".
-                        'Dauer: '.$dateData['duration']."\r\n".
-                        'Notiz: '.$dateData['comment']."\r\n";
+                    $text = 'Lieber ' . $pUserData['firstname'] . ', der Kurs ' . getFixedDateTitle($dateId) . ' hat sich geändert, hier sind die neuen Kursdaten: ' . "\r\n" .
+                        'DF Ort: ' . getTableData('mdl_block_exaplanmoodles', $dateData['moodleid'], 'companyname') . "\r\n" .
+                        'Region: ' . getRegionTitle($dateData['region']) . "\r\n" .
+                        'DF Art: ' . getIsOnlineTitle($dateData['isonline']) . "\r\n" .
+                        'Trainer: ' . $trainerData['firstname'] . ' ' . $trainerData['lastname'] . "\r\n" .
+                        'Location: ' . $dateData['location'] . "\r\n" .
+                        'Uhrzeit: ' . date('H:i', $dateData['starttime']) . "\r\n" .
+                        'Dauer: ' . $dateData['duration'] . "\r\n" .
+                        'Notiz: ' . $dateData['comment'] . "\r\n";
                     block_exaplan_create_plannotification($pUserId, $registeredStudent['puserid'], $text);
                 }
             }
