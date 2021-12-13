@@ -1051,7 +1051,8 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
     $content .= '<td align="right" colspan="3">';
     if (!$dateRec || $dateRec['state'] != BLOCK_EXAPLAN_DATE_CANCELED) {
         // do not show save buttons for canceled date
-        $content .= '<button name="date_save" class="btn btn-success btn-date-save" type="submit" value="date_save" >Änderung speichern</button>';
+        if ($selectedDateId) {$btntxt="Änderung speichern";} else{$btntxt="'Termin fixieren";};
+        $content .= '<button name="date_save" class="btn btn-success btn-date-save" type="submit" value="date_save" >'.$btntxt.'</button>';
     }
     $content .= '</td>';
     $content .= '</tr>';
