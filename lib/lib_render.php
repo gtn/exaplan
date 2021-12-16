@@ -110,7 +110,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                     // desired dates
                     $disabled = '';
                     if (getDesiredDates($pUser['id'], $part['id'])) {
-                      $buttonTitle = 'Wunschtermin';
+                      $buttonTitle = 'in Planung';
                       $buttonClass = ' exaplan-date-desired ';
                       $innerButtonClass = ' btn btn-desired ';
                       if ($modulepartid == $part["id"]) {
