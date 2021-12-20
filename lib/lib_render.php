@@ -329,7 +329,7 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
             $tooltips .= '<span id="tooltipster_content'.$date['id'].'">';
             $tooltips .= ($date['starttime'] ? 'Uhrzeit: <strong>'.date('H:i', $date['starttime']).'</strong> '.date('d.m.Y', $date['date']).'<br>' : '')
                 .($date['duration'] ? 'Dauer: '.$date['duration'].'<br>' : '')
-                .($date['moodleid'] ? 'DF Ort: '.getMoodleDataByMoodleid($date['moodleid'], 'companyname').'<br>' : '')
+                .($date['moodleid'] ? 'Ort: '.getMoodleDataByMoodleid($date['moodleid'], 'companyname').'<br>' : '')
                 .getRegionTitle($date['region']).' - '.getIsOnlineTitle($date['isonline']).'<br>'
                 .($date['location'] ? 'Location: '.$date['location'].'<br>' : '')
                 .($trainer ? 'Skillswork-Trainer: '.@$trainer['firstname'].' '.@$trainer['lastname'].'<br>' : '');
@@ -555,6 +555,7 @@ function modulepartAdminViewByDate_OLD($modulepartId, $date, $defaultRegion = ''
                 // count of desired dates
                 $desiredDates = getDesiredDates($dateData['pUserData']['id'], $modulepartId, null, null, $defaultRegion);
                 if (count($desiredDates) > 0) {
+
                     $desiredDatesCount = count($desiredDates) . ' Termin' . (count($desiredDates) > 1 ? 'e' : '');
                 } else {
                     $desiredDatesCount = '';
@@ -1212,7 +1213,7 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
 
     // table header with main data
     $content .= '<tr>';
-    $content .= '<th>Sie planen: '.$moduleName.' | '.$modulepartName.'</th>';
+    $content .= '<th>Termindetails: '.$moduleName.' | '.$modulepartName.'</th>';
     $content .= '<th>'.date('d.m.Y', $dateData['date']).'</th>';
     $content .= '</tr>';
 
@@ -1225,17 +1226,17 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
     };
 
     // moodleid info
-    $moodleData = getMoodleDataByMoodleid($dateData['moodleid']);
-    $content .= $tableRow('DF Ort:', @$moodleData['companyname']);
+    $moodleData = getMoodleDataByMoodleid($dateData['moodleid'],'','Öffentlich');
+    $content .= $tableRow('Ort:', @$moodleData['companyname']);
 
     // region
-    $content .= $tableRow('Region:', getRegionTitle(@$dateData['region']));
+    //$content .= $tableRow('Region:', getRegionTitle(@$dateData['region']));
 
     // is online
-    $content .= $tableRow('DF Art:', getIsOnlineTitle($dateData['isonline']));
+    $content .= $tableRow('Art:', getIsOnlineTitle($dateData['isonline']));
 
     // location
-    $content .= $tableRow('Location:', $dateData['location']);
+    $content .= $tableRow('Ort:', $dateData['location']);
 
     // time start
     $content .= $tableRow('Uhrzeit:', date('H:i', $dateData['starttime']));
@@ -1245,7 +1246,7 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
 
     // trainer
     $trainer = getTableData('mdl_block_exaplanpusers', $dateData['trainerpuserid']);
-    $content .= $tableRow('Skillswork-Trainer:', @$trainer['firstname'].' '.@$trainer['lastname']);
+    $content .= $tableRow('Trainer:', @$trainer['firstname'].' '.@$trainer['lastname']);
 
     // description
     if ($dateData['comment']) {
@@ -1276,9 +1277,9 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
 
     switch ($dashboardType) {
         case BLOCK_EXAPLAN_DASHBOARD_INPROCESS:
-            $dashoboardTitle = 'Übersicht: in Bearbeitung';
+            $dashoboardTitle = 'Übersicht: zukünftige Termine';
             break;
-        case 'BLOCK_EXAPLAN_DASHBOARD_PAST':
+        case BLOCK_EXAPLAN_DASHBOARD_PAST:
             $dashoboardTitle = 'Übersicht: zurückliegende Termine';
             break;
         case BLOCK_EXAPLAN_DASHBOARD_DEFAULT:

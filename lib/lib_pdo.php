@@ -979,7 +979,7 @@ function getFixedDateState($dateId) {
  * @param string $field
  * @return array
  */
-function getMoodleDataByMoodleid($moodleid, $field = '') {
+function getMoodleDataByMoodleid($moodleid, $field = '',$returnifempty=null) {
     $pdo = getPdoConnect();
 
     $sql = "SELECT * FROM mdl_block_exaplanmoodles WHERE moodleid = :moodleid";
@@ -995,5 +995,5 @@ function getMoodleDataByMoodleid($moodleid, $field = '') {
         return $result;
     }
 
-    return null;
+    return array('companyname'=>$returnifempty);
 }
