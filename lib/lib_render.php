@@ -1195,12 +1195,20 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
         return 'No data!';
     }
 
-    $content .= '<table class="table table-sm table-borderless exaplan-date-details-table">';
-
     $modulepartName = getTableData('mdl_block_exaplanmoduleparts', $modulepartId, 'title');
     $moduleId = getTableData('mdl_block_exaplanmoduleparts', $modulepartId, 'modulesetid');
     $moduleName = getTableData('mdl_block_exaplanmodulesets', $moduleId, 'title');
     $dateData = getTableData('mdl_block_exaplandates', $dateId);
+
+    $absent = false;
+    if ($relationData = isPuserIsFixedForDate($puserId, $dateData['id'], true)) {
+        if ($relationData['absent']) {
+            $absent = true;
+        }
+    }
+
+    $content .= '<div class="exaplan-date-details-container">';
+    $content .= '<table class="table table-sm table-borderless exaplan-date-details-table '.($absent ? ' absent ' : '').'">';
 
     // table header with main data
     $content .= '<tr>';
@@ -1247,6 +1255,14 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
     }
 
     $content .= '</table>';
+
+    // if the student is_absent - add marker
+    if ($absent) {
+        $content .= '<div class="block-exaplan-absent-marker">gefehlt</div>';
+    }
+
+
+    $content .= '</div>';
 
     return $content;
 }
