@@ -600,7 +600,9 @@ function removeDateIfNoUsers($dateid)
         // no related users - delete this dateid
         $statement = $pdo->prepare("DELETE FROM mdl_block_exaplandates WHERE id = :dateid;");
         $statement->execute($params);
+        return true;
     }
+    return false;
 }
 
 function updateNotifications()

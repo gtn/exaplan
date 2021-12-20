@@ -175,7 +175,11 @@ switch ($action) {
                         // set 'canceled'
                         $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, BLOCK_EXAPLAN_DATE_CANCELED);
                     } else if ($dateState == BLOCK_EXAPLAN_DATE_BLOCKED) {
-                        removeDateIfNoUsers($dateId);
+                        // remove date if not any user
+                        if (!removeDateIfNoUsers($dateId)) {
+                            // set 'fixed' state if at least one user is related
+                            $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, BLOCK_EXAPLAN_DATE_FIXED);
+                        };
                     }
                 }
             } else {
