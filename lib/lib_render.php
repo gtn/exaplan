@@ -899,7 +899,8 @@ function rowForStudentInFormAdminDateFixing($pUserData, $dateData, $pUserSelecte
     // count of desired dates
     $desiredDates = getDesiredDates($pUserId, $modulepartId, null, null, $defaultRegion);
     if (count($desiredDates) > 0) {
-        $desiredDatesCount = count($desiredDates) . ' Termin' . (count($desiredDates) > 1 ? 'e' : '');
+    	   	$datelist = getDesiredDatesDatelist($desiredDates);
+        $desiredDatesCount = '<a href="#" title="'.$datelist.'">'.count($desiredDates) . '</a> Termin' . (count($desiredDates) > 1 ? 'e' : '');
     } else {
         $desiredDatesCount = '';
     }

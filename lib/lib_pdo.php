@@ -708,7 +708,13 @@ function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $t
     return $dates;
 
 }
-
+function getDesiredDatesDatelist($desiredDates){
+	$datelist="";
+	foreach ($desiredDates as $desiredDates){
+		$datelist.=date('d.m.Y',$desiredDates["date"]).", ";
+	}
+	return $datelist;
+}
 /**
  * @param int $puserid (null if needed data about whole modulepart)
  * @param int $modulepartid (null if needed data about all moduleparts)
