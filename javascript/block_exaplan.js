@@ -53,6 +53,7 @@ $(function () {
         });*/
     });
 
+
 });
 
 function selectedDateEvent(calEvent, monthCalendar) {

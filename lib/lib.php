@@ -42,6 +42,13 @@ const BLOCK_EXAPLAN_MIDDATE_BEFORE = 1; // before midday
 const BLOCK_EXAPLAN_MIDDATE_AFTER = 2; // after midday
 const BLOCK_EXAPLAN_MIDDATE_ALL = 3; // all day
 
+/**
+ * DASHBOARD TYPES
+ */
+const BLOCK_EXAPLAN_DASHBOARD_DEFAULT = 'default'; // default dashboard
+const BLOCK_EXAPLAN_DASHBOARD_INPROCESS = 'inProcess'; // in process dasboard
+const BLOCK_EXAPLAN_DASHBOARD_PAST = 'past'; // data from the past
+
 
 /**
  *

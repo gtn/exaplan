@@ -182,8 +182,8 @@ switch ($action) {
                 // create/update date record
                 $selectedDateId = $dateId;
                 $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, $state);
-                // if it is a new date record - add seelected students
-                if ($state == BLOCK_EXAPLAN_DATE_FIXED && $selectedDateId != $dateId) { // creating of new FIXED date (only fixed)
+                // if it is a new date record - add selected students
+                if (in_array($state, [BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED]) && $selectedDateId != $dateId) { // creating of new FIXED date
                     if ($students && count($students)) {
                         foreach ($students as $student) {
                             addPUserToDate($dateId, $student, 0, $pUserId, $date, $moduleset, $modulepartid, true, $sendNotificationToStudent);

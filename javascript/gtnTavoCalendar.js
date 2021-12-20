@@ -26,6 +26,50 @@
     };
 })(TavoCalendar.prototype.dayClick);
 
+// update all calendars after change month of single calendar
+(function(nextMonth) {
+    TavoCalendar.prototype.nextMonth = function(e) {
+
+        var currentElementId = $(this.elements.calendar_code).closest('.calendar-month-item.tavo-calendar').attr('id');
+        // start original event
+        var result = nextMonth.apply(this, arguments);
+
+        var repeat = arguments[1]; // for stop looping
+        if (repeat != 'no_repeat') {
+            // update all other calendars
+            allCalendars.forEach((calendarInstance) => {
+                var instanceId = $(calendarInstance.elements.calendar_code).closest('.calendar-month-item.tavo-calendar').attr('id');
+                if (currentElementId != instanceId) {
+                    calendarInstance.nextMonth(e, 'no_repeat');
+                }
+            });
+            updateAllCalendarMetadata();
+        }
+
+    };
+})(TavoCalendar.prototype.nextMonth);
+(function(prevMonth) {
+    TavoCalendar.prototype.prevMonth = function(e) {
+
+        var currentElementId = $(this.elements.calendar_code).closest('.calendar-month-item.tavo-calendar').attr('id');
+        // start original event
+        var result = prevMonth.apply(this, arguments);
+
+        var repeat = arguments[1]; // for stop looping
+        if (repeat != 'no_repeat') {
+            // update all other calendars
+            allCalendars.forEach((calendarInstance) => {
+                var instanceId = $(calendarInstance.elements.calendar_code).closest('.calendar-month-item.tavo-calendar').attr('id');
+                if (currentElementId != instanceId) {
+                    calendarInstance.prevMonth(e, 'no_repeat');
+                }
+            });
+            updateAllCalendarMetadata();
+        }
+
+    };
+})(TavoCalendar.prototype.prevMonth);
+
 
 TavoCalendar.prototype.blurCalendar = function() {
     // blur calendar only selected day is not in the past

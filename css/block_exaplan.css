@@ -480,7 +480,8 @@ body {
     display: inline-block;
 }
 
-#exaplan .btn-danger,
+/*#exaplan .btn-danger,*/
+#exaplan .btn,
 #exaplan .btn-desired,
 #exaplan .btn-fixed,
 #exaplan .btn-blocked,
@@ -544,9 +545,20 @@ body {
     margin-left: 20px;
 }
 
+.moduleListTable .exaplan-date-fixed {
+    background-color: #005300 !important;
+    border-color: #005300 !important;
+    color: #ffffff !important;
+}
 .moduleListTable .exaplan-date-blocked {
     background-color: #8CD0F2 !important;
+    border-color: #8CD0F2 !important;
     color: #253b48 !important;
+}
+.moduleListTable .exaplan-date-canceled {
+    background-color: #666666 !important;
+    border-color: #666666 !important;
+    color: #ffffff !important;
 }
 
 /* skill bar------------------------------------------------------------------------*/

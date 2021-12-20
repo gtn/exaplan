@@ -15,7 +15,7 @@ class block_exaplan extends block_base {
         $PAGE->requires->css('/blocks/exaplan/css/block_exaplan.css', true);
 
         $modulepartid = optional_param("mpid", 0, PARAM_INT);
-        $dashboardType = optional_param("dashboardType", 'default', PARAM_TEXT);
+        $dashboardType = optional_param("dashboardType", BLOCK_EXAPLAN_DASHBOARD_DEFAULT, PARAM_TEXT);
         $isadmin = block_exaplan_is_admin();
         $isteacher = block_exaplan_is_teacher_in_any_course();
 

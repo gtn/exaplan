@@ -101,7 +101,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                 $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$part["id"].'" 
                                 role="button" 
                                 data-modulepartId="'.$part['id'].'"
-                                class="btn btn-danger exaplan-admin-modulepart-button '.$buttonClass.'"
+                                class="btn exaplan-admin-modulepart-button '.$buttonClass.'"
                             > '.$title.' </a>';
             } else {
                 if (!$part['date']  // no any date yet
@@ -387,7 +387,7 @@ function printAdminModulepartView($modulepartid, $date = '', $region = '', $sele
     $content .= '</tr>';
     $content .= '</table>';
     // calendars
-    $content .= block_exaplan_calendars_view(0, 4, false, $modulepartid, $region);
+    $content .= block_exaplan_calendars_view(0, 3, false, $modulepartid, $region);
     // day ajax reloaded data (just HTML container)
     $content .= '<div id="modulepart-date-data">';
     if ($date) {
@@ -1043,38 +1043,63 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
     $content .= '</tr>';
 
     // buttons
-    $content .= '<tr>';
-    $content .= '<td align="left" colspan="3">';
-    if (!@$dateRec['state'] || @$dateRec['state'] == BLOCK_EXAPLAN_DATE_BLOCKED) {
-        $content .= '<button name="date_block" class="btn btn-info btn-date-block" type="submit" value="date_block" >Termin blocken</button>';
-    }
-    $content .= '</td>';
-    $content .= '<td align="right" colspan="3">';
-    if (!$dateRec || $dateRec['state'] != BLOCK_EXAPLAN_DATE_CANCELED) {
-        // do not show save buttons for canceled date
-        if ($selectedDateId) {$btntxt="Änderung speichern";} else{$btntxt="Termin fixieren";};
-        $content .= '<button name="date_save" class="btn btn-success btn-date-save" type="submit" value="date_save" >'.$btntxt.'</button>';
-    }
-    $content .= '</td>';
-    $content .= '</tr>';
+    $buttons = ['row1' => [], 'row2' => []];
+    // first buttons row
+    // possible variants of buttons:
+    // 1. no any selected date: date_block, date_save
+    if (empty($dateRec)) {
+        $buttons['row1']['left'] = '<button name="date_block" class="btn btn-info btn-date-block" type="submit" value="date_block" >Termin blocken</button>';
+        $buttons['row1']['right'] = '<button name="date_save" class="btn btn-success btn-date-save" type="submit" value="date_save" >Termin fixieren</button>';
+    } else {
+        // 2. selected date - by selected state
+        // 2.a. blocked
+        if (@$dateRec['state'] == BLOCK_EXAPLAN_DATE_BLOCKED) {
+            $buttons['row1']['left'] = '<button name="date_save" class="btn btn-success btn-date-save" type="submit" value="date_save" >Termin fixieren</button>';
+            $buttons['row1']['right'] = '<button name="date_block" class="btn btn-info btn-date-block" type="submit" value="date_block" >Änderung speichern</button>';
+        }
+        // 2.b. fixed
+        if (@$dateRec['state'] == BLOCK_EXAPLAN_DATE_FIXED) {
+            $buttons['row1']['left'] = '';
+            $buttons['row1']['right'] = '<button name="date_save" class="btn btn-success btn-date-save" type="submit" value="date_save" >Änderung speichern</button>';
+        }
+        // 2.c canceled
+        if (@$dateRec['state'] == BLOCK_EXAPLAN_DATE_CANCELED) {
+            // empty row
+        }
 
-    // buttons. second row
+    }
+    // second buttons row
+    $buttons['row2']['left'] = ''; // always empty
     if ($selectedDateId) {
-        $content .= '<tr>';
-        $content .= '<td align="left" colspan="3">';
-        $content .= '</td>';
         $cancelButtonTitle = 'Termin absagen';
         $buttonDisabled = '';
-        if ($dateRec['state'] == BLOCK_EXAPLAN_DATE_BLOCKED) {
+        if (@$dateRec['state'] == BLOCK_EXAPLAN_DATE_BLOCKED) {
             $cancelButtonTitle = 'Blockierung aufheben';
         } elseif ($dateRec['state'] == BLOCK_EXAPLAN_DATE_CANCELED) {
             $cancelButtonTitle = 'Termin abgesagt';
             $buttonDisabled = ' disabled = "disabled" ';
         }
-        $content .= '<td align="right" colspan="3">';
-        $content .= '<button name="date_cancel" class="btn btn-default btn-date-cancel" type="submit" value="date_cancel" '.$buttonDisabled.'>'.$cancelButtonTitle.'</button></td>';
-        $content .= '</tr>';
+        $buttons['row2']['right'] = '<button name="date_cancel" class="btn btn-default btn-date-cancel" type="submit" value="date_cancel" '.$buttonDisabled.'>'.$cancelButtonTitle.'</button></td>';
     }
+
+    $getButtonRowContent = function($rowNumber) use ($buttons) {
+        $rowContent = '';
+        $rowIndex = 'row'.$rowNumber;
+        if (array_key_exists($rowIndex, $buttons) && count($buttons[$rowIndex]) > 0) {
+            $rowContent .= '<tr>';
+            $rowContent .= '<td align="left" colspan="3">';
+            $rowContent .= @$buttons[$rowIndex]['left'];
+            $rowContent .= '</td>';
+            $rowContent .= '<td align="right" colspan="3">';
+            $rowContent .= @$buttons[$rowIndex]['right'];
+            $rowContent .= '</td>';
+            $rowContent .= '</tr>';
+        }
+        return $rowContent;
+    };
+
+    $content .= $getButtonRowContent(1);
+    $content .= $getButtonRowContent(2);
 
     $content .= '</table>';
 
@@ -1194,7 +1219,7 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
     return $content;
 }
 
-function printAdminDashboard($dashboardType = 'default')
+function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
 {
     global $CFG, $PAGE;
     $content = '';
@@ -1202,13 +1227,13 @@ function printAdminDashboard($dashboardType = 'default')
     $modulesets = getAllModules();
 
     switch ($dashboardType) {
-        case 'inProcess':
+        case BLOCK_EXAPLAN_DASHBOARD_INPROCESS:
             $dashoboardTitle = 'Übersicht: in Bearbeitung';
             break;
-        case 'past':
+        case 'BLOCK_EXAPLAN_DASHBOARD_PAST':
             $dashoboardTitle = 'Übersicht: zurückliegende Termine';
             break;
-        case 'default':
+        case BLOCK_EXAPLAN_DASHBOARD_DEFAULT:
         default:
             $dashoboardTitle = 'Übersicht Anfragen';
             break;
@@ -1243,7 +1268,11 @@ function printAdminDashboard($dashboardType = 'default')
     $content .= '<tr>';
     $content .= '<th rowspan="2" valign="top">Meine Module</th>';
     $content .= '<th rowspan="2" valign="top">Termine</th>';
-    $content .= '<th colspan="1">Anzahl Teilnehmer angefragt:</th>';
+    $content .= '<th colspan="1">';
+    if ($dashboardType == BLOCK_EXAPLAN_DASHBOARD_DEFAULT) {
+        $content .= 'Anzahl Teilnehmer angefragt:';
+    }
+    $content .= '</th>';
     $content .= '</tr>';
     /*$content .= '<tr>';
     $content .= '<th class="regionColumn">'.getRegionTitle('RegionOst').'</th>';
@@ -1276,32 +1305,33 @@ function printAdminDashboard($dashboardType = 'default')
                 $content .= '<td class="regionColumn">';
                 $buttonClass = '';
                 switch ($dashboardType) {
-                    case 'inProcess':
+                    case BLOCK_EXAPLAN_DASHBOARD_INPROCESS:
                         // existing fixed / blocked dates (in the future)
                         $fixedDates = getFixedDatesAdvanced(null, $part['id'], null, null, true, $region, 'future');
 //                        $fixedDates = getDatesForModulePart($part['id'], null, $region, 'future');
                         if (count($fixedDates) > 0) {
-                            $buttonClass .= ' exaplan-date-fixed ';
+                            $shownDates = [];
                             foreach ($fixedDates as $fixedDate) {
-                                if ($fixedDate['dateType'] == BLOCK_EXAPLAN_DATE_BLOCKED) {
-                                    $buttonClass = ' exaplan-date-blocked ';
+                                if (!in_array($fixedDate['id'], $shownDates)) { // getFixedDatesAdvanced returns multiple records for the same date by related users
+                                    $buttonClass = ' exaplan-date-' . getDateStateCodeByIndex($fixedDate['dateType']) . ' ';
+                                    $content .= $buttonTemplate($part['id'], $region, date('d.m.Y', $fixedDate['date']), $buttonClass, $fixedDate['date']) . '&nbsp;';
+                                    $shownDates[] = $fixedDate['id'];
                                 }
-                                $content .= $buttonTemplate($part['id'], $region, date('d.m.Y', $fixedDate['date']), $buttonClass, $fixedDate['date']).'&nbsp;';
                             }
                         }
                         break;
-                    case 'past':
+                    case BLOCK_EXAPLAN_DASHBOARD_PAST:
                         // fixed dates in past
 //                        $fixedDates = getFixedDatesAdvanced(null, $part['id'], null, null, false, $region, 'past');
                         $fixedDates = getDatesForModulePart($part['id'], null, $region, 'past');
                         if (count($fixedDates) > 0) {
-                            $buttonClass .= ' exaplan-date-fixed ';
                             foreach ($fixedDates as $fixedDate) {
+                                $buttonClass = ' exaplan-date-'.getDateStateCodeByIndex($fixedDate['dateType']).' ';
                                 $content .= $buttonTemplate($part['id'], $region, date('d.m.Y', $fixedDate['date']), $buttonClass, $fixedDate['date']).'&nbsp;';
                             }
                         }
                         break;
-                    case 'default':
+                    case BLOCK_EXAPLAN_DASHBOARD_DEFAULT:
                         // desired dates
                         $desiredDates = getDesiredDates(null, $part['id'], null, null, $region);
                         if (count($desiredDates) > 0) {
@@ -1341,18 +1371,18 @@ function printAdminDashboard($dashboardType = 'default')
     $content .= '<div class="BlockFooter">';
     // buttons to dashboards
     switch ($dashboardType) {
-        case 'inProcess':
-            $content .= '<a href="'.$PAGE->url.'?dashboardType=default" role="button" class="btn btn-info btn-to-dashboard"> Übersicht Anfragen </a>&nbsp;';
-            $content .= '<a href="'.$PAGE->url.'?dashboardType=past" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: zurückliegende Termine </a>&nbsp;';
+        case BLOCK_EXAPLAN_DASHBOARD_INPROCESS:
+            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_DEFAULT.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht Anfragen </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_PAST.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: zurückliegende Termine </a>&nbsp;';
             break;
-        case 'past':
-            $content .= '<a href="'.$PAGE->url.'?dashboardType=default" role="button" class="btn btn-info btn-to-dashboard"> Übersicht Anfragen </a>&nbsp;';
-            $content .= '<a href="'.$PAGE->url.'?dashboardType=inProcess" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: in Bearbeitung </a>&nbsp;';
+        case BLOCK_EXAPLAN_DASHBOARD_PAST:
+            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_DEFAULT.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht Anfragen </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_INPROCESS.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: in Bearbeitung </a>&nbsp;';
             break;
-        case 'default':
+        case BLOCK_EXAPLAN_DASHBOARD_DEFAULT:
         default:
-            $content .= '<a href="'.$PAGE->url.'?dashboardType=inProcess" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: in Bearbeitung </a>&nbsp;';
-            $content .= '<a href="'.$PAGE->url.'?dashboardType=past" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: zurückliegende Termine </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_INPROCESS.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: in Bearbeitung </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_PAST.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: zurückliegende Termine </a>&nbsp;';
             break;
     }
     $content .= '</div>';
