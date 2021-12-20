@@ -28,8 +28,8 @@ switch ($action) {
     case 'registerToDate':
         if ($dateId > 0) {
             addPUserToDate($dateId, getPuser($userid)['id']);
-            $url = new moodle_url('/blocks/exaplan/dateDetails.php', array('mpid' => $modulepartid, 'dateid' => $dateId));
-            redirect($url, 'You were registered');
+            $url = new moodle_url('/blocks/exaplan/dateDetails.php', array('mpid' => $modulepartid, 'dateid' => $dateId, 'userid' => $userid, 'pagehash' => block_exaplan_hash_current_userid($userid)));
+            redirect($url);
         }
         break;
 }

@@ -287,6 +287,13 @@ $(function () {
         }
     });
 
+    // confirmation message to register self to the fixed date
+    $('body').on('click', '.exaplan-register-toDate', function (e) {
+        var text = $(this).attr('data-confirmMessage');
+        return confirm(text);
+    })
+
+
 });
 
 

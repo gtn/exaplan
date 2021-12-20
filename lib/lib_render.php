@@ -79,7 +79,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
         $content .= '<thead>';
         $content .= '<tr>';
         foreach($moduleset->parts as $part) {
-            $content .= '<th>'.$part["title"].'</th>';
+            $content .= '<td>'.$part["title"].'</td>';
         }
         $content .= '</tr>';
         $content .= '</thead>';
@@ -305,13 +305,20 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
     $modulePart = getTableData('mdl_block_exaplanmoduleparts', $modulepartId);
     $modulepartName = $modulePart['title'];
     $moduleName = getTableData('mdl_block_exaplanmodulesets', $modulePart['modulesetid'], 'title');
-    $existingDates = getFixedDatesAdvanced(null, $modulepartId, null, null, true, '', '', [BLOCK_EXAPLAN_DATE_DESIRED, BLOCK_EXAPLAN_DATE_FIXED]);
+    $existingDates = getFixedDatesAdvanced(null, $modulepartId, null, null, true, '', 'future', [BLOCK_EXAPLAN_DATE_DESIRED, BLOCK_EXAPLAN_DATE_FIXED]);
     $content .= '<h4>Sie planen: '.$moduleName.' | '.$modulepartName.'</h4>';
     if ($existingDates) {
+        $usersMoodle = getPuser($userid)['moodleid'];
         $content .= '<div class="register-existing-dates">';
         $tooltips = '<div class="tooltip_templates">';
         $content .= '<table class="table table-sm table-borderless">';
+        $reallyUsedDates = 0; // foreach can show not all dates, so calc them
         foreach ($existingDates as $dKey => $date) {
+            // if the date is related to "moodle" - show it only this moodle is the same as users moodle
+            if ($usersMoodle && $date['moodleid'] && $usersMoodle != $date['moodleid']) {
+                continue;
+            }
+            $reallyUsedDates++;
             $content .= '<tr>';
             $content .= '<td>';
             if ($dKey === 0) {
@@ -321,20 +328,29 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
             $trainer = getTableData('mdl_block_exaplanpusers', $date['trainerpuserid']);
             $tooltips .= '<span id="tooltipster_content'.$date['id'].'">';
             $tooltips .= ($date['starttime'] ? 'Uhrzeit: <strong>'.date('H:i', $date['starttime']).'</strong> '.date('d.m.Y', $date['date']).'<br>' : '')
+                .($date['duration'] ? 'Dauer: '.$date['duration'].'<br>' : '')
+                .($date['moodleid'] ? 'DF Ort: '.getMoodleDataByMoodleid($date['moodleid'], 'companyname').'<br>' : '')
+                .getRegionTitle($date['region']).' - '.getIsOnlineTitle($date['isonline']).'<br>'
                 .($date['location'] ? 'Location: '.$date['location'].'<br>' : '')
                 .($trainer ? 'Skillswork-Trainer: '.@$trainer['firstname'].' '.@$trainer['lastname'].'<br>' : '');
             $tooltips .= '</span>';
-            $content .= '<td align="right"><a href="#" class="btn btn-sm exaplan-existing-date tooltipster" data-tooltip-content="#tooltipster_content'.$date['id'].'">'.date('d.m.Y', $date['date']).'</a></td>';
+            $content .= '<td align="right"><a href="#" class="btn btn-sm exaplan-existing-date tooltipster" data-tooltip-content="#tooltipster_content'.$date['id'].'">';
+            $content .= date('d.m.Y', $date['date']);
+            $content .= '</a></td>';
             $url = $CFG->wwwroot.'/blocks/exaplan/calendar.php?action=registerToDate&mpid='.$modulepartId.'&dateid='.$date['id'].'&userid='.$userid.'&pagehash='.block_exaplan_hash_current_userid($userid).'';
-            $content .= '<td align="left"><a href="'.$url.'" class="btn btn-sm exaplan-register-toDate">Termin bestätigen</a></td>';
+            $confirmMessage = 'Sie buchen sich gerade im Termin "'.getFixedDateTitle($date['id']).'" am "'.date('d.m.Y', $date['date']).'" in Region "'.getRegionTitle($date['region']).'" ein. Wollen Sie das wirklich?';
+            $confirmMessage = htmlentities($confirmMessage);
+            $content .= '<td align="left"><a href="'.$url.'" class="btn btn-sm exaplan-register-toDate" data-confirmMessage="'.$confirmMessage.'">Termin bestätigen</a></td>';
 
             $content .= '</tr>';
         }
         $content .= '</table>';
         $tooltips .= '</div>';
-        $content .= $tooltips;
-        $content .= '<strong>ODER</strong><br>';
-        $content .= 'Wunschtermin wählen:';
+        if ($reallyUsedDates) {
+            $content .= $tooltips;
+            $content .= '<strong>ODER</strong><br>';
+            $content .= 'Wunschtermin wählen:';
+        }
         $content .= '</div>';
     }
     if ($modulePart['duration'] != 1) {
@@ -1186,28 +1202,44 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
     $moduleName = getTableData('mdl_block_exaplanmodulesets', $moduleId, 'title');
     $dateData = getTableData('mdl_block_exaplandates', $dateId);
 
-
+    // table header with main data
     $content .= '<tr>';
     $content .= '<th>Sie planen: '.$moduleName.' | '.$modulepartName.'</th>';
     $content .= '<th>'.date('d.m.Y', $dateData['date']).'</th>';
     $content .= '</tr>';
 
-    $content .= '<tr>';
-    $content .= '<td class="dataLabel">Location:</td>';
-    $content .= '<td class="dataContent">'.$dateData['location'].'</td>';
-    $content .= '</tr>';
+    $tableRow = function($label, $value) {
+        $content = '<tr>';
+        $content .= '<td class="dataLabel">'.$label.'</td>';
+        $content .= '<td class="dataContent">'.$value.'</td>';
+        $content .= '</tr>';
+        return $content;
+    };
 
-    $content .= '<tr>';
-    $content .= '<td class="dataLabel">Uhrzeit:</td>';
-    $content .= '<td class="dataContent">'.date('H:i', $dateData['starttime']).'</td>';
-    $content .= '</tr>';
+    // moodleid info
+    $moodleData = getMoodleDataByMoodleid($dateData['moodleid']);
+    $content .= $tableRow('DF Ort:', @$moodleData['companyname']);
 
-    $content .= '<tr>';
-    $content .= '<td class="dataLabel">Skillswork-Trainer:</td>';
+    // region
+    $content .= $tableRow('Region:', getRegionTitle(@$dateData['region']));
+
+    // is online
+    $content .= $tableRow('DF Art:', getIsOnlineTitle($dateData['isonline']));
+
+    // location
+    $content .= $tableRow('Location:', $dateData['location']);
+
+    // time start
+    $content .= $tableRow('Uhrzeit:', date('H:i', $dateData['starttime']));
+
+    // duration
+    $content .= $tableRow('Dauer:', $dateData['duration']);
+
+    // trainer
     $trainer = getTableData('mdl_block_exaplanpusers', $dateData['trainerpuserid']);
-    $content .= '<td class="dataContent">'.@$trainer['firstname'].' '.@$trainer['lastname'].'</td>';
-    $content .= '</tr>';
+    $content .= $tableRow('Skillswork-Trainer:', @$trainer['firstname'].' '.@$trainer['lastname']);
 
+    // description
     if ($dateData['comment']) {
         $content .= '<tr>';
         $content .= '<td colspan="2"><strong>Notiz:</strong><br>'.$dateData['comment'].'</td>';

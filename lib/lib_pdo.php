@@ -973,3 +973,27 @@ function getMoodles() {
 function getFixedDateState($dateId) {
     return getTableData('mdl_block_exaplandates', $dateId, 'state');
 }
+
+/**
+ * @param int $moodleid moodleId - not id!
+ * @param string $field
+ * @return array
+ */
+function getMoodleDataByMoodleid($moodleid, $field = '') {
+    $pdo = getPdoConnect();
+
+    $sql = "SELECT * FROM mdl_block_exaplanmoodles WHERE moodleid = :moodleid";
+    $statement = $pdo->prepare($sql);
+    $statement->execute([':moodleid' => $moodleid]);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
+    $result = $statement->fetchAll();
+    if ($result) {
+        $result = $result[0];
+        if ($field) {
+            $result = @$result[$field];
+        }
+        return $result;
+    }
+
+    return null;
+}

@@ -545,17 +545,17 @@ body {
     margin-left: 20px;
 }
 
-.moduleListTable .exaplan-date-fixed {
+.moduleListTable .exaplan-date-fixed:not(.exaplan-date-absent) {
     background-color: #005300 !important;
     border-color: #005300 !important;
     color: #ffffff !important;
 }
-.moduleListTable .exaplan-date-blocked {
+.moduleListTable .exaplan-date-blocked:not(.exaplan-date-absent) {
     background-color: #8CD0F2 !important;
     border-color: #8CD0F2 !important;
     color: #253b48 !important;
 }
-.moduleListTable .exaplan-date-canceled {
+.moduleListTable .exaplan-date-canceled:not(.exaplan-date-absent) {
     background-color: #666666 !important;
     border-color: #666666 !important;
     color: #ffffff !important;
