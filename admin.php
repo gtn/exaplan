@@ -78,19 +78,19 @@ switch ($action) {
             $dateData = getTableData('mdl_block_exaplandates', $dateId);
             $bulkAction = required_param('bulk_function', PARAM_TEXT);
             switch ($bulkAction) {
-                case 'studentsAdd':
+                case 'studentsAdd': // add selected students to the date
                     if ($students && count($students)) {
                         foreach ($students as $student) {
                             $absent = 0; // add with absent = 0
                             addPUserToDate($dateId, $student, $absent, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
-                            // delete (disable) ALL other desired dates (not for 'blocked' dates)
-                            if ($dateData['state'] != BLOCK_EXAPLAN_DATE_BLOCKED) {
+                            // delete (disable) ALL other desired dates
+//                            if ($dateData['state'] != BLOCK_EXAPLAN_DATE_BLOCKED) {
                                 removeDesiredDate($modulepartid, $student);
-                            }
+//                            }
                         }
                     }
                     break;
-                case 'studentsRemove':
+                case 'studentsRemove': // remove selected students from date
                     if ($students && count($students)) {
                         foreach ($students as $student) {
                             removePUserFromDate($dateId, $student, $modulepartid);
@@ -101,7 +101,7 @@ switch ($action) {
                         }
                     }
                     break;
-                case 'studentsAbsent':
+                case 'studentsAbsent': // set 'absent' for selected student and date
                     // if the user is not linked yet to this date - it will be linked now and setted up absent = 1
                     if ($students && count($students)) {
                         $sendNotificationToStudent = false; // TODO: message?
@@ -114,7 +114,7 @@ switch ($action) {
                         }
                     }
                     break;
-                case 'sendMessage':
+                case 'sendMessage': // send custom message to selected students
                     $bulkMessage = optional_param('bulk_message', '', PARAM_TEXT);
                     if ($bulkMessage && $students && count($students)) {
                         foreach ($students as $student) {

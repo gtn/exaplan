@@ -565,7 +565,7 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
         if (!array_key_exists($dateIndex, $usersForDay)) {
             $usersForDay[$dateIndex] = ['desired' => [], 'fixed' => [], 'blocked' => []];
         }
-        if (!array_key_exists($dateIndex, $selectedDates)) { // TODO: Check it if the user has fixed and desitrred the same date
+        if (!array_key_exists($dateIndex, $selectedDates)) { // TODO: Check it if the user has fixed and desired the same date
             $selectedDates[$dateIndex] = [
                 'date' => $dateIndex,
                 'middayType' => getTimeslotName($date['timeslot'], true),
@@ -574,7 +574,7 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
                 'desired' => false,
                 'fixed' => false,
                 'blocked' => false,
-                'usersCount' => ['desired' => 0, 'fixed' => 0, 'blocked' => 0],
+                'usersCount' => ['desired' => null, 'fixed' => null, 'blocked' => null],
             ];
         }
         // count of all related users
@@ -586,6 +586,8 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
         if (@$date['relatedUserId'] && !in_array($date['relatedUserId'], $usersForDay[$dateIndex][$dateTypeCode])) {
             $usersForDay[$dateIndex][$dateTypeCode][] = $date['relatedUserId'];
             $selectedDates[$dateIndex]['usersCount'][$dateTypeCode] += 1;
+        } elseif (in_array($date['dateType'], [BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED])) {
+            $selectedDates[$dateIndex]['usersCount'][$dateTypeCode] = 0; // to mark dates without related users (0)-markers
         }
         $selectedDates[$dateIndex]['moduleparts'][] = $date['modulepartid'];
         $selectedDates[$dateIndex]['readonly'] = $readonly; // TODO: another rules for readonly days?

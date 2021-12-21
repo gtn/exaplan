@@ -1148,11 +1148,23 @@ function adminBulkFunctionsFormPart($usersDataColumnsCount, $dateId) {
         'sendMessage' => 'Nachricht senden',
     ];
     $dateData = getTableData('mdl_block_exaplandates', $dateId);
-    // hide some actions for date states
-    if ($dateData['state'] != BLOCK_EXAPLAN_DATE_FIXED) {
-        unset($bulkFunctions['studentsAdd']);
-        unset($bulkFunctions['studentsRemove']);
-        unset($bulkFunctions['studentsAbsent']);
+    // hide some actions by date states
+    switch ($dateData['state']) {
+        case BLOCK_EXAPLAN_DATE_DESIRED:
+            unset($bulkFunctions['studentsAdd']);
+            unset($bulkFunctions['studentsRemove']);
+            unset($bulkFunctions['studentsAbsent']);
+            break;
+        case BLOCK_EXAPLAN_DATE_FIXED:
+            break;
+        case BLOCK_EXAPLAN_DATE_BLOCKED:
+            unset($bulkFunctions['studentsAbsent']);
+            break;
+        case BLOCK_EXAPLAN_DATE_CANCELED:
+            unset($bulkFunctions['studentsAdd']);
+            unset($bulkFunctions['studentsRemove']);
+            unset($bulkFunctions['studentsAbsent']);
+            break;
     }
     $content .= '<select id="bulk_function" class="form-control" name="bulk_function">';
     foreach ($bulkFunctions as $value => $title) {
