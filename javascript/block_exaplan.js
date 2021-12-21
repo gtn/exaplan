@@ -293,6 +293,30 @@ $(function () {
         return confirm(text);
     })
 
+    // mark dates on calendar
+    $('body').on('mouseover', '.exaplan-markCalendarDates', function (e) {
+        var datesList = $(this).attr('data-markDates');
+        var datesArr = datesList.split(",").map(item => item.trim());
+        datesArr.forEach(function (dateItem) {
+            if (dateItem.length) {
+                allCalendars.forEach((calendarInstance) => {
+                    calendarInstance.addMetaData(dateItem, {markHover: true});
+                });
+            }
+        })
+    })
+    // UNmark dates on calendar
+    $('body').on('mouseout', '.exaplan-markCalendarDates', function (e) {
+        var datesList = $(this).attr('data-markDates');
+        var datesArr = datesList.split(",").map(item => item.trim());
+        datesArr.forEach(function (dateItem) {
+            if (dateItem.length) {
+                allCalendars.forEach((calendarInstance) => {
+                    calendarInstance.addMetaData(dateItem, {unMarkHover: true});
+                });
+            }
+        })
+    })
 
 });
 

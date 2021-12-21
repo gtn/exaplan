@@ -721,3 +721,7 @@ tr[data-listid="mainList"] td {
     -ms-transform: translate(-50%, -50%) rotate(-45deg);
     transform: translate(-50%, -50%) rotate(-45deg);
 }
+
+.exaplan-calendar-date-marked .tavo-calendar__day-inner {
+    border: solid 1px #b8860b;
+}

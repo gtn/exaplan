@@ -899,8 +899,9 @@ function rowForStudentInFormAdminDateFixing($pUserData, $dateData, $pUserSelecte
     // count of desired dates
     $desiredDates = getDesiredDates($pUserId, $modulepartId, null, null, $defaultRegion);
     if (count($desiredDates) > 0) {
-    	   	$datelist = getDesiredDatesDatelist($desiredDates);
-        $desiredDatesCount = '<a href="#" title="'.$datelist.'">'.count($desiredDates) . '</a> Termin' . (count($desiredDates) > 1 ? 'e' : '');
+        $datelist = getDesiredDatesDatelist($desiredDates);
+        $dateListForJS = implode(',', array_map(function ($d) {return date('Y-m-d', $d["date"]);}, $desiredDates));
+        $desiredDatesCount = '<a href="#" title="'.$datelist.'" class="exaplan-markCalendarDates" data-markDates="'.$dateListForJS.'">'.count($desiredDates) . '</a> Termin' . (count($desiredDates) > 1 ? 'e' : '');
     } else {
         $desiredDatesCount = '';
     }

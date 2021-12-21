@@ -170,6 +170,12 @@ TavoCalendar.prototype.addMetaData = function(date, metaData) {
                 if (metaData.blocked) {
                     dayWrapper.addClass('exaplan-calendar-date-blocked');
                 }
+                if (metaData.markHover) {
+                    dayWrapper.addClass('exaplan-calendar-date-marked');
+                }
+                if (metaData.unMarkHover) {
+                    dayWrapper.removeClass('exaplan-calendar-date-marked');
+                }
                 if (metaData.moduleparts && typeof currentModulepartId != 'undefined' && currentModulepartId > 0) {
                     if (metaData.moduleparts.indexOf(currentModulepartId) == -1) {
                         // add class to mute this day
