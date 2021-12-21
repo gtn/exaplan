@@ -1101,6 +1101,13 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
         $buttons['row2']['right'] = '<button name="date_cancel" class="btn btn-default btn-date-cancel" type="submit" value="date_cancel" '.$buttonDisabled.'>'.$cancelButtonTitle.'</button></td>';
     }
 
+    // third buttons row
+    $buttons['row3']['left'] = ''; // always empty
+    if ($selectedDateId) {
+        $returnButtonTitle = 'abbrechen';
+        $buttons['row3']['right'] = '<button name="date_return" class="btn btn-default btn-date-return" type="button" value="date_return" data-toDate="'.$date.'">'.$returnButtonTitle.'</button></td>';
+    }
+
     $getButtonRowContent = function($rowNumber) use ($buttons) {
         $rowContent = '';
         $rowIndex = 'row'.$rowNumber;
@@ -1119,6 +1126,7 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
 
     $content .= $getButtonRowContent(1);
     $content .= $getButtonRowContent(2);
+    $content .= $getButtonRowContent(3);
 
     $content .= '</table>';
 

@@ -58,7 +58,7 @@ $(function () {
 
 function selectedDateEvent(calEvent, monthCalendar) {
     if (isExaplanAdmin) {
-        modulepartInfoByDateAjax(calEvent, monthCalendar);
+        modulepartInfoByDateAjax(calEvent, monthCalendar, null);
     } else {
         selectedDateSendAjax(calEvent, monthCalendar);
     }
@@ -98,7 +98,7 @@ function selectedDateSendAjax(calEvent, monthCalendar) {
             url: ajaxUrl,
             cache: false
         }).done(function (result) {
-            console.log('block_exaplan.js:100');console.log(result);// !!!!!!!!!! delete it
+            // console.log('block_exaplan.js:100');console.log(result);// !!!!!!!!!! delete it
             calendarData = JSON.parse(result);
             updateCalendarSelectedDates();
             updateAllCalendarMetadata();
@@ -113,7 +113,7 @@ function selectedDateSendAjax(calEvent, monthCalendar) {
     }
 }
 
-function modulepartInfoByDateAjax(calEvent, monthCalendar) {
+function modulepartInfoByDateAjax(calEvent, monthCalendar, onDone) {
     calEvent.preventDefault();
     
     var selectedDate =  lastCalendarSelectedDate;
@@ -135,6 +135,9 @@ function modulepartInfoByDateAjax(calEvent, monthCalendar) {
         updateAllCalendarMetadata();
         $('#modulepart-date-data').html(resultData.htmlContent);
         monthCalendar.unBlurCalendar();
+        if (typeof onDone === 'function') {
+            onDone();
+        }
     }).fail(function () {
         console.log('Something wrong in Ajax!! 1635165804897')
     });
@@ -317,6 +320,23 @@ $(function () {
             }
         })
     })
+
+    // return button
+    $('body').on('click', '.btn-date-return', function (e) {
+        e.preventDefault();
+        var toDate = $(this).attr('data-toDate');
+        lastCalendarSelectedDate = toDate;
+        // blur all calendars
+        allCalendars.forEach((calendarInstance) => {
+            calendarInstance.blurCalendar();
+        });
+        modulepartInfoByDateAjax(e, allCalendars[0], function() {
+            // unblur all
+            allCalendars.forEach((calendarInstance) => {
+                calendarInstance.unBlurCalendar();
+            });
+        });
+    });
 
 });
 

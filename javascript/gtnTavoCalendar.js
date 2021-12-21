@@ -243,7 +243,7 @@ TavoCalendar.prototype.markSelectedModulePart = function(modulepartId, calendarD
 
 
 // Own DayClick function!
-// deprecated? Look on the custom code in the start f this file: ...(function(dayClick) {   TavoCalendar.prototype.dayClick = function() {
+// deprecated? Look on the custom code in the start of this file: ...(function(dayClick) {   TavoCalendar.prototype.dayClick = function() {
 TavoCalendar.prototype.gtnDayClick = function(date, day_el) {
     lastCalendarSelectedDate = date;
     lastCalendarSelectedDay = $(day_el).clone().find(':not(.tavo-calendar__day-inner)').remove().end().text(); // not the best way, but works
