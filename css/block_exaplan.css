@@ -492,6 +492,7 @@ body {
 #exaplan .btn-date-save,
 #exaplan .btn-date-block,
 #exaplan .btn-date-cancel,
+#exaplan .btn-date-return,
 #exaplan .btn-bulkaction-go,
 #exaplan .btn-to-dashboard,
 .block_exaplan .btn-to-dashboard {
@@ -697,6 +698,10 @@ tr[data-listid="mainList"] td {
 
 .exaplan-adminModulepartView .btn-date-cancel {
     background-color: #bbbbbb !important;
+}
+
+.exaplan-adminModulepartView .btn-date-return {
+    background-color: #cccccc !important;
 }
 
 
