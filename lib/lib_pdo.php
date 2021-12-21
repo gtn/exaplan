@@ -503,6 +503,32 @@ function removeDesiredDate($modulepartid, $puserid)
 }
 
 /**
+ * remove all desired dates for the user and module part
+ * @param int $modulepartid
+ * @param int $puserid
+ * @param bool $onlyInFuture
+ * @return bool
+ */
+function restoreDesiredDates($modulepartid, $puserid, $onlyInFuture = true)
+{
+    if (!$modulepartid || !$puserid) {
+        return true;
+    }
+    $pdo = getPdoConnect();
+    $params = [
+        ':modulepartid' => $modulepartid,
+        ':puserid' => $puserid,
+    ];
+    $sql = 'UPDATE mdl_block_exaplandesired SET disabled = 0 WHERE modulepartid = :modulepartid AND puserid = :puserid ';
+    if ($onlyInFuture) {
+        $sql .= ' AND date >= '.strtotime("today", time()).' ';
+    }
+    $statement = $pdo->prepare($sql);
+    $statement->execute($params);
+    return true;
+}
+
+/**
  * @param $dateid
  * @param $puserid
  * @param int $absent

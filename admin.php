@@ -106,8 +106,11 @@ switch ($action) {
                     if ($students && count($students)) {
                         $sendNotificationToStudent = false; // TODO: message?
                         foreach ($students as $student) {
+                            // set absent for the student
                             $absent = 1;
                             addPUserToDate($dateId, $student, $absent, $pUserId, $date, $moduleset, $modulepart, true, $sendNotificationToStudent);
+                            // restore his desired dates
+                            restoreDesiredDates($modulepartid, $student);
                         }
                     }
                     break;
@@ -197,7 +200,7 @@ switch ($action) {
 
             }
 
-            // add selected users inly during creating of NEW fixed date
+            // add selected users only during creating of NEW fixed date
             // for existing dates - this action moved to bulk actions
             if ($state == BLOCK_EXAPLAN_DATE_FIXED) {
                 // change exists fixed date:
