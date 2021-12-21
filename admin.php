@@ -159,27 +159,26 @@ switch ($action) {
                 // - remove blocked date at all
                 if ($dateId) {
                     $dateState = getFixedDateState($dateId);
-                    if ($dateState == BLOCK_EXAPLAN_DATE_FIXED) {
+                    if (in_array($dateState, [BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED])) {
                         // unlink students
                         $registeredUsers = getFixedPUsersForDate($dateId);
-                        $registeredUsersIds = array_map(function ($u) {
-                            return $u['puserid'];
-                        }, $registeredUsers);
+                        $registeredUsersIds = array_map(function ($u) {return $u['puserid']; }, $registeredUsers);
                         foreach ($registeredUsersIds as $studentId) {
                             removePUserFromDate($dateId, $studentId, $modulepartid);
-                            // send messages
-                            $pUserData = getTableData('mdl_block_exaplanpusers', $studentId);
-                            $text = 'Lieber '.$pUserData['firstname'].', leider wurde der Kurs '.getFixedDateTitle($dateId).' abgesagt. Deine Planung ist noch da, bitte plane den Rest neu.';
-                            block_exaplan_create_plannotification($pUserId, $studentId, $text);
+                            if ($dateState == BLOCK_EXAPLAN_DATE_FIXED) {
+                                // send messages
+                                $pUserData = getTableData('mdl_block_exaplanpusers', $studentId);
+                                $text = 'Lieber ' . $pUserData['firstname'] . ', leider wurde der Kurs ' . getFixedDateTitle($dateId) . ' abgesagt. Deine Planung ist noch da, bitte plane den Rest neu.';
+                                block_exaplan_create_plannotification($pUserId, $studentId, $text);
+                            }
                         }
-                        // set 'canceled'
-                        $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, BLOCK_EXAPLAN_DATE_CANCELED);
-                    } else if ($dateState == BLOCK_EXAPLAN_DATE_BLOCKED) {
-                        // remove date if not any user
-                        if (!removeDateIfNoUsers($dateId)) {
-                            // set 'fixed' state if at least one user is related
-                            $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, BLOCK_EXAPLAN_DATE_FIXED);
-                        };
+                        if ($dateState == BLOCK_EXAPLAN_DATE_FIXED) {
+                            // set 'canceled'
+                            $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, BLOCK_EXAPLAN_DATE_CANCELED);
+                        } elseif ($dateState == BLOCK_EXAPLAN_DATE_BLOCKED) {
+                            // remove date if not any user (must be no one)
+                            removeDateIfNoUsers($dateId);
+                        }
                     }
                 }
             } else {
