@@ -1448,11 +1448,11 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
             break;
         case BLOCK_EXAPLAN_DASHBOARD_PAST:
             $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_DEFAULT.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht Anfragen </a>&nbsp;';
-            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_INPROCESS.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: in Bearbeitung </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_INPROCESS.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: zukünftige Termine </a>&nbsp;';
             break;
         case BLOCK_EXAPLAN_DASHBOARD_DEFAULT:
         default:
-            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_INPROCESS.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: in Bearbeitung </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_INPROCESS.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: zukünftige Termine </a>&nbsp;';
             $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_PAST.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: zurückliegende Termine </a>&nbsp;';
             break;
     }
