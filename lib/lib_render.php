@@ -1185,10 +1185,16 @@ function adminBulkFunctionsFormPart($usersDataColumnsCount, $dateId) {
 /**
  * @param int $modulepartId
  * @param string $date
+ * @param int $selectedDateId
+ * @return string
  */
 function buttonsForExistingDates($modulepartId, $date, $selectedDateId) {
-    $dates = getDatesForModulePart($modulepartId, $date);
     $content = '';
+    $when = 'future';
+    if (block_exaplan_is_admin()) {
+        $when = 'always';
+    }
+    $dates = getDatesForModulePart($modulepartId, $date, '', $when);
     foreach ($dates as $fDate) {
         $titleParts = [
             $date,

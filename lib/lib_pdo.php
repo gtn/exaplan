@@ -867,7 +867,7 @@ function getFixedDatesAdvanced($puserid = null, $modulepartid = null, $date = nu
  * @param int $modulepartid
  * @param $date
  * @param string $region
- * @param string $timeRange
+ * @param string $timeRange when: future, past, always
  * @return array|null
  */
 function getDatesForModulePart($modulepartid, $date = null, $region = '', $timeRange = 'future')
@@ -912,6 +912,9 @@ function getDatesForModulePart($modulepartid, $date = null, $region = '', $timeR
                 break;
             case 'past':
                 $whereArr[] = ' d.date < '.strtotime("today", time()).' '; // in past
+                break;
+            case 'always':
+                // in past and in future
                 break;
         }
     }

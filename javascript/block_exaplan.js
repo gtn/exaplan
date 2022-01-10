@@ -19,6 +19,10 @@ $(function () {
         locale: 'de'
     }
 
+    if (isExaplanAdmin) {
+        calendar_default_options.past_select = true;
+    }
+
     var allMonthElements = $('#block_exaplan_dashboard_calendar .calendar-month-item');
     allMonthElements.each(function (i, calMonth) {
         var month_options = Object.assign({}, calendar_default_options);
