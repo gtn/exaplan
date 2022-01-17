@@ -22,7 +22,7 @@ global $CFG, $PAGE, $OUTPUT, $USER;
 block_exaplan_init_js_css();
 $courseid = required_param('courseid', PARAM_INT);
 $action = optional_param('action', "", PARAM_ALPHA);
-$reltable="block_exaplanmodulesets";
+$reltable = "block_exaplanmodulesets";
 if (! $course = $DB->get_record ( 'course', array ('id' => $courseid) )) {
 	print_error ( 'invalidcourse', 'block_simplehtml', $courseid );
 }
@@ -39,48 +39,48 @@ $PAGE->set_title("Terminplaner Datenwartung");
 $isadmin = block_exaplan_is_admin();
 if ($isadmin){
 	if (isset($action)) {
-    switch ($action) {
-        case 'save':
-            // save existing records
-            if (isset($_POST['data'])) {
-                $data = $_POST['data'];
-                foreach ($data as $id => $recordtitle) {
-                    $newtitle = trim($recordtitle);
-                    if ($id > 0 && $newtitle) {
-                        $DB->execute('UPDATE {'.$reltable.'} SET title =? WHERE id = ?', array($newtitle, $id));
+        switch ($action) {
+            case 'save':
+                // save existing records
+                if (isset($_POST['data'])) {
+                    $data = $_POST['data'];
+                    foreach ($data as $id => $recordtitle) {
+                        $newtitle = trim($recordtitle);
+                        if ($id > 0 && $newtitle) {
+                            $DB->execute('UPDATE {'.$reltable.'} SET title =? WHERE id = ?', array($newtitle, $id));
+                        }
                     }
                 }
-            }
-            // add new record
-            if (isset($_POST['datanew'])) {
-                $data = $_POST['datanew'];
-                foreach ($data as $id => $recordtitle) {
-                    $newtitle = trim($recordtitle);
-                    if ($newtitle) {
-                        /*$sqlmaxsorting = "SELECT MAX(sorting) as sorting FROM {".$reltable."} WHERE source = ?";
-                        $max_sorting = $DB->get_record_sql($sqlmaxsorting, array(BLOCK_EXACOMP_DATA_SOURCE_CUSTOM));
-                        $sorting = intval($max_sorting->sorting) + 1;*/
-                        $DB->insert_record($reltable, (object)array(
-                                'title' => $newtitle,
-                                'description' => 0,
-                                'courseidnumber' => $newcourseidnumber,
-                                'nodesireddates' => 0,
-                                'isinstructor ' => 0));
+                // add new record
+                if (isset($_POST['datanew'])) {
+                    $data = $_POST['datanew'];
+                    foreach ($data as $id => $recordtitle) {
+                        $newtitle = trim($recordtitle);
+                        if ($newtitle) {
+                            /*$sqlmaxsorting = "SELECT MAX(sorting) as sorting FROM {".$reltable."} WHERE source = ?";
+                            $max_sorting = $DB->get_record_sql($sqlmaxsorting, array(BLOCK_EXACOMP_DATA_SOURCE_CUSTOM));
+                            $sorting = intval($max_sorting->sorting) + 1;*/
+                            $DB->insert_record($reltable, (object)array(
+                                    'title' => $newtitle,
+                                    'description' => 0,
+                                    'courseidnumber' => $courseid,
+                                    'nodesireddates' => 0,
+                                    'isinstructor ' => 0));
+                        }
                     }
                 }
-            }
-            redirect($CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid='.$courseid);
-            die;
-            break;
-        case 'delete':
-            $rectodelete = required_param('recid', PARAM_INT);
-            $DB->delete_records($reltable, ['id' => $rectodelete]);
-            redirect($CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid='.$courseid, 'Der Eintrag wurde gelöscht', null, 'info');
-            die;
-            break;
+                redirect($CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid='.$courseid);
+                die;
+                break;
+            case 'delete':
+                $rectodelete = required_param('recid', PARAM_INT);
+                $DB->delete_records($reltable, ['id' => $rectodelete]);
+                redirect($CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid='.$courseid, 'Der Eintrag wurde gelöscht', null, 'info');
+                die;
+                break;
+        }
     }
-}
-}else{
+} else {
 //is no admin
 }
 

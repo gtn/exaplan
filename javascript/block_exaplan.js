@@ -342,6 +342,14 @@ $(function () {
         });
     });
 
+    // Create a new Module button
+    $(document).on('click', '#exaplan_add_record_button' , function(e) {
+        e.preventDefault();
+        if ($('#exaplan-table-records').length) {
+            $('#exaplan-table-records > tbody:last-child').append('<tr><td class="cell"><input type="text" name="datanew[]" value="" placeholder="" class="form-control " /></td><td class="cell" colspan="10">&nbsp;</td></tr>');
+        }
+    });
+
 });
 
 
