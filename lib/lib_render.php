@@ -1463,7 +1463,7 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
             break;
     }
     $content .= '</div>';
-
+		$content .= '<div><a href="'.$CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid=1" role="button" class="btn btn-info btn-to-dashboard"> Moduleinträge bearbeiten </a>&nbsp;';
     $content .= '</div>';
     $content .= '</div><!-- / exaplan-result-item --->';
     return $content;
