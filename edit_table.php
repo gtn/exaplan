@@ -29,10 +29,10 @@ switch ($targetTable) {
     case 'moduleparts':
         $moduleSetId = required_param('msid', PARAM_INT);
         $moduleSetTitle = getTableData('block_exaplanmodulesets', $moduleSetId, 'title');
-        $contentTitle = '<h3>Termine bearbeiten<br/><h4>für <strong>'.$moduleSetTitle.'</strong></h4></h3>';
+        $contentTitle = '<h3>Modulteile bearbeiten<br/><h4>für <strong>'.$moduleSetTitle.'</strong></h4></h3>';
         $reltable = "block_exaplanmoduleparts";
         $recordsCondition = ['modulesetid' => $moduleSetId];
-        $cellTitles = ['Titel', 'Duration'];
+        $cellTitles = ['Titel', 'Dauer (1=halbtags; 2=ganztags)'];
         $inputs = [
             'title' => [],
 //            'modulesetid' => ['type' => 'hidden'], // TODO: selectbox?
@@ -48,7 +48,7 @@ switch ($targetTable) {
         $contentTitle = '<h3>Moduleinträge bearbeiten</h3>';
         $reltable = "block_exaplanmodulesets";
         $recordsCondition = [];
-        $cellTitles = ['Titel', 'Beschreibung', 'Kurse ID', 'keine Wunschtermine', 'Ausbildnerkurs', '', '', 'Terminen'];
+        $cellTitles = ['Titel', 'Beschreibung', 'Kurs ID = Moodle Kurs ID', 'keine Wunschtermine', 'Ausbildnerkurs', '', '', 'Modulteile'];
         $inputs = [
             'title' => [],
             'description' => ['type' => 'textarea'],
@@ -141,6 +141,9 @@ if ($isadmin) {
             case 'delete':
                 $rectodelete = required_param('recid', PARAM_INT);
                 $DB->delete_records($reltable, ['id' => $rectodelete]);
+                if ($reltable=="block_exaplanmodulesets"){
+                	$DB->delete_records("block_exaplanmoduleparts", ['modulesetid' => $rectodelete]);
+                }
                 $redirectUrl .= block_exaplan_add_params_to_url($addParamsToUrls);
                 redirect($redirectUrl, 'Der Eintrag wurde gelöscht', null, 'info');
                 die;
@@ -243,7 +246,7 @@ function block_exaplan_edit_table($records, $cellTitles, $inputs, $courseid) {
                         $cell->attributes['valign'] = 'top';
                         $cell->attributes['class'] .= 'hideForNew';
                         $editUrl = $CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid=1&targetTable=moduleparts&msid='.$record->id;
-                        $cell->text = '<a href="'.$editUrl.'" class="btn btn-info">Terminen bearbeiten</a>';
+                        $cell->text = '<a href="'.$editUrl.'" class="btn btn-info">Modulteile bearbeiten</a>';
                         $row->cells[] = $cell;
                         break;
                 }
@@ -287,7 +290,7 @@ function block_exaplan_edit_table($records, $cellTitles, $inputs, $courseid) {
         switch ($targetTable) {
             case 'moduleparts':
                 $buttons .= '<p>';
-                $buttons .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid=1" role="button" class="btn btn-secondary btn-to-dashboard">zurück zum Moduleinträge bearbeiten</a>';
+                $buttons .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid=1" role="button" class="btn btn-secondary btn-to-dashboard">zurück zu <b>Moduleinträge bearbeiten</b></a>';
                 $buttons .= '</p>';
                 break;
             default:
