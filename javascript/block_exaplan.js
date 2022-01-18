@@ -19,7 +19,7 @@ $(function () {
         locale: 'de'
     }
 
-    if (isExaplanAdmin) {
+    if (typeof isExaplanAdmin !== 'undefined' && isExaplanAdmin) {
         calendar_default_options.past_select = true;
     }
 
@@ -196,6 +196,29 @@ function updateAllCalendarMetadata() {
     }
 }
 
+function clear_form_elements(containerEl) {
+    containerEl.find(':input').each(function() {
+        switch(this.type) {
+            case 'password':
+            case 'text':
+            case 'textarea':
+            case 'file':
+            case 'select-one':
+            case 'select-multiple':
+            case 'date':
+            case 'number':
+            case 'tel':
+            case 'email':
+                $(this).val('');
+                break;
+            case 'checkbox':
+            case 'radio':
+                this.checked = false;
+                break;
+        }
+    });
+}
+
 
 $(function () {
 
@@ -346,7 +369,27 @@ $(function () {
     $(document).on('click', '#exaplan_add_record_button' , function(e) {
         e.preventDefault();
         if ($('#exaplan-table-records').length) {
-            $('#exaplan-table-records > tbody:last-child').append('<tr><td class="cell"><input type="text" name="datanew[]" value="" placeholder="" class="form-control " /></td><td class="cell" colspan="10">&nbsp;</td></tr>');
+            var lastRow = $('#exaplan-table-records tbody').find("tr.existingRecord:last");
+            if (!lastRow.length) {
+                // get from template if not any records yet
+                lastRow = $('#exaplan-table-records tbody').find("tr.onlyRecordTemplate");
+            }
+            var newRow = lastRow.clone();
+            var randomId = Math.floor(Math.random() * (999999 - 1111)) + 1111;
+            console.log('block_exaplan.js:379');console.log(randomId);// !!!!!!!!!! delete it
+            // clear all inputs
+            clear_form_elements(newRow);
+            // change input names
+            newRow.find('[name]').each(function () {
+                var currName = $(this).attr('name');
+                var newName = currName.replace(/data\[\d*\]/, 'datanew['+randomId+']');
+                $(this).attr('name', newName);
+            })
+            // hide some columns
+            newRow.find('.hideForNew').html('');
+            newRow.removeClass('onlyRecordTemplate existingRecord');
+            newRow.show();
+            $('#exaplan-table-records tbody').find("tr:last").after(newRow);
         }
     });
 

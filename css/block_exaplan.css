@@ -542,7 +542,7 @@ body {
 
 #exaplan .result-item-header {
     background-color: #ddd;
-    min-height:50px;
+    min-height: 50px;
 }
 
 #exaplan .exaplan-result-item {
@@ -731,3 +731,45 @@ tr[data-listid="mainList"] td {
     border: solid 1px #b8860b;
     box-shadow: 0 0 1px 1px rgba(184, 134, 11, 0.5);
 }
+
+#exaplan .moduleListTable .moduleset-title {
+    position: relative;
+}
+
+#exaplan .moduleListTable .edit-modulepart-button,
+#exaplan .moduleListTable .add-modulepart-button {
+    position: absolute;
+    right: 5px;
+    /*float: right;*/
+    /*margin-left: 3px;*/
+    /*margin-right: 3px;*/
+    display: none;
+}
+#exaplan .moduleListTable .moduleset-title:hover .edit-modulepart-button {
+    display: inline-block;
+}
+#exaplan .moduleListTable .moduleset-title .add-modulepart-button {
+    display: inline-block;
+}
+#exaplan .moduleListTable .edit-modulepart-button a,
+#exaplan .moduleListTable .add-modulepart-button a {
+    color: green;
+}
+
+#exaplan-table-records tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+#exaplan-table-records td, #exaplan-table-records th {
+    white-space: nowrap;
+    padding: 3px 10px;
+}
+
+#exaplan-table-records td.to-center {
+    text-align: center;
+}
+
+#exaplan-table-records tr.onlyRecordTemplate {
+    display: none;
+}
+

@@ -1034,3 +1034,15 @@ function getMoodleDataByMoodleid($moodleid, $field = '',$returnifempty=null) {
 
     return array('companyname'=>$returnifempty);
 }
+
+function getModulePartsForModuleSet($modulesetId) {
+    $pdo = getPdoConnect();
+
+    $sql = "SELECT * FROM mdl_block_exaplanmoduleparts WHERE modulesetid = :modulesetid";
+    $statement = $pdo->prepare($sql);
+    $statement->execute([':modulesetid' => $modulesetId]);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
+    $result = $statement->fetchAll();
+
+    return $result;
+}

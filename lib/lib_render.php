@@ -1298,7 +1298,7 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
 
 function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
 {
-    global $CFG, $PAGE;
+    global $CFG, $PAGE, $OUTPUT;
     $content = '';
 
     $modulesets = getAllModules();
@@ -1372,64 +1372,88 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
     };
 
     foreach ($modulesets as $moduleKey => $moduleset){
-        $content .= '<tr> <td valign="top" rowspan="'.count($moduleset->parts).'">'.$moduleset->set["title"].'</td>';
-        foreach($moduleset->parts as $partK => $part) {
-            if ($partK != 0) {
-                $content .= '<tr>';
-            }
-            $content .= '<th>'.$part["title"].'</th>';
-            foreach ($regions as $region) {
-                $content .= '<td class="regionColumn">';
-                $buttonClass = '';
-                switch ($dashboardType) {
-                    case BLOCK_EXAPLAN_DASHBOARD_INPROCESS:
-                        // existing fixed / blocked dates (in the future)
-                        $fixedDates = getFixedDatesAdvanced(null, $part['id'], null, null, true, $region, 'future');
-//                        $fixedDates = getDatesForModulePart($part['id'], null, $region, 'future');
-                        if (count($fixedDates) > 0) {
-                            $shownDates = [];
-                            foreach ($fixedDates as $fixedDate) {
-                                if (!in_array($fixedDate['id'], $shownDates)) { // getFixedDatesAdvanced returns multiple records for the same date by related users
-                                    $buttonClass = ' exaplan-date-' . getDateStateCodeByIndex($fixedDate['dateType']) . ' ';
-                                    $content .= $buttonTemplate($part['id'], $region, date('d.m.Y', $fixedDate['date']), $buttonClass, $fixedDate['date']) . '&nbsp;';
-                                    $shownDates[] = $fixedDate['id'];
+        if ($moduleset->parts && count($moduleset->parts) > 0) {
+            $content .= '<tr>';
+            $content .= '<td valign="top" rowspan="'.count($moduleset->parts).'" class="moduleset-title">';
+            $content .= html_writer::span($moduleset->set["title"], 'title');
+            $editUrl = $CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid=1&targetTable=moduleparts&msid='.$moduleset->set['id'];
+            $content .= html_writer::span(
+                '<a href="'.$editUrl.'">'.$OUTPUT->pix_icon("i/edit", "Terminen bearbeiten").'</a>',
+                'edit-modulepart-button');
+            $content .= '</td>';
+            foreach ($moduleset->parts as $partK => $part) {
+                if ($partK != 0) {
+                    $content .= '<tr>';
+                }
+                $content .= '<th>' . $part["title"] . '</th>';
+                foreach ($regions as $region) {
+                    $content .= '<td class="regionColumn">';
+                    $buttonClass = '';
+                    switch ($dashboardType) {
+                        case BLOCK_EXAPLAN_DASHBOARD_INPROCESS:
+                            // existing fixed / blocked dates (in the future)
+                            $fixedDates = getFixedDatesAdvanced(null, $part['id'], null, null, true, $region, 'future');
+                            //                        $fixedDates = getDatesForModulePart($part['id'], null, $region, 'future');
+                            if (count($fixedDates) > 0) {
+                                $shownDates = [];
+                                foreach ($fixedDates as $fixedDate) {
+                                    if (!in_array($fixedDate['id'], $shownDates)) { // getFixedDatesAdvanced returns multiple records for the same date by related users
+                                        $buttonClass = ' exaplan-date-' . getDateStateCodeByIndex($fixedDate['dateType']) . ' ';
+                                        $content .= $buttonTemplate($part['id'], $region, date('d.m.Y', $fixedDate['date']), $buttonClass, $fixedDate['date']) . '&nbsp;';
+                                        $shownDates[] = $fixedDate['id'];
+                                    }
                                 }
                             }
-                        }
-                        break;
-                    case BLOCK_EXAPLAN_DASHBOARD_PAST:
-                        // fixed dates in past
-//                        $fixedDates = getFixedDatesAdvanced(null, $part['id'], null, null, false, $region, 'past');
-                        $fixedDates = getDatesForModulePart($part['id'], null, $region, 'past');
-                        if (count($fixedDates) > 0) {
-                            foreach ($fixedDates as $fixedDate) {
-                                $buttonClass = ' exaplan-date-'.getDateStateCodeByIndex($fixedDate['dateType']).' ';
-                                $content .= $buttonTemplate($part['id'], $region, date('d.m.Y', $fixedDate['date']), $buttonClass, $fixedDate['date']).'&nbsp;';
+                            break;
+                        case BLOCK_EXAPLAN_DASHBOARD_PAST:
+                            // fixed dates in past
+                            //                        $fixedDates = getFixedDatesAdvanced(null, $part['id'], null, null, false, $region, 'past');
+                            $fixedDates = getDatesForModulePart($part['id'], null, $region, 'past');
+                            if (count($fixedDates) > 0) {
+                                foreach ($fixedDates as $fixedDate) {
+                                    $buttonClass = ' exaplan-date-' . getDateStateCodeByIndex($fixedDate['dateType']) . ' ';
+                                    $content .= $buttonTemplate($part['id'], $region, date('d.m.Y', $fixedDate['date']), $buttonClass, $fixedDate['date']) . '&nbsp;';
+                                }
                             }
-                        }
-                        break;
-                    case BLOCK_EXAPLAN_DASHBOARD_DEFAULT:
-                        // desired dates
-                        $desiredDates = getDesiredDates(null, $part['id'], null, null, $region);
-                        if (count($desiredDates) > 0) {
-                            // get count of unique pUsers
-                            $desiredDatesUsers = count(array_unique(array_column($desiredDates, 'puserid')));
-                            $title = $desiredDatesUsers . ' Anfragen';
-                            $buttonClass .= ' exaplan-date-desired ';
-                            $content .= $buttonTemplate($part['id'], $region, $title, $buttonClass) . '&nbsp;';
-                        }
-                        // button to add new fixed date
-                        $title = ' - - ';
-                        $buttonClass .= ' exaplan-date-no-desired ';
-                        $content .= $buttonTemplate($part['id'], $region, $title, $buttonClass);
-                        break;
-                }
+                            break;
+                        case BLOCK_EXAPLAN_DASHBOARD_DEFAULT:
+                            // desired dates
+                            $desiredDates = getDesiredDates(null, $part['id'], null, null, $region);
+                            if (count($desiredDates) > 0) {
+                                // get count of unique pUsers
+                                $desiredDatesUsers = count(array_unique(array_column($desiredDates, 'puserid')));
+                                $title = $desiredDatesUsers . ' Anfragen';
+                                $buttonClass .= ' exaplan-date-desired ';
+                                $content .= $buttonTemplate($part['id'], $region, $title, $buttonClass) . '&nbsp;';
+                            }
+                            // button to add new fixed date
+                            $title = ' - - ';
+                            $buttonClass .= ' exaplan-date-no-desired ';
+                            $content .= $buttonTemplate($part['id'], $region, $title, $buttonClass);
+                            break;
+                    }
 
-                $content .= '</td>';
+                    $content .= '</td>';
+                }
+                if ($partK != 0 || count($moduleset->parts) == 1) {
+                    $content .= '</tr>';
+                }
             }
-            if ($partK != 0 || count($moduleset->parts) == 1) {
-                $content .= '</tr>';
-            }
+        } else {
+            // no any part yet
+            $content .= '<tr>';
+            $content .= '<td valign="top" class="moduleset-title">';
+            $content .= html_writer::span($moduleset->set["title"], 'title');
+            // add module part button
+            $editUrl = $CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid=1&targetTable=moduleparts&msid='.$moduleset->set['id'];
+            $content .= html_writer::span(
+                '<a href="'.$editUrl.'">'.$OUTPUT->pix_icon("i/addblock", "Terminen hinzufügen").'</a>',
+                'add-modulepart-button');
+            $content .= '</td>';
+            $content .= '<td>';
+            $content .= '</td>';
+            $content .= '<td colspan="20"></td>';
+            $content .= '</tr>';
         }
 
     }
