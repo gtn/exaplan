@@ -1378,7 +1378,7 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
             $content .= html_writer::span($moduleset->set["title"], 'title');
             $editUrl = $CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid=1&targetTable=moduleparts&msid='.$moduleset->set['id'];
             $content .= html_writer::span(
-                '<a href="'.$editUrl.'">'.$OUTPUT->pix_icon("i/edit", "Terminen bearbeiten").'</a>',
+                '<a href="'.$editUrl.'">'.$OUTPUT->pix_icon("i/edit", "Modulteile bearbeiten").'</a>',
                 'edit-modulepart-button');
             $content .= '</td>';
             foreach ($moduleset->parts as $partK => $part) {
@@ -1447,7 +1447,7 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
             // add module part button
             $editUrl = $CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid=1&targetTable=moduleparts&msid='.$moduleset->set['id'];
             $content .= html_writer::span(
-                '<a href="'.$editUrl.'">'.$OUTPUT->pix_icon("i/addblock", "Terminen hinzufügen").'</a>',
+                '<a href="'.$editUrl.'">'.$OUTPUT->pix_icon("i/addblock", "Modulteile hinzufügen").'</a>',
                 'add-modulepart-button');
             $content .= '</td>';
             $content .= '<td>';

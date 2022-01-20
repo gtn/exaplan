@@ -749,8 +749,8 @@ function getTimeslotName($timeslot, $short = false) {
 }
 
 function getRegionTitle($region, $short = false) {
-    $shorts = ['' => 'Online', 'all' => 'Online', 'RegionOst' => 'Ost', 'RegionWest' => 'West'];
-    $full = ['' => 'Online', 'all' => 'Online', 'RegionOst' => 'Region Ost', 'RegionWest' => 'Region West'];
+    $shorts = ['' => 'Online', 'all' => 'Online', 'RegionOst' => 'Wien', 'RegionWest' => 'Linz'];
+    $full = ['' => 'Online', 'all' => 'Online', 'RegionOst' => 'Region Wien', 'RegionWest' => 'Region Linz'];
     if ($short) {
         return $shorts[$region];
     }
@@ -796,3 +796,4 @@ function getFixedDateTitle($dateId) {
 
     return $title;
 }
+
