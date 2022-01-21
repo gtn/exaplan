@@ -543,6 +543,7 @@ body {
 #exaplan .result-item-header {
     background-color: #ddd;
     min-height: 50px;
+    position: relative;
 }
 
 #exaplan .exaplan-result-item {
@@ -773,3 +774,10 @@ tr[data-listid="mainList"] td {
     display: none;
 }
 
+#exaplan .result-item-header .dashboard-settings {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #555555;
+    float: right;
+}

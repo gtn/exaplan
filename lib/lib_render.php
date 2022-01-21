@@ -1332,7 +1332,10 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
                         <div class="result-item-header-cnt">                                                    
                             <h5 class="item-header-title">'.$dashoboardTitle.'</h5>   	                        	
                         </div>
-                    </div>
+                        <div class="dashboard-settings">
+                            <a href="'.$CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid=1" role="button" >'.$OUTPUT->pix_icon("i/settings", "Einstellung").'</a>                    
+                        </div>
+                    </div>                    
                 </th>';
     $content .= '</tr>';
     $content .= '</thead>';
