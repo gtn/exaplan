@@ -109,7 +109,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                 ) {
                     // desired dates
                     $disabled = '';
-                    if (getDesiredDates($pUser['id'], $part['id'])) {
+                    if (getDesiredDates($pUser['id'], $part['id'], null, null, null, 'future')) {
                       $buttonTitle = 'in Planung';
                       $buttonClass = ' exaplan-date-desired ';
                       $innerButtonClass = ' btn btn-desired ';
@@ -1418,7 +1418,7 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
                             break;
                         case BLOCK_EXAPLAN_DASHBOARD_DEFAULT:
                             // desired dates
-                            $desiredDates = getDesiredDates(null, $part['id'], null, null, $region);
+                            $desiredDates = getDesiredDates(null, $part['id'], null, null, $region, 'future');
                             if (count($desiredDates) > 0) {
                                 // get count of unique pUsers
                                 $desiredDatesUsers = count(array_unique(array_column($desiredDates, 'puserid')));

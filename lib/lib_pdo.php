@@ -675,8 +675,9 @@ function updateNotifications()
  * @param string|int $date (null if for all dates)
  * @param int $timeslot midday type
  * @param int $region region: RegionOst, RegionWest, all
+ * @param int $timeRange range of result: future, past
  */
-function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null, $region = null)
+function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $timeslot = null, $region = null, $timeRange = '')
 {
     $pdo = getPdoConnect();
     $leftJoin = '';
@@ -716,6 +717,17 @@ function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $t
             case 'online':
                 // all possible regions (or empty)
                 $whereArr[] = ' u.region IN (\'RegionOst\', \'RegionWest\', \'all\', \'\') ';
+                break;
+        }
+    }
+
+    if ($timeRange) {
+        switch ($timeRange) {
+            case 'future':
+                $whereArr[] = ' des.date >= '.strtotime("today", time()).' '; // today or in future
+                break;
+            case 'past':
+                $whereArr[] = ' des.date < '.strtotime("today", time()).' '; // in past
                 break;
         }
     }
