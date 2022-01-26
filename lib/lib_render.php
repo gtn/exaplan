@@ -96,7 +96,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                     $buttonClass .= ' exaplan-date-desired ';
                 } else {
                     $title = ' - - ';
-                    $buttonClass .= ' exaplan-date-no-desired ';
+                    $buttonClass .= ' exaplan-date-no-desired-admin ';
                 }
                 $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/admin.php?mpid='.$part["id"].'" 
                                 role="button" 
@@ -112,14 +112,14 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                     if (getDesiredDates($pUser['id'], $part['id'], null, null, null, 'future')) {
                       $buttonTitle = 'in Planung';
                       $buttonClass = ' exaplan-date-desired ';
-                      $innerButtonClass = ' btn btn-desired ';
+                      $innerButtonClass = ' btn btn-desired-student ';
                       if ($modulepartid == $part["id"]) {
                         $buttonClass .= ' exaplan-date-current-modulepart ';
                     	}
                     } else {
                     	$buttonTitle = 'offen';
 	                    $buttonClass = '';
-	                    $innerButtonClass = ' btn btn-danger ';
+	                    $innerButtonClass = ' btn btn-danger-student ';
 	                    if ($modulepartid == $part["id"]) {
                             $buttonClass .= ' exaplan-date-current-modulepart ';
                     	}
@@ -129,7 +129,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                     if ($moduleset->set["nodesireddates"]) {
                         // disable possibility to select desired dates (if the student already has or not)
                         $buttonTitle = ' - - ';
-                        $buttonClass = ' exaplan-date-nodesireddates ';
+                        $buttonClass = ' exaplan-date-nodesireddates-student ';
                         $dateUrl = '#';
                         $disabled = ' disabled = "disabled" ';
                     }
@@ -1378,11 +1378,12 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
         if ($moduleset->parts && count($moduleset->parts) > 0) {
             $content .= '<tr>';
             $content .= '<td valign="top" rowspan="'.count($moduleset->parts).'" class="moduleset-title">';
-            $content .= html_writer::span($moduleset->set["title"], 'title');
+            
             $editUrl = $CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid=1&targetTable=moduleparts&msid='.$moduleset->set['id'];
             $content .= html_writer::span(
                 '<a href="'.$editUrl.'">'.$OUTPUT->pix_icon("i/edit", "Modulteile bearbeiten").'</a>',
                 'edit-modulepart-button');
+                $content .= html_writer::span($moduleset->set["title"], 'title');
             $content .= '</td>';
             foreach ($moduleset->parts as $partK => $part) {
                 if ($partK != 0) {
@@ -1431,7 +1432,7 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
                             }
                             // button to add new fixed date
                             $title = ' - - ';
-                            $buttonClass .= ' exaplan-date-no-desired ';
+                            $buttonClass .= ' exaplan-date-no-desired-admin ';
                             $content .= $buttonTemplate($part['id'], $region, $title, $buttonClass);
                             break;
                     }
@@ -1477,20 +1478,20 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
     switch ($dashboardType) {
         case BLOCK_EXAPLAN_DASHBOARD_INPROCESS:
             $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_DEFAULT.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht Anfragen </a>&nbsp;';
-            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_PAST.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: zurückliegende Termine </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_PAST.'" role="button" class="btn btn-info btn-to-dashboard2"> Übersicht: zurückliegende Termine </a>&nbsp;';
             break;
         case BLOCK_EXAPLAN_DASHBOARD_PAST:
             $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_DEFAULT.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht Anfragen </a>&nbsp;';
-            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_INPROCESS.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: zukünftige Termine </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_INPROCESS.'" role="button" class="btn btn-info btn-to-dashboard2"> Übersicht: zukünftige Termine </a>&nbsp;';
             break;
         case BLOCK_EXAPLAN_DASHBOARD_DEFAULT:
         default:
             $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_INPROCESS.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: zukünftige Termine </a>&nbsp;';
-            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_PAST.'" role="button" class="btn btn-info btn-to-dashboard"> Übersicht: zurückliegende Termine </a>&nbsp;';
+            $content .= '<a href="'.$PAGE->url.'?dashboardType='.BLOCK_EXAPLAN_DASHBOARD_PAST.'" role="button" class="btn btn-info btn-to-dashboard2"> Übersicht: zurückliegende Termine </a>&nbsp;';
             break;
     }
     $content .= '</div>';
-		$content .= '<div><a href="'.$CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid=1" role="button" class="btn btn-info btn-to-dashboard"> Moduleinträge bearbeiten </a>&nbsp;';
+		$content .= '<div><a href="'.$CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid=1" role="button" class="btn btn-info btn-to-dashboard3"> Moduleinträge bearbeiten </a>&nbsp;';
     $content .= '</div>';
     $content .= '</div><!-- / exaplan-result-item --->';
     return $content;

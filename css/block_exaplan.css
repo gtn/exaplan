@@ -403,7 +403,7 @@ body {
 #exaplan table {
     font-family: arial, sans-serif;
     border-collapse: collapse;
-
+	width: 100%;
 }
 
 #exaplan th {
@@ -451,6 +451,8 @@ body {
     justify-content: space-between !important;
     aalign-items:  center; /*didi, f�hrt zu herunterr�ckung vom icon*/
     position: relative;
+    
+    
 }
 
 
@@ -502,8 +504,9 @@ body {
     border-radius: 4px;
     padding-left: 20px;
     padding-right: 20px;
-    font-size: 0.6rem;
+    font-size: 0.75rem;
     line-height: 1.2rem;
+    margin-left: 0.5rem; 
 }
 
 #exaplan .btn-danger,
@@ -512,7 +515,7 @@ body {
 #exaplan .btn-blocked,
 #exaplan .btn-canceled {
     color: #ffffff;
-    background: #C20530;
+    background: #ffc98e;
 }
 #exaplan .btn-desired {
     background: rgb(246, 184, 12, 0.25);
@@ -542,8 +545,18 @@ body {
 
 #exaplan .result-item-header {
     background-color: #ddd;
-    min-height: 50px;
-    position: relative;
+    min-height:50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+#exaplan .result-item-header .result-item-header-cnt {
+	flex-grow: 1;
+}
+
+#exaplan .result-item-header .dashboard-settings a .icon {
+	padding-top: 10px;
 }
 
 #exaplan .exaplan-result-item {
@@ -565,6 +578,21 @@ body {
     border-color: #666666 !important;
     color: #ffffff !important;
 }
+.btn-to-dashboard {background: #f8931f; }
+.btn-to-dashboard:hover,
+.btn-to-dashboard:focus {background: #ffc480;}
+.btn-to-dashboard2 {background-color: #2aaae2; border-color: #2aaae2;}
+.btn-to-dashboard2:hover,
+.btn-to-dashboard2:focus {background: #6dcaf3;}
+.btn-to-dashboard3 {background-color: #c5c4c3; border-color: #c5c4c3;}
+.btn-to-dashboard3:hover,
+.btn-to-dashboard3:focus {background: #e2e1e0;
+
+.btn-student  {
+      color: #ffffff;
+      background: #C20530;
+  }
+
 
 /* skill bar------------------------------------------------------------------------*/
 
@@ -573,6 +601,7 @@ body {
 #exaplan .result-item-header-cnt {
     width: 100%; /* Full width */
     background-color: #ddd; /* Grey background */
+    background-color: #ddd;
 }
 
 #exaplan .skills {
@@ -589,7 +618,8 @@ body {
 
 #exaplan .btn {padding: .175rem .25rem;}
 #exaplan table.tbl_modulparts th{padding: 0 .25rem;}
-#exaplan table.tbl_modulparts td{padding: 0 .25rem;}
+#exaplan table.tbl_modulparts td{padding: 0 .25rem;
+}
 
 #exaplan .mainTable {
     width: 100%;
@@ -731,53 +761,4 @@ tr[data-listid="mainList"] td {
 .exaplan-calendar-date-marked .tavo-calendar__day-inner {
     border: solid 1px #b8860b;
     box-shadow: 0 0 1px 1px rgba(184, 134, 11, 0.5);
-}
-
-#exaplan .moduleListTable .moduleset-title {
-    position: relative;
-}
-
-#exaplan .moduleListTable .edit-modulepart-button,
-#exaplan .moduleListTable .add-modulepart-button {
-    position: absolute;
-    right: 5px;
-    /*float: right;*/
-    /*margin-left: 3px;*/
-    /*margin-right: 3px;*/
-    display: none;
-}
-#exaplan .moduleListTable .moduleset-title:hover .edit-modulepart-button {
-    display: inline-block;
-}
-#exaplan .moduleListTable .moduleset-title .add-modulepart-button {
-    display: inline-block;
-}
-#exaplan .moduleListTable .edit-modulepart-button a,
-#exaplan .moduleListTable .add-modulepart-button a {
-    color: green;
-}
-
-#exaplan-table-records tr:nth-child(even) {
-    background-color: #fafafa;
-}
-
-#exaplan-table-records td, #exaplan-table-records th {
-    white-space: nowrap;
-    padding: 3px 10px;
-}
-
-#exaplan-table-records td.to-center {
-    text-align: center;
-}
-
-#exaplan-table-records tr.onlyRecordTemplate {
-    display: none;
-}
-
-#exaplan .result-item-header .dashboard-settings {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    color: #555555;
-    float: right;
 }
