@@ -87,8 +87,8 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
         $content .= '<tbody>';
         foreach ($moduleset->parts as $part) {
             $absentHas = false;
-            $content .= '<td>';
             if ($isadmin == 1) {
+                $content .= '<td>';
                 // for admins
                 $desiredDates = getDesiredDates(null, $part['id']);
                 $buttonClass = '';
@@ -104,10 +104,12 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                                 data-modulepartId="'.$part['id'].'"
                                 class="btn exaplan-admin-modulepart-button '.$buttonClass.'"
                             > '.$title.' </a>';
+                $content .= '</td>';
             } else {
                 if (!$part['date']  // no any date yet
                     || !in_array($part['date'][0]['state'], [BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED]) // only desired dates
                 ) {
+                    $content .= '<td>';
                     // desired dates
                     $disabled = '';
                     if (getDesiredDates($pUser['id'], $part['id'], null, null, null, 'future')) {
@@ -141,27 +143,35 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                                     data-modulepartId="'.$part['id'].'"
                                     '.($modulepartid == $part["id"] ? 'data-modulepartselected="1"' : '').'
                                 > <button type="button" class="'.$innerButtonClass.'" '.$disabled.'>'.$buttonTitle.'</button> </a>';
+                    $content .= '</td>';
                 } else {
                     // fixed date exists
-                    $buttonClass = '';
-                    if ($dateId && $modulepartid == $part["id"]) {
-                        $buttonClass .= ' exaplan-date-current-modulepart ';
+                    $datesForUser = getFixedDatesAdvanced($pUser['id'], $part['id']);
+
+                    foreach ($datesForUser as $dateTemp) {
+                        $content .= '<td>';
+                        $buttonClass = '';
+                        if ($dateId == $dateTemp['id'] && $modulepartid == $part["id"]) {
+                            $buttonClass .= ' exaplan-date-current-modulepart ';
+                        }
+                        // 'absent' date
+                        if (@$dateTemp['absent']) {
+                            $absentHas = true;
+                            $buttonClass .= ' exaplan-date-absent ';
+                        }
+                        $content .= '<a href="' . $CFG->wwwroot . '/blocks/exaplan/dateDetails.php?mpid=' . $part["id"] . '&userid=' . $userid . '&dateid=' . $dateTemp['id'] . '&pagehash=' . block_exaplan_hash_current_userid($userid) . '"
+                                    class="btn exaplan-date-fixed exaplan-selectable-date ' . $buttonClass . '" 
+                                    data-dateId="' . $dateTemp['id'] . '" 
+                                    data-modulepartId="' . $part['id'] . '">
+                                 <button type="button" class=" btn btn-fixed ">' . date('d.m.Y', $dateTemp['date']) .
+                            '</button></a>';
+                        $content .= '</td>';
                     }
-                    // 'absent' date
-                    if (@$part['date'][0]['absent']) {
-                        $absentHas = true;
-                        $buttonClass .= ' exaplan-date-absent ';
-                    }
-                    $content .= '<a href="'.$CFG->wwwroot.'/blocks/exaplan/dateDetails.php?mpid='.$part["id"].'&userid='.$userid.'&dateid='.$part['date'][0]['id'].'&pagehash='.block_exaplan_hash_current_userid($userid).'"
-                                    class="btn exaplan-date-fixed exaplan-selectable-date '.$buttonClass.'" 
-                                    data-dateId="'.$part['date'][0]['id'].'" 
-                                    data-modulepartId="'.$part['id'].'">
-                                 <button type="button" class=" btn btn-fixed ">'.date('d.m.Y', $part['date'][0]['date']).
-                                '</button></a>';
                 }
             }
             // add possibility to add new desired dates if the student has absent fixed date
             if ($absentHas) {
+                $content .= '<td>';
                 $dateUrl = $CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'&userid='.$userid.'&pagehash='.block_exaplan_hash_current_userid($userid);
                 $content .= '<a href="'.$dateUrl.'" 
                                     role="button" 
@@ -169,8 +179,8 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                                     data-modulepartId="'.$part['id'].'"
                                     '.($modulepartid == $part["id"] ? 'data-modulepartselected="1"' : '').'
                                 > <button type="button" class="btn btn-danger">neu planen</button> </a>';
+                $content .= '</td>';
             }
-            $content .= '</td>';
         }
         $content .= '</tbody>';
         $content .= '</table>';
