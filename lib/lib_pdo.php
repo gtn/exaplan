@@ -155,6 +155,7 @@ function getOrCreatePuser($userid = 0)
     $statement->execute($params);
     $user = $statement->fetchAll();
     if ($user == null) {
+        // create a new p-user
         $params = array(
             ':userid' => $userid,
             ':moodleid' => get_config('exaplan', 'moodle_id'),
@@ -164,10 +165,23 @@ function getOrCreatePuser($userid = 0)
             ':region' => $region,
         );
 
-        $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpusers (userid, moodleid, firstname, lastname, email, region) VALUES (:userid, :moodleid, :firstname,:lastname, :email, :region);");
+        // add values from user_info_fields
+        $infoFields = block_exaplan_get_list_of_profile_fields();
+        $infoFields = array_keys($infoFields);
+        foreach ($infoFields as $infoFieldKey) {
+            $infoValue = block_exaplan_get_custom_profile_field_value($userid, $infoFieldKey);
+            $params[':'.$infoFieldKey] = $infoValue;
+        }
+
+        $insertFieldNames = array_map(function($f) {return substr($f, 1);}, array_keys($params));  // field names from $params without ':'
+        // insert
+        $sql = 'INSERT INTO mdl_block_exaplanpusers ('.implode(', ', $insertFieldNames).') 
+                                    VALUES ('.implode(', ', array_keys($params)).');';
+        $statement = $pdo->prepare($sql);
         $statement->execute($params);
         return $pdo->lastInsertId();
     } else {
+        // return existing p-user
         return $user[0]['id'];
     }
 }
@@ -279,7 +293,8 @@ function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_FIXED)
                                                     JOIN mdl_block_exaplanpuser_date_mm udmm ON d.id = udmm.dateid
                                                   WHERE d.modulepartid = :modulepartid
                                                         AND udmm.puserid = :puserid
-                                                        AND d.state = :state");
+                                                        AND d.state = :state
+                                                  ORDER BY d.state DESC ");
                     $statement->execute($params);
                     $statement->setFetchMode(PDO::FETCH_ASSOC);
                     $date = $statement->fetchAll();

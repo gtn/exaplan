@@ -65,6 +65,26 @@ function xmldb_block_exaplan_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2022012700, 'exaplan');
     }
 
+    if ($oldversion < 2022012703) {
+
+        block_exaplan_update_profile_fields();
+
+        upgrade_block_savepoint(true, 2022012703, 'exaplan');
+    }
+
+    if ($oldversion < 2022012704) {
+        $table = new xmldb_table('block_exaplanpusers');
+        $fields = block_exaplan_get_list_of_profile_fields();
+        $fields = array_keys($fields);
+        foreach ($fields as $fieldName) {
+            $field = new xmldb_field($fieldName, XMLDB_TYPE_CHAR, '250', null, null, null);
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_block_savepoint(true, 2022012704, 'exaplan');
+    }
     
     return $result;
 }

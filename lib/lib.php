@@ -825,3 +825,79 @@ function checkOnlineRoomTypeByLink($link) {
     }
     return 'BBB'; // default is "Big Blue Button"
 }
+
+// only for current moodle installation!
+function block_exaplan_get_custom_profile_field_value($userid, $fieldname) {
+    global $DB;
+    return $DB->get_field_sql('SELECT uid.data
+			  FROM {user_info_data} uid
+			  JOIN {user_info_field} uif ON uif.id = uid.fieldid
+			WHERE uif.shortname = ? AND uid.userid = ?
+			', [$fieldname, $userid]);
+}
+
+function block_exaplan_get_list_of_profile_fields() {
+    // shortname => name
+    // note: shortname (field key) must be the same as field name in 'mdl_block_exaplanpusers'
+    // TODO: change this array if we will need not only 'text' type!
+    return [
+        'region' => 'Region',
+        'firma' => 'Firma',
+        'standort' => 'Standort',
+        'rolle' => 'Rolle',
+        'kursart' => 'Kursart',
+        'jahrgang' => 'Jahrgang',
+        'quartal' => 'Quartal',
+    ];
+}
+
+// only for current moodle installation!
+function block_exaplan_update_profile_fields() {
+    global $DB;
+    // first - get category ID
+    $categoryName = 'Skillswork TN Daten';
+    $catid = $DB->get_field_sql('SELECT id FROM {user_info_category} WHERE name = \''.$categoryName.'\' ORDER BY sortorder LIMIT 1');
+    if (!$catid) {
+        $catid = $DB->insert_record('user_info_category', [
+            'name' => $categoryName,
+            'sortorder' => 1,
+        ]);
+    }
+
+    // second - create non-existing fields
+    // for field sorting
+    $sortorder = $DB->get_field_sql('SELECT MAX(sortorder) FROM {user_info_field} WHERE categoryid = ? ', [$catid]);
+
+    // TODO: make different properties if fields will have different types
+    $fieldProperties = [
+        'description' => '',
+        'datatype' => 'text',
+        'categoryid' => $catid,
+        'locked' => 0,
+        'required' => 0,
+        'visible' => 2,
+        'param1' => 30,
+        'param2' => 2048,
+        'param3' => 0,
+    ];
+
+    foreach (block_exaplan_get_list_of_profile_fields() as $fieldShortName => $fieldName) {
+        $field = array_merge($fieldProperties,
+            [   'shortname' => $fieldShortName,
+                'name' => $fieldName,
+            ]
+        );
+        $fieldId = $DB->get_field('user_info_field', 'id', ['shortname' => $fieldShortName]);
+        if ($fieldId) {
+            // don't do anything?
+        } else {
+            // insert new
+            $sortorder++;
+            $field['sortorder'] = $sortorder;
+            $DB->insert_record('user_info_field', $field);
+        }
+    }
+
+}
+
+
