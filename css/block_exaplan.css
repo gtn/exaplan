@@ -1,3 +1,5 @@
+.exaplan-date-desired {background: #f8931f; }   
+    
 #region-main-box section.block_exaplan .card-title {display:none !important;}
 
 .exaplan-selectable-date:hover {
@@ -47,15 +49,25 @@ a.exaplan-date-current-modulepart {
     color: black;
 }
 
-a.exaplan-admin-modulepart-button.exaplan-date-desired {
+#exaplan a.exaplan-admin-modulepart-button.exaplan-date-desired {
     background-color: rgb(246, 184, 12, 1);
     border-color: rgb(246, 184, 12, 1);
+    background-color:#f8931f;
     color: white;
 }
-a.exaplan-admin-modulepart-button.exaplan-date-desired:hover {
+#exaplan a.exaplan-admin-modulepart-button.exaplan-date-desired:hover {
     border-color: white;
     color: black;
+    
 }
+#exaplan .btn-danger a.exaplan-admin-modulepart-button.exaplan-date-no-desired-admin{
+	background-color:rgb(247, 147, 30);
+}
+#exaplan .btn-danger a.exaplan-admin-modulepart-button.exaplan-date-no-desired-admin:hover{
+	background-color:rgb(247, 147, 30);
+}
+
+
 a.exaplan-admin-modulepart-button.exaplan-date-fixed {
     background-color: rgb(0, 83, 0, 1);
     border-color: rgb(0, 83, 0, 1);
@@ -513,7 +525,31 @@ body {
 #exaplan .btn-canceled {
     color: #ffffff;
     background: #C20530;
+    background: #ffc98e;
 }
+#exaplan .btn-anfragen{
+	background: #ffc98e;
+}
+
+#exaplan .btn-anfragen.btnactive{
+	background-color:#f8931f;
+}
+#exaplan .btn-zukunft{
+	background: #8dd2f0;
+}
+
+#exaplan .btn-zukunft.btnactive{
+	background-color:#29ABE2;
+}
+#exaplan .btn-past{
+	background: rgb(220,219,219);
+}
+
+#exaplan .btn-past.btnactive{
+	background-color:#bbbbbb;
+}
+
+
 #exaplan .btn-desired {
     background: rgb(246, 184, 12, 0.25);
     color: #000000;
