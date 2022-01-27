@@ -106,6 +106,7 @@ function getPuser($userid = 0)
 
     $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid AND moodleid = :moodleid ");
     $statement->execute($params);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
     $user = $statement->fetchAll();
     if (!$user || !count($user)) {
         // create a new pUser
@@ -342,7 +343,7 @@ function getPrefferedDate($modulepartid, $date, $timeslot = null, $states = [])
  * @param string $duration
  * @return string
  */
-function setPrefferedDate($updateExisting, $dateId = 0, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment, $region, $moodleid = 0, $isonline = 0, $duration = '', $state = BLOCK_EXAPLAN_DATE_DESIRED)
+function setPrefferedDate($updateExisting, $dateId = 0, $modulepartid, $puserid, $date, $timeslot, $location, $trainerId, $starttime, $comment, $region, $moodleid = 0, $isonline = 0, $duration = '', $onlineroom = '', $state = BLOCK_EXAPLAN_DATE_DESIRED)
 {
     $pdo = getPdoConnect();
     $timestamp = new DateTime();
@@ -364,6 +365,7 @@ function setPrefferedDate($updateExisting, $dateId = 0, $modulepartid, $puserid,
         ':moodleid' => $moodleid,
         ':isonline' => $isonline,
         ':duration' => $duration,
+        ':onlineroom' => $onlineroom,
     ];
 
     // do not care about timeslot and state during selecting. We must have only single record for the day+modulepart
@@ -372,7 +374,6 @@ function setPrefferedDate($updateExisting, $dateId = 0, $modulepartid, $puserid,
 
 
     if ($dateRec) {
-        
         // return existing dateId. We do not need to create it
         if ($updateExisting) {
             unset($params[':modulepartid']);
@@ -389,7 +390,8 @@ function setPrefferedDate($updateExisting, $dateId = 0, $modulepartid, $puserid,
                              timeslot = :timeslot,
                              moodleid = :moodleid,
                              isonline = :isonline,
-                             duration = :duration
+                             duration = :duration,
+                             onlineroom = :onlineroom
                         WHERE id = " . intval($dateId) . ";";
             $statement = $pdo->prepare($sql);
             $statement->execute($params);
@@ -403,8 +405,8 @@ function setPrefferedDate($updateExisting, $dateId = 0, $modulepartid, $puserid,
     ]);
 
     $sql = "INSERT INTO mdl_block_exaplandates
-                        (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp, location, trainerpuserid, starttime, comment, region, moodleid, isonline, duration)
-                  VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp, :location, :trainerpuserid, :starttime, :comment, :region, :moodleid, :isonline, :duration);";
+                        (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp, location, trainerpuserid, starttime, comment, region, moodleid, isonline, duration, onlineroom)
+                  VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp, :location, :trainerpuserid, :starttime, :comment, :region, :moodleid, :isonline, :duration, :onlineroom);";
 //    echo "<pre>debug:<strong>lib_pdo.php:297</strong>\r\n"; print_r($params); echo '</pre>'; // !!!!!!!!!! delete it
 //    echo $sql; exit;
     $statement = $pdo->prepare($sql);

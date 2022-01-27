@@ -42,6 +42,7 @@ switch ($action) {
         $location = optional_param('location', '', PARAM_TEXT);
         $eventTime = optional_param('time', '', PARAM_TEXT);
         $duration = optional_param('duration', '', PARAM_TEXT);
+        $onlineroom = optional_param('onlineroom', '', PARAM_TEXT);
         $description = optional_param('description', '', PARAM_TEXT);
 //        $trainerId = optional_param('trainer', 0, PARAM_INT);
 //        $pTrainer = getPuser($trainerId)['id'];
@@ -177,7 +178,7 @@ switch ($action) {
                         }
                         if ($dateState == BLOCK_EXAPLAN_DATE_FIXED) {
                             // set 'canceled'
-                            $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, BLOCK_EXAPLAN_DATE_CANCELED);
+                            $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, $onlineroom, BLOCK_EXAPLAN_DATE_CANCELED);
                         } elseif ($dateState == BLOCK_EXAPLAN_DATE_BLOCKED) {
                             // remove date if not any user (must be no one)
                             removeDateIfNoUsers($dateId);
@@ -187,7 +188,7 @@ switch ($action) {
             } else {
                 // create/update date record
                 $selectedDateId = $dateId;
-                $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, $state);
+                $dateId = setPrefferedDate(true, $dateId, $modulepartid, $pUserId, $dateTS, $middayType, $location, $pTrainer, $eventTime, $description, $dateRegion, $moodleid, $isonline, $duration, $onlineroom, $state);
                 // if it is a new date record - add selected students
                 if (in_array($state, [BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED]) && $selectedDateId != $dateId) { // creating of new FIXED date
                     if ($students && count($students)) {

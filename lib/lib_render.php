@@ -67,6 +67,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
     $content .= '<tr>';
     $content .= '<th>Meine Module</th>';
     $content .= '<th>Termine</th>';
+    $content .= '<th></th>';
 
     $content .= '</tr>';
     $content .= '</thead>';
@@ -176,6 +177,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
         $content .= '</td>';
         $content .= '</tr>';
     }
+    $content .= '<tr><td>&nbsp;</td><td>&nbsp;</td></tr>'; // empty row for correct heights of module cells
 
     $content .= '</tbody>';
     $content .= '</table>';
@@ -190,6 +192,12 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
     if ($withDateDetails) {
         $content .= '<td valign="top" >';
         $content .= studentEventDetailsView($userid, $modulepartid, $dateId);
+        $content .= '</td>';
+    }
+
+    if (!$withCalendar && !$withDateDetails) {
+        $content .= '<td valign="top">';
+        $content .= printStudentExistingFixedDates($pUser['id']);
         $content .= '</td>';
     }
 
@@ -1054,6 +1062,13 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
     $content .= '</td>';
     $content .= '</tr>';
 
+    // link to online room
+    $content .= '<tr>';
+    $content .= '<td colspan="6">';
+    $content .= '<label for="onlineroom_'.$instanceKey.'">Raum (BBB oder Teams):</label>';
+    $content .= '<input type="text" name="onlineroom" value="'.@$dateRec['onlineroom'].'" class="form-control" id="onlineroom_'.$instanceKey.'" /></td>';
+    $content .= '</td>';
+
     // description
     $content .= '<tr>';
     $content .= '<td colspan="6">';
@@ -1216,6 +1231,8 @@ function buttonsForExistingDates($modulepartId, $date, $selectedDateId) {
 }
 
 function studentEventDetailsView($userId, $modulepartId, $dateId) {
+    global $OUTPUT;
+
     $content = '';
 
     $puserId = getPuser($userId)['id'];
@@ -1275,6 +1292,13 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
     // trainer
     $trainer = getTableData('mdl_block_exaplanpusers', $dateData['trainerpuserid']);
     $content .= $tableRow('Trainer:', @$trainer['firstname'].' '.@$trainer['lastname']);
+
+    // link to online room
+    if ($dateData['isonline'] && $dateData['onlineroom']) {
+        $link = $dateData['onlineroom'];
+        $rowContent = checkOnlineRoomTypeByLink($link).'&nbsp;|&nbsp;<a href="'.$link.'" class="exaplan-onlineroom-link" target="_blank">Startseite&nbsp;'.$OUTPUT->pix_icon("e/insert_edit_video", checkOnlineRoomTypeByLink($link)).'</a>';
+        $content .= $tableRow('Raum:', $rowContent);
+    }
 
     // description
     if ($dateData['comment']) {
@@ -1494,5 +1518,34 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
 		$content .= '<div><a href="'.$CFG->wwwroot.'/blocks/exaplan/edit_table.php?courseid=1" role="button" class="btn btn-info btn-to-dashboard3"> Moduleinträge bearbeiten </a>&nbsp;';
     $content .= '</div>';
     $content .= '</div><!-- / exaplan-result-item --->';
+    return $content;
+}
+
+function printStudentExistingFixedDates($pUserId) {
+    $content = '';
+    $dates = getFixedDatesAdvanced($pUserId, null, null, null, false, '', 'future', [BLOCK_EXAPLAN_DATE_FIXED]);
+    $content .= '<table class="exaplan-student-dates-preview">';
+    foreach ($dates as $k => $dateData) {
+        $content .= '<tr>';
+        $content .= '<td>';
+        $content .= '<strong>'.getFixedDateModuleTitles($dateData['id']).'</strong>';
+        $content .= '</td>';
+        $content .= '<td>';
+        $content .= '<strong>'.date("d.m.Y", $dateData['date']).'</strong>';
+        $content .= '</td>';
+        $content .= '</tr>';
+        $content .= '<tr>';
+        $content .= '<td>';
+        if ($dateData['isonline']) {
+            $link = $dateData['onlineroom'];
+            $content .= checkOnlineRoomTypeByLink($link).'&nbsp;|&nbsp;<a href="'.$link.'" class="exaplan-onlineroom-link" target="_blank">Startseite</a>';
+        } else {
+            $content .= 'Präsenztermin | '.$dateData['location'];
+        }
+        $content .= '</td>';
+        $content .= '</tr>';
+        $content .= '<tr><td colspan="2">&nbsp;</td></tr>';
+    }
+    $content .= '</table>';
     return $content;
 }

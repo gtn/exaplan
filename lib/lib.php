@@ -797,3 +797,31 @@ function getFixedDateTitle($dateId) {
     return $title;
 }
 
+// combine diff data to get fixed date title
+function getFixedDateModuleTitles($dateId, $divider = ' ') {
+    $data = [];
+    $dateData = getTableData('mdl_block_exaplandates', $dateId);
+    $modulePart = getModulepartByModulepartid($dateData['modulepartid']);
+    $moduleSet = getModulesetByModulesetid($modulePart['modulesetid']);
+    if ($moduleSet['title']) {
+        $data[] = $moduleSet['title'];
+    }
+    if ($modulePart['title']) {
+        $data[] = $modulePart['title'];
+    }
+
+    return implode($divider, $data);
+}
+
+
+// gets name of online room (BBB, team or may be other?) by its link
+function checkOnlineRoomTypeByLink($link) {
+    $link = trim($link);
+    if (!$link) {
+        return ''; // for empty links. TODO: may be add a marker about empty link?
+    }
+    if (strpos($link, 'teams') !== false) {
+        return 'Teams';
+    }
+    return 'BBB'; // default is "Big Blue Button"
+}

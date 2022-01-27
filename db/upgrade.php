@@ -53,6 +53,18 @@ function xmldb_block_exaplan_upgrade($oldversion) {
         
         upgrade_block_savepoint(true, 2021113000, 'exaplan');
     }
+
+    if ($oldversion < 2022012700) {
+        $table = new xmldb_table('block_exaplandates');
+        $field = new xmldb_field('onlineroom', XMLDB_TYPE_TEXT);
+
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_block_savepoint(true, 2022012700, 'exaplan');
+    }
+
     
     return $result;
 }
