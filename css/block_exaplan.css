@@ -502,11 +502,8 @@ body {
     text-decoration: none;
     border-style: none;
     border-radius: 4px;
-    padding-left: 20px;
-    padding-right: 20px;
     font-size: 0.75rem;
     line-height: 1.2rem;
-    margin-left: 0.5rem; 
 }
 
 #exaplan .btn-danger,
@@ -515,7 +512,7 @@ body {
 #exaplan .btn-blocked,
 #exaplan .btn-canceled {
     color: #ffffff;
-    background: #ffc98e;
+    background: #C20530;
 }
 #exaplan .btn-desired {
     background: rgb(246, 184, 12, 0.25);
@@ -588,11 +585,7 @@ body {
 .btn-to-dashboard3:hover,
 .btn-to-dashboard3:focus {background: #e2e1e0;
 
-.btn-student  {
-      color: #ffffff;
-      background: #C20530;
-  }
-
+ .exaplan-date-desired {background: #f8931f; }
 
 /* skill bar------------------------------------------------------------------------*/
 

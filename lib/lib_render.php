@@ -112,14 +112,14 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                     if (getDesiredDates($pUser['id'], $part['id'], null, null, null, 'future')) {
                       $buttonTitle = 'in Planung';
                       $buttonClass = ' exaplan-date-desired ';
-                      $innerButtonClass = ' btn btn-desired-student ';
+                      $innerButtonClass = ' btn btn-desired btn-student ';
                       if ($modulepartid == $part["id"]) {
                         $buttonClass .= ' exaplan-date-current-modulepart ';
                     	}
                     } else {
                     	$buttonTitle = 'offen';
 	                    $buttonClass = '';
-	                    $innerButtonClass = ' btn btn-danger-student ';
+	                    $innerButtonClass = ' btn btn-danger btn-student ';
 	                    if ($modulepartid == $part["id"]) {
                             $buttonClass .= ' exaplan-date-current-modulepart ';
                     	}
@@ -129,7 +129,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                     if ($moduleset->set["nodesireddates"]) {
                         // disable possibility to select desired dates (if the student already has or not)
                         $buttonTitle = ' - - ';
-                        $buttonClass = ' exaplan-date-nodesireddates-student ';
+                        $buttonClass = ' exaplan-date-nodesireddates btn-student ';
                         $dateUrl = '#';
                         $disabled = ' disabled = "disabled" ';
                     }
