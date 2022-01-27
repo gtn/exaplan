@@ -65,13 +65,6 @@ function xmldb_block_exaplan_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2022012700, 'exaplan');
     }
 
-    if ($oldversion < 2022012703) {
-
-        block_exaplan_update_profile_fields();
-
-        upgrade_block_savepoint(true, 2022012703, 'exaplan');
-    }
-
     if ($oldversion < 2022012704) {
         $table = new xmldb_table('block_exaplanpusers');
         $fields = block_exaplan_get_list_of_profile_fields();
@@ -84,6 +77,13 @@ function xmldb_block_exaplan_upgrade($oldversion) {
         }
 
         upgrade_block_savepoint(true, 2022012704, 'exaplan');
+    }
+
+    if ($oldversion < 2022012706) {
+
+        block_exaplan_update_profile_fields();
+
+        upgrade_block_savepoint(true, 2022012706, 'exaplan');
     }
     
     return $result;
