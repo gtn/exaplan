@@ -6,56 +6,59 @@ var lastCalendarSelectedDay = '';
 
 $(function () {
 
-// Tavo Calendar
+    // Tavo Calendar
+    if (typeof moment !== 'undefined') {
 
-    // calendar options
-    var lastPossiobbleDay = moment().add(2, 'M').endOf("month").format(exaplanCalendarDateFormat);
+        // calendar options
+        var lastPossiobbleDay = moment().add(2, 'M').endOf("month").format(exaplanCalendarDateFormat);
 
-    var calendar_default_options = {
-        format: exaplanCalendarDateFormat,
-        range_select: false,
-        future_select: lastPossiobbleDay,
-        multi_select: true,
-        locale: 'de'
-    }
-
-    if (typeof isExaplanAdmin !== 'undefined' && isExaplanAdmin) {
-        calendar_default_options.past_select = true;
-    }
-
-    var allMonthElements = $('#block_exaplan_dashboard_calendar .calendar-month-item');
-    allMonthElements.each(function (i, calMonth) {
-        var month_options = Object.assign({}, calendar_default_options);
-        if (i > 0) {
-            // every next calendar shows next month
-            month_options.date = moment().add(i, 'M').startOf("month").format(exaplanCalendarDateFormat);
-        } else {
-            month_options.date = moment().format(exaplanCalendarDateFormat);
+        var calendar_default_options = {
+            format: exaplanCalendarDateFormat,
+            range_select: false,
+            future_select: lastPossiobbleDay,
+            multi_select: true,
+            locale: 'de'
         }
-        var calendar_month = new TavoCalendar(calMonth, month_options);
-        allCalendars.push(calendar_month);
-        calMonth.addEventListener('calendar-select-before', (ev) => {
-            calendar_month.blurCalendar();
-        });
-        calMonth.addEventListener('calendar-select', (ev) => {
-            return selectedDateEvent(ev, calendar_month);
-        });
-        /*calMonth.addEventListener('calendar-select-after', (ev) => {
-            return selectedDateEvent(ev, calendar_month);
-        });*/
-        calMonth.addEventListener('calendar-change', (ev) => {
-            updateAllCalendarMetadata();
-        });
-        calMonth.addEventListener('calendar-range', (ev) => {
-            updateAllCalendarMetadata();
-        });
-        calMonth.addEventListener('calendar-reset', (ev) => {
-            updateAllCalendarMetadata();
-        });
-        /*calMonth.addEventListener('calendar-metadata-finished', (ev) => {
 
-        });*/
-    });
+        if (typeof isExaplanAdmin !== 'undefined' && isExaplanAdmin) {
+            calendar_default_options.past_select = true;
+        }
+
+        var allMonthElements = $('#block_exaplan_dashboard_calendar .calendar-month-item');
+        allMonthElements.each(function (i, calMonth) {
+            var month_options = Object.assign({}, calendar_default_options);
+            if (i > 0) {
+                // every next calendar shows next month
+                month_options.date = moment().add(i, 'M').startOf("month").format(exaplanCalendarDateFormat);
+            } else {
+                month_options.date = moment().format(exaplanCalendarDateFormat);
+            }
+            var calendar_month = new TavoCalendar(calMonth, month_options);
+            allCalendars.push(calendar_month);
+            calMonth.addEventListener('calendar-select-before', (ev) => {
+                calendar_month.blurCalendar();
+            });
+            calMonth.addEventListener('calendar-select', (ev) => {
+                return selectedDateEvent(ev, calendar_month);
+            });
+            /*calMonth.addEventListener('calendar-select-after', (ev) => {
+                return selectedDateEvent(ev, calendar_month);
+            });*/
+            calMonth.addEventListener('calendar-change', (ev) => {
+                updateAllCalendarMetadata();
+            });
+            calMonth.addEventListener('calendar-range', (ev) => {
+                updateAllCalendarMetadata();
+            });
+            calMonth.addEventListener('calendar-reset', (ev) => {
+                updateAllCalendarMetadata();
+            });
+            /*calMonth.addEventListener('calendar-metadata-finished', (ev) => {
+
+            });*/
+        });
+
+    }
 
 
 });
@@ -376,7 +379,7 @@ $(function () {
             }
             var newRow = lastRow.clone();
             var randomId = Math.floor(Math.random() * (999999 - 1111)) + 1111;
-            console.log('block_exaplan.js:379');console.log(randomId);// !!!!!!!!!! delete it
+            // console.log('block_exaplan.js:379');console.log(randomId);// !!!!!!!!!! delete it
             // clear all inputs
             clear_form_elements(newRow);
             // change input names
@@ -392,6 +395,22 @@ $(function () {
             $('#exaplan-table-records tbody').find("tr:last").after(newRow);
         }
     });
+
+    // show/hide all 'standort' groups
+    $('.exaplan-standort-groups-allcollapse').on('click', function (e) {
+        e.preventDefault();
+        var currentState = $(this).attr('data-collapsed');
+        var groupsToCollapse = $(this).closest('.exaplan-standort-groups-container').find('.exaplan-standort-groupitem .collapse');
+        if (currentState == 0) {
+            currentState = 1;
+            groupsToCollapse.collapse('show');
+        } else {
+            currentState = 0;
+            groupsToCollapse.collapse('hide');
+        }
+        $(this).attr('data-collapsed', currentState);
+    })
+
 
 });
 

@@ -166,8 +166,7 @@ function getOrCreatePuser($userid = 0)
         );
 
         // add values from user_info_fields
-        $infoFields = block_exaplan_get_list_of_profile_fields();
-        $infoFields = array_keys($infoFields);
+        $infoFields = block_exaplan_get_list_of_profile_fields(true);
         foreach ($infoFields as $infoFieldKey) {
             $infoValue = block_exaplan_get_custom_profile_field_value($userid, $infoFieldKey);
             $params[':'.$infoFieldKey] = $infoValue;

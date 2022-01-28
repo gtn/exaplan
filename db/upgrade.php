@@ -67,8 +67,7 @@ function xmldb_block_exaplan_upgrade($oldversion) {
 
     if ($oldversion < 2022012704) {
         $table = new xmldb_table('block_exaplanpusers');
-        $fields = block_exaplan_get_list_of_profile_fields();
-        $fields = array_keys($fields);
+        $fields = block_exaplan_get_list_of_profile_fields(true);
         foreach ($fields as $fieldName) {
             $field = new xmldb_field($fieldName, XMLDB_TYPE_CHAR, '250', null, null, null);
             if (!$dbman->field_exists($table, $field)) {

@@ -836,11 +836,11 @@ function block_exaplan_get_custom_profile_field_value($userid, $fieldname) {
 			', [$fieldname, $userid]);
 }
 
-function block_exaplan_get_list_of_profile_fields() {
+function block_exaplan_get_list_of_profile_fields($justFieldKeys = false) {
     // shortname => name
     // note: shortname (field key) must be the same as field name in 'mdl_block_exaplanpusers'
     // TODO: change this array if we will need not only 'text' type!
-    return [
+    $fields = [
         'region' => 'Region',
         'firma' => 'Firma',
         'standort' => 'Standort',
@@ -849,6 +849,10 @@ function block_exaplan_get_list_of_profile_fields() {
         'jahrgang' => 'Jahrgang',
         'quartal' => 'Quartal',
     ];
+    if ($justFieldKeys) {
+        return array_keys($fields);
+    }
+    return $fields;
 }
 
 // only for current moodle installation!
