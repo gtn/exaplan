@@ -39,14 +39,12 @@ class block_exaplan extends block_base {
                 $students = array_merge($students, $enrolled);
             }
 
-            // add data from 'mdl_user_info_field'
-            $additionalFields = block_exaplan_get_list_of_profile_fields(true);
+            // add data for grouping
             foreach ($students as $stId => $studentData) {
-                foreach ($additionalFields as $fieldKey) {
-                    $students[$stId]->{$fieldKey} = block_exaplan_get_custom_profile_field_value($studentData->id, $fieldKey);
-                }
+                $pUserId = getPuser($studentData->id)['id'];
+                $students[$stId]->standort = getTableData('block_exaplanpusers', $pUserId, 'standort');
             }
-            // sort students by 'standort' for grouping later and by lastname
+            // sort students by 'standort' (for grouping later) and by 'lastname'
             // NOTE: students without value in 'standort' - will be first
             usort($students, function($s1, $s2) {
                 if ($s1->standort == $s2->standort) {
