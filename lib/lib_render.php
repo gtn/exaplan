@@ -43,11 +43,11 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
     $content .= '<table class="mainTable" border="0">';
     $content .= '<thead>';
     $content .= '<tr>';
-    $content .= '<th colspan="2"><div class="result-item-header">
+    $content .= '<th colspan="2"><div class="result-item-header result-item-header-user">
 <div class="result-item-header-cnt">
 	
 <div class="icon">
-<img style="position:absolute;left:-20px;" src="'.$CFG->wwwroot.'/blocks/exaplan/pix/teilnehmer.svg" height="50" width="50">
+<img style="" src="'.$CFG->wwwroot.'/blocks/exaplan/pix/teilnehmer.svg" height="50" width="50">
 </div>
 <h5 class="item-header-title">'.$tnname.'</h5>   
 	<button type="button" class="btn btn-outline-danger">

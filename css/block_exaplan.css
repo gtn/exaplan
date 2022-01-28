@@ -420,7 +420,7 @@ body {
 
 #exaplan th {
     text-align: left;
-    padding: 4px 0 4px 0;
+    padding: 5px 0 5px 0;
 }
 
 
@@ -454,15 +454,40 @@ body {
 
 
 #exaplan .result-item-header-cnt {
-    display: -ms-flexbox !important;
+    /*display: -ms-flexbox !important;
     display: flex;
     -ms-flex-direction: row !important;
     flex-direction: row;
     -ms-flex-pack: justify !important;
 
     justify-content: space-between !important;
-    aalign-items:  center; /*didi, f�hrt zu herunterr�ckung vom icon*/
-    position: relative;
+    aalign-items:  center; 
+    position: relative;*/
+}
+
+#exaplan .result-item-header-user .result-item-header-cnt {
+	display: -ms-flexbox !important;
+    display: flex;
+    -ms-flex-direction: row !important;
+    flex-direction: row;
+    -ms-flex-pack: justify !important;
+
+    justify-content: space-between !important;
+    min-height: 50px;
+   -ms-flex-align: center !important;
+   align-items: center !important;
+}
+
+#exaplan .result-item-header-user .result-item-header-cnt > div.icon {
+	width: 50px;
+	height: 50px;
+	position: absolute;
+	left: -20px;
+}
+
+#exaplan .result-item-header-user .result-item-header-cnt .item-header-title {
+	flex-grow: 1;
+	padding-left: 50px;
 }
 
 
@@ -472,7 +497,9 @@ body {
     letter-spacing: 2px;
     word-spacing: 2px;
     color: #2E2E2E;
-    padding: 10px 7px 0px 75px;
+    NO-padding: 10px 7px 0px 75px;
+    margin-bottom: 0;
+    padding-left: 1rem;
 }
 
 #exaplan .circleBase {
@@ -508,13 +535,14 @@ body {
 #exaplan .btn-bulkaction-go,
 #exaplan .btn-to-dashboard,
 .block_exaplan .btn-to-dashboard {
-    font-family: Arial;
+    /*font-family: Arial;*/
+    font-weight: bold;
     text-decoration: none;
     border-style: none;
     border-radius: 4px;
     padding-left: 20px;
     padding-right: 20px;
-    font-size: 0.6rem;
+    font-size: 0.7rem;
     line-height: 1.2rem;
 }
 
@@ -580,6 +608,16 @@ body {
     background-color: #ddd;
     min-height: 50px;
     position: relative;
+    
+    display: -ms-flexbox !important;
+	display: flex !important;
+	-ms-flex-direction: row !important;
+	flex-direction: row;
+	-ms-flex-align: center !important;
+	align-items: center !important;
+	
+	-ms-flex-pack: justify !important;
+	justify-content: space-between !important;
 }
 
 #exaplan .exaplan-result-item {
@@ -623,12 +661,23 @@ body {
 #exaplan .js {width: 65%; background-color: #C20530;}
 #exaplan .php {width: 100%; background-color: #E02061;}
 
-#exaplan .btn {padding: .175rem .25rem;}
+#exaplan .btn {
+	padding: .08rem .55rem;
+}
 #exaplan table.tbl_modulparts th{padding: 0 .25rem;}
 #exaplan table.tbl_modulparts td{padding: 0 .25rem;}
 
 #exaplan .mainTable {
     width: 100%;
+    margin-bottom: 20px;
+}
+
+#exaplan .moduleListTable > tbody > tr {
+	border-bottom: 1px solid #eaeaea;
+}
+
+#exaplan table.tbl_modulparts tr {
+	border-bottom: 0 !important;
 }
 
 #exaplan .moduleListTable {
@@ -655,6 +704,18 @@ body {
     text-align: left;
     /*background: #9CDAA4;*/
     color: #ffffff;
+}
+
+#exaplan .BlockFooter {
+	margin-bottom: .5rem;
+}
+
+#exaplan .btn.btn-to-dashboard3 {
+	min-width: 220px;
+}
+
+#exaplan .BlockFooter .btn {
+	min-width: 220px;
 }
 
 #exaplan .btn-fixed.exaplan-existing-date {
@@ -811,9 +872,14 @@ tr[data-listid="mainList"] td {
 }
 
 #exaplan .result-item-header .dashboard-settings {
-    position: absolute;
+    /*position: absolute;
     top: 10px;
-    right: 10px;
+    right: 10px;*/
     color: #555555;
-    float: right;
+    No-float: right;
+    padding-right: 1rem;
+}
+
+#exaplan .result-item-header .dashboard-settings .icon {
+	margin-right: 0;
 }
