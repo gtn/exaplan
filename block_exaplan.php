@@ -73,7 +73,7 @@ class block_exaplan extends block_base {
             $groupNumber = 1;
             $content .= '<div class="exaplan-standort-groups-container">';
             $content .= '<div class="exaplan-standort-groups-service">';
-            $content .= '<a href="#" class="exaplan-standort-groups-allcollapse" data-collapsed="0">show/hide all</a>';
+            $content .= '<a href="#" class="exaplan-standort-groups-allcollapse" data-collapsed="0">alle anzeigen|verstecken</a>';
             $content .= '</div>';
             foreach ($groups as $groupTitle => $students) {
                 $groupId = 'groupitem_'.$groupNumber;
