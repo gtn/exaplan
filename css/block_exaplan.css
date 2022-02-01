@@ -666,8 +666,12 @@ body {
 }
 #exaplan table.tbl_modulparts th{padding: 0 .25rem;}
 #exaplan table.tbl_modulparts td{padding: 0 .25rem;}
-
+#exaplan tr.desiredList {background-color:#ffc98e;}
 #exaplan .mainTable {
+    width: 100%;
+    margin-bottom: 20px;
+}
+#exaplan .mainTableAdmin {
     width: 100%;
     margin-bottom: 20px;
 }
@@ -912,7 +916,7 @@ tr[data-listid="mainList"] td {
 	background-color: rgb(42,171,226,1);
 }
 
-#exaplan .btn.btn-orange {
+#exaplan .btn.btn-orange, #exaplan .bg-orange {
 	background-color: rgb(246,146,29,1);
 }
 

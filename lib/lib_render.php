@@ -91,6 +91,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                 $content .= '<td>';
                 // for admins
                 $desiredDates = getDesiredDates(null, $part['id']);
+
                 $buttonClass = '';
                 if (count($desiredDates) > 0) {
                     $title = count($desiredDates).' Anfragen';
@@ -897,7 +898,7 @@ function rowForStudentInFormAdminDateFixing($pUserData, $dateData, $pUserSelecte
     $content = '';
     $defaultRowHeght = 20;
 
-    $content .= '<tr data-listId="'.$listId.'">';
+    $content .= '<tr data-listId="'.$listId.'" class="'.$listId.'">';
     $content .= '<td valign="top" height="' . $defaultRowHeght . '" class="studentNameColumn">';
     // fixed or desired
     $content .= '<label for="fixedUser' . $pUserId . '">';
@@ -1359,7 +1360,7 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
 
     $content .= '</div>';
     $content .= '<div class="BlockBody">';
-    $content .= '<table class="mainTable" border="0">';
+    $content .= '<table class="mainTableAdmin" border="0">';
     $content .= '<thead>';
     $content .= '<tr>';
     $content .= '<th colspan="3">
@@ -1381,7 +1382,7 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
     $content .= '<table class="moduleListTable" border="0">';
     $content .= '<thead>';
     $content .= '<tr>';
-    $content .= '<th rowspan="2" valign="top">Meine Module</th>';
+    $content .= '<th rowspan="2" valign="top">Module</th>';
     $content .= '<th rowspan="2" valign="top">Termine</th>';
     $content .= '<th colspan="1">';
     if ($dashboardType == BLOCK_EXAPLAN_DASHBOARD_DEFAULT) {
@@ -1458,10 +1459,12 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
                         case BLOCK_EXAPLAN_DASHBOARD_DEFAULT:
                             // desired dates
                             $desiredDates = getDesiredDates(null, $part['id'], null, null, $region, 'future');
+                            
                             if (count($desiredDates) > 0) {
                                 // get count of unique pUsers
                                 $desiredDatesUsers = count(array_unique(array_column($desiredDates, 'puserid')));
-                                $title = $desiredDatesUsers . ' Anfragen';
+                                if ($desiredDatesUsers == 1) {$title = $desiredDatesUsers . ' Anfrage';}
+                                else {$title = $desiredDatesUsers . ' Anfragen';}
                                  $buttonClass2 = $buttonClass.' exaplan-date-desired ';
                                 $content .= $buttonTemplate($part['id'], $region, $title, $buttonClass2) . '&nbsp;';
                             }

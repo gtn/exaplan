@@ -732,7 +732,7 @@ function getDesiredDates($puserid = null, $modulepartid = null, $date = null, $t
             case 'all':
             case 'online':
                 // all possible regions (or empty)
-                $whereArr[] = ' u.region IN (\'RegionOst\', \'RegionWest\', \'all\', \'\') ';
+                $whereArr[] = ' u.region IN (\'RegionOst\',\'Linz\', \'RegionWest\', \'Wien\',\'all\', \'\') ';
                 break;
         }
     }
