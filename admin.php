@@ -281,7 +281,7 @@ if ($isadmin) {
     echo printAdminModulepartView($modulepartid, $dateGP, $region, $dateId);
 }
 
-echo '<a href="'.$CFG->wwwroot.'/my/'.($dashboardType ? '?dashboardType='.$dashboardType : '').'" role="button" class="btn btn-info btn-to-dashboard"> zurück zum Dashboard </a>';
+echo '<a href="'.$CFG->wwwroot.'/my/'.($dashboardType ? '?dashboardType='.$dashboardType : '').'" role="button" class="btn btn-info btn-to-dashboard btn-red"> zurück zum Dashboard </a>';
 
 echo '</div>';
 

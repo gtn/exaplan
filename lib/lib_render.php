@@ -1198,7 +1198,7 @@ function adminBulkFunctionsFormPart($usersDataColumnsCount, $dateId) {
     }
     $content .= '</select>';
     $content .= '</td>';
-    $content .= '<td align="left" width="15%"><button name="bulk_go" class="btn btn-info btn-bulkaction-go" type="submit" value="bulk_go" >go!</button></td>';
+    $content .= '<td align="left" width="5%"><button name="bulk_go" class="btn btn-info btn-bulkaction-go" type="submit" value="bulk_go" >go!</button></td>';
     $content .= '</tr>';
     $content .= '<tr id="bulkMessage" style="display: none;">';
     $content .= '<td align="right">Nachricht:</td>';

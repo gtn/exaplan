@@ -624,17 +624,17 @@ body {
     margin-left: 20px;
 }
 
-.moduleListTable .exaplan-date-fixed:not(.exaplan-date-absent) {
+#exaplan .moduleListTable .exaplan-date-fixed:not(.exaplan-date-absent) {
     background-color: #005300 !important;
     border-color: #005300 !important;
     color: #ffffff !important;
 }
-.moduleListTable .exaplan-date-blocked:not(.exaplan-date-absent) {
+#exaplan .moduleListTable .exaplan-date-blocked:not(.exaplan-date-absent) {
     background-color: #8CD0F2 !important;
     border-color: #8CD0F2 !important;
     color: #253b48 !important;
 }
-.moduleListTable .exaplan-date-canceled:not(.exaplan-date-absent) {
+#exaplan .moduleListTable .exaplan-date-canceled:not(.exaplan-date-absent) {
     background-color: #666666 !important;
     border-color: #666666 !important;
     color: #ffffff !important;
@@ -687,6 +687,10 @@ body {
 #exaplan .moduleListTable th.regionColumn,
 #exaplan .moduleListTable td.regionColumn {
     padding-left: 15px;
+}
+
+#exaplan .moduleListTable .btn {
+	margin-bottom: .2rem;
 }
 
 #exaplan .exaplan-date-button-item {
@@ -882,4 +886,120 @@ tr[data-listid="mainList"] td {
 
 #exaplan .result-item-header .dashboard-settings .icon {
 	margin-right: 0;
+}
+
+.tavo-calendar__header {
+	background-color: rgb(192,20,48,1);
+}
+
+#exaplan .exaplan-adminModulepartView label input {
+	margin-right: 4px;
+}
+
+#exaplan .btn.btn-red {
+	background-color: rgb(192,20,48,1);
+}
+
+#exaplan .btn.btn-light-grey {
+	background-color: rgb(197,196,195,1);
+}
+
+#exaplan .btn.btn-green {
+	background-color: rgb(58,181,74,1);
+}
+
+#exaplan .btn.btn-light-blue {
+	background-color: rgb(42,171,226,1);
+}
+
+#exaplan .btn.btn-orange {
+	background-color: rgb(246,146,29,1);
+}
+
+#exaplan .btn.btn-red.btn-off {
+	background-color: rgb(192,20,48,.5);
+}
+
+#exaplan .btn.btn-light-grey.btn-off {
+	background-color: rgb(197,196,195,.5);
+}
+
+#exaplan .btn.btn-green.btn-off {
+	background-color: rgb(58,181,74,.5);
+}
+
+#exaplan .btn.btn-light-blue.btn-off {
+	background-color: rgb(42,171,226,.5);
+}
+
+#exaplan .btn.btn-orange.btn-off {
+	background-color: rgb(246,146,29,.5);
+}
+
+#exaplan .btn.bg-light-red {
+	background-color: rgb(192,20,48,.2);
+}
+
+#exaplan .btn.bg-light-grey {
+	background-color: rgb(197,196,195,.2);
+}
+
+#exaplan .btn.bg-light-orange {
+	background-color: rgb(246,146,29,.2);
+}
+
+#exaplan table.exaplan-adminModulepartView td.fixedDatesList {
+	padding: .3rem 1rem;
+}
+
+#exaplan .exaplan-standort-groups-container .exaplan-standort-groups-service {
+	margin-bottom: 1rem;
+}
+
+#exaplan .exaplan-standort-groups-container .exaplan-standort-groups-service .exaplan-standort-groups-allcollapse {
+	font-weight: bold;
+	text-decoration: none;
+	border-style: none;
+	border-radius: 4px;
+	padding-left: 20px;
+	padding-right: 20px;
+	font-size: 0.7rem;
+	line-height: 1.2rem;
+	background-color: rgb(192,20,48,1);
+	color: #fff;
+	padding: .15rem .55rem;
+}
+
+#exaplan .exaplan-standort-groups-container .exaplan-standort-groups-service .exaplan-standort-groups-allcollapse[data-collapsed="1"] {
+	background-color: rgb(192,20,48,.2);
+}
+
+#exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	color: #000;
+	margin-bottom: 1rem;
+	background-color: #f5f3f3;
+	padding: .5rem;
+}
+
+#exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a:hover, 
+#exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a:focus {
+	text-decoration: none !important;
+}
+
+#exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a i.fa {
+	margin-right: 1rem;
+	font-size: 
+}
+
+#exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a.collapsed i.fa {
+	transform: rotate(180deg);
+}
+
+#exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a h3 {
+	margin-bottom: 0;
+	font-size: 1.24rem;
+	font-weight: 500;
 }

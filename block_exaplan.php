@@ -44,7 +44,7 @@ class block_exaplan extends block_base {
                 $pUserId = getPuser($studentData->id)['id'];
                 $students[$stId]->standort = getTableData('block_exaplanpusers', $pUserId, 'standort');
             }
-            // sort students by 'standort' (for grouping later) and by 'lastname'
+            // sort students by 'standort' for grouping later and by lastname
             // NOTE: students without value in 'standort' - will be first
             usort($students, function($s1, $s2) {
                 if ($s1->standort == $s2->standort) {
@@ -88,8 +88,8 @@ class block_exaplan extends block_base {
                 // custom collapsible html
                 $content .= '<div class="exaplan-standort-groupitem">';
                 $content .= '<div class="exaplan-standort-title">';
-                $content .= '<a href="#'.$groupId.'" data-toggle="collapse" aria-expanded="false" aria-controls="'.$groupId.'">';
-                $content .= '<h3>'.$groupTitle.'</h3>';
+                $content .= '<a href="#'.$groupId.'" class="collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="'.$groupId.'">';
+                $content .= '<h3>'.$groupTitle.'</h3><i class="fa fa-chevron-down"></i>';
                 $content .= '</div>';
                 $content .= '</a>';
                 $content .= '<div class="collapse exaplan-standort-usersdata" id="'.$groupId.'">';

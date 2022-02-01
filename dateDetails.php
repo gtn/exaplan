@@ -51,7 +51,7 @@ if (!$dateDetailsExisting) {
 $content .= printUser($userid, $isadmin, $modulepartid, false, $dateId, true);
 
 $content .= '<br>';
-$content .= '<a href="'.$CFG->wwwroot.'/my/" role="button" class="btn btn-info btn-to-dashboard"> zurück zum Dashboard </a>';
+$content .= '<a href="'.$CFG->wwwroot.'/my/" role="button" class="btn btn-info btn-to-dashboard btn-red"> zurück zum Dashboard </a>';
 
 $content .= '</div>';
 
