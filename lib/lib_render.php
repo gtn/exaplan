@@ -1463,7 +1463,7 @@ function printAdminDashboard($dashboardType = BLOCK_EXAPLAN_DASHBOARD_DEFAULT)
                             if (count($desiredDates) > 0) {
                                 // get count of unique pUsers
                                 $desiredDatesUsers = count(array_unique(array_column($desiredDates, 'puserid')));
-                                if ($desiredDatesUsers == 1) {$title = $desiredDatesUsers . ' Anfrage';}
+                                if ($desiredDatesUsers == 1) {$title = $desiredDatesUsers . ' Anfrage<span class="hidechar">n</span> ';}
                                 else {$title = $desiredDatesUsers . ' Anfragen';}
                                 $buttonClass2 = $buttonClass.' exaplan-date-desired ';
                                 $content .= $buttonTemplate($part['id'], $region, $title, $buttonClass2) . '&nbsp;';
