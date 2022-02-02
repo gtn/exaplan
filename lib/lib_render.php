@@ -136,7 +136,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                         $buttonClass = ' exaplan-date-nodesireddates btn-student btn-red';
                         $innerButtonClass .= ' btn-off';
                         $dateUrl = '#';
-                        $disabled = ' disabled = "disabled" ';
+                        $disabled = ' onClick="return false;" ';
                     }
 
                     $content .= '<a href="'.$dateUrl.'" 
