@@ -43,12 +43,16 @@ class block_exaplan extends block_base {
             foreach ($students as $stId => $studentData) {
                 $pUserId = getPuser($studentData->id)['id'];
                 $students[$stId]->standort = getTableData('block_exaplanpusers', $pUserId, 'standort');
+                $students[$stId]->jahrgang = getTableData('block_exaplanpusers', $pUserId, 'jahrgang');
             }
-            // sort students by 'standort' for grouping later and by lastname
+            // sort students by 'standort', 'jahrgang' for grouping later and by lastname
             // NOTE: students without value in 'standort' - will be first
             usort($students, function($s1, $s2) {
                 if ($s1->standort == $s2->standort) {
-                    return strcmp($s1->lastname, $s2->lastname);
+                    if ($s1->jahrgang == $s2->jahrgang) {
+                        return strcmp($s1->lastname, $s2->lastname);
+                    }
+                    return strcmp($s1->jahrgang, $s2->jahrgang);
                 }
                 return strcmp($s1->standort, $s2->standort);
             });
@@ -58,14 +62,21 @@ class block_exaplan extends block_base {
             $studentids = array();
             foreach ($students as $student){
                 if (!in_array($student->id, $studentids)) {
-                    $groupKey = trim((string)$student->standort);
-                    if (!$groupKey) {
-                        $groupKey = 'nein irgendein Standort';
+                    $groupStandortKey = trim((string)$student->standort);
+                    if (!$groupStandortKey) {
+                        $groupStandortKey = 'nein irgendein Standort';
                     }
-                    if (!array_key_exists($groupKey, $groups)) {
-                        $groups[$groupKey] = [];
+                    $groupJahrgangKey = trim((string)$student->jahrgang);
+                    if (!$groupJahrgangKey) {
+                        $groupJahrgangKey = 'nein irgendein Jahrgang';
                     }
-                    $groups[$groupKey][] = printUser($student->id, $isadmin, $modulepartid, false);
+                    if (!array_key_exists($groupStandortKey, $groups)) {
+                        $groups[$groupStandortKey] = [];
+                    }
+                    if (!array_key_exists($groupJahrgangKey, $groups[$groupStandortKey])) {
+                        $groups[$groupStandortKey][$groupJahrgangKey] = [];
+                    }
+                    $groups[$groupStandortKey][$groupJahrgangKey][] = printUser($student->id, $isadmin, $modulepartid, false);
                     $studentids[] = $student->id;
                 }
             }
@@ -75,26 +86,35 @@ class block_exaplan extends block_base {
             $content .= '<div class="exaplan-standort-groups-service">';
             $content .= '<a href="#" class="exaplan-standort-groups-allcollapse" data-collapsed="0">alle anzeigen|verstecken</a>';
             $content .= '</div>';
-            foreach ($groups as $groupTitle => $students) {
-                $groupId = 'groupitem_'.$groupNumber;
-
-                // moodle API collapsible functions are not working
-//                $groupContent = '';
-//                foreach ($students as $studentDataContent) {
-//                    $groupContent .= $studentDataContent;
-//                }
-//                $content .= print_collapsible_region($groupContent, '', $groupId, $groupTitle, '', false, true);
+            foreach ($groups as $groupTitle => $subGroupsJahrgangData) {
+                $groupStandortId = 'groupitem_'.$groupNumber;
+                $groupJahrgangNumber = 1;
 
                 // custom collapsible html
                 $content .= '<div class="exaplan-standort-groupitem">';
                 $content .= '<div class="exaplan-standort-title">';
-                $content .= '<a href="#'.$groupId.'" class="collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="'.$groupId.'">';
+                $content .= '<a href="#'.$groupStandortId.'" class="collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="'.$groupStandortId.'">';
                 $content .= '<h3>'.$groupTitle.'</h3><i class="fa fa-chevron-down"></i>';
                 $content .= '</div>';
                 $content .= '</a>';
-                $content .= '<div class="collapse exaplan-standort-usersdata" id="'.$groupId.'">';
-                foreach ($students as $studentDataContent) {
-                    $content .= $studentDataContent;
+                $content .= '<div class="collapse exaplan-standort-usersdata" id="'.$groupStandortId.'">';
+                foreach ($subGroupsJahrgangData as $groupJahrgangTitle => $students) {
+//                    $content .= $studentDataContent;
+                    $groupJahrgangId = 'groupitem_'.$groupNumber.'_'.$groupJahrgangNumber;
+                    $content .= '<div class="exaplan-jahrgang-groupitem">';
+                    $content .= '<div class="exaplan-jahrgang-title">';
+                    $content .= '<a href="#'.$groupJahrgangId.'" class="collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="'.$groupJahrgangId.'">';
+                    $content .= '<h3>'.$groupJahrgangTitle.'</h3><i class="fa fa-chevron-down"></i>';
+                    $content .= '</div>';
+                    $content .= '</a>';
+                    $content .= '<div class="collapse exaplan-jahrgang-usersdata" id="'.$groupJahrgangId.'">';
+                    foreach ($students as $studentDataContent) {
+                        $content .= $studentDataContent;
+                    }
+                    $content .= '</div>';
+                    $content .= '</div>';
+                    $groupJahrgangNumber++;
+
                 }
                 $content .= '</div>';
                 $content .= '</div>';
