@@ -64,11 +64,11 @@ class block_exaplan extends block_base {
                 if (!in_array($student->id, $studentids)) {
                     $groupStandortKey = trim((string)$student->standort);
                     if (!$groupStandortKey) {
-                        $groupStandortKey = 'nein irgendein Standort';
+                        $groupStandortKey = 'Benutzer*innen ohne Standort';
                     }
                     $groupJahrgangKey = trim((string)$student->jahrgang);
                     if (!$groupJahrgangKey) {
-                        $groupJahrgangKey = 'nein irgendein Jahrgang';
+                        $groupJahrgangKey = 'Benutzer*innen ohne Jahrgang';
                     }
                     if (!array_key_exists($groupStandortKey, $groups)) {
                         $groups[$groupStandortKey] = [];

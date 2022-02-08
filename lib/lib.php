@@ -845,9 +845,7 @@ function block_exaplan_get_list_of_profile_fields($justFieldKeys = false) {
         'firma' => 'Firma',
         'standort' => 'Standort',
         'rolle' => 'Rolle',
-        'kursart' => 'Kursart',
         'jahrgang' => 'Jahrgang',
-        'quartal' => 'Quartal',
     ];
     if ($justFieldKeys) {
         return array_keys($fields);
