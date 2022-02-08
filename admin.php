@@ -227,7 +227,7 @@ switch ($action) {
                         'Trainer: ' . $trainerData['firstname'] . ' ' . $trainerData['lastname'] . "\r\n" .
                         'Location: ' . $dateData['location'] . "\r\n" .
                         'Uhrzeit: ' . date('H:i', $dateData['starttime']) . "\r\n" .
-                        'Dauer: ' . $dateData['duration'] . "\r\n" .
+                        'Ende: ' . $dateData['duration'] . "\r\n" .
                         'Notiz: ' . $dateData['comment'] . "\r\n";
                     block_exaplan_create_plannotification($pUserId, $registeredStudent['puserid'], $text);
                 }

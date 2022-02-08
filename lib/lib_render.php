@@ -348,7 +348,7 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
             $trainer = getTableData('mdl_block_exaplanpusers', $date['trainerpuserid']);
             $tooltips .= '<span id="tooltipster_content'.$date['id'].'">';
             $tooltips .= ($date['starttime'] ? 'Uhrzeit: <strong>'.date('H:i', $date['starttime']).'</strong> '.date('d.m.Y', $date['date']).'<br>' : '')
-                .($date['duration'] ? 'Dauer: '.$date['duration'].'<br>' : '')
+                .($date['duration'] ? 'Ende: '.$date['duration'].'<br>' : '')
                 .($date['moodleid'] ? 'Ort: '.getMoodleDataByMoodleid($date['moodleid'], 'companyname').'<br>' : '')
                 .getRegionTitle($date['region']).' - '.getIsOnlineTitle($date['isonline']).'<br>'
                 .($date['location'] ? 'Location: '.$date['location'].'<br>' : '')
@@ -1069,7 +1069,7 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
     $content .= '</td>';
     // duration
     $content .= '<td colspan="2">';
-    $content .= '<label for="duration_'.$instanceKey.'">Dauer:</label>';
+    $content .= '<label for="duration_'.$instanceKey.'">Ende:</label>';
     $content .= '<input type="text" name="duration" value="'.@$dateRec['duration'].'" class="form-control" id="duration_'.$instanceKey.'" >';
     $content .= '</td>';
     $content .= '</tr>';
@@ -1299,7 +1299,7 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
     $content .= $tableRow('Uhrzeit:', date('H:i', $dateData['starttime']));
 
     // duration
-    $content .= $tableRow('Dauer:', $dateData['duration']);
+    $content .= $tableRow('Ende:', $dateData['duration']);
 
     // trainer
     $trainer = getTableData('mdl_block_exaplanpusers', $dateData['trainerpuserid']);
