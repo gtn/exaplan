@@ -378,7 +378,7 @@ function setPrefferedDate($updateExisting, $dateId = 0, $modulepartid, $puserid,
         ':region' => trim($region),
         ':moodleid' => $moodleid,
         ':isonline' => $isonline,
-        ':duration' => $duration,
+        ':duration' => (strtotime(date('Y-m-d', $date) . ' ' . $duration) ?: strtotime('today midnight') - 3600 * 2), // day's 22:00 if no time in the form!,
         ':onlineroom' => $onlineroom,
     ];
 

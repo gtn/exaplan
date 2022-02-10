@@ -348,7 +348,7 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
             $trainer = getTableData('mdl_block_exaplanpusers', $date['trainerpuserid']);
             $tooltips .= '<span id="tooltipster_content'.$date['id'].'">';
             $tooltips .= ($date['starttime'] ? 'Uhrzeit: <strong>'.date('H:i', $date['starttime']).'</strong> '.date('d.m.Y', $date['date']).'<br>' : '')
-                .($date['duration'] ? 'Ende: '.$date['duration'].'<br>' : '')
+                .($date['duration'] ? 'Ende: '.date('H:i', $date['duration']).'<br>' : '')
                 .($date['moodleid'] ? 'Ort: '.getMoodleDataByMoodleid($date['moodleid'], 'companyname').'<br>' : '')
                 .getRegionTitle($date['region']).' - '.getIsOnlineTitle($date['isonline']).'<br>'
                 .($date['location'] ? 'Location: '.$date['location'].'<br>' : '')
@@ -1065,12 +1065,13 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
     $timeString = (@$dateRec['starttime'] ? date('H:i', @$dateRec['starttime']) : '00:00');
     $content .= '<td colspan="2">';
     $content .= '<label for="time_'.$instanceKey.'">Uhrzeit:</label>';
-    $content .= '<input type="text" name="time" value="'.$timeString.'" class="form-control" id="time_'.$instanceKey.'" >';
+    $content .= '<input type="time" name="time" value="'.$timeString.'" class="form-control" id="time_'.$instanceKey.'" >';
     $content .= '</td>';
     // duration
+    $durationString = (@$dateRec['duration'] ? date('H:i', @$dateRec['duration']) : '22:00'); // from 10.02.2022 it is a TIMEstamp of event's end
     $content .= '<td colspan="2">';
     $content .= '<label for="duration_'.$instanceKey.'">Ende:</label>';
-    $content .= '<input type="text" name="duration" value="'.@$dateRec['duration'].'" class="form-control" id="duration_'.$instanceKey.'" >';
+    $content .= '<input type="time" name="duration" value="'.$durationString.'" class="form-control" id="duration_'.$instanceKey.'" >';
     $content .= '</td>';
     $content .= '</tr>';
 
@@ -1299,7 +1300,7 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
     $content .= $tableRow('Uhrzeit:', date('H:i', $dateData['starttime']));
 
     // duration
-    $content .= $tableRow('Ende:', $dateData['duration']);
+    $content .= $tableRow('Ende:', date('H:i', $dateData['duration']));
 
     // trainer
     $trainer = getTableData('mdl_block_exaplanpusers', $dateData['trainerpuserid']);
