@@ -195,7 +195,13 @@ function getAllModules()
     $pdo = getPdoConnect();
     $params = array();
 
-    $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanmodulesets");
+    $sql = 'SELECT ms.* 
+              FROM mdl_block_exaplanmodulesets ms
+                LEFT JOIN mdl_course c ON c.idnumber = ms.courseidnumber
+              WHERE c.visible = 1
+                AND (c.enddate = 0 OR  (c.enddate > 0 AND c.enddate > UNIX_TIMESTAMP()))                 
+          ';
+    $statement = $pdo->prepare($sql);
     $statement->execute($params);
     $statement->setFetchMode(PDO::FETCH_ASSOC);
     $modules = $statement->fetchAll();
@@ -256,6 +262,11 @@ function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_FIXED)
 
     $courses = $DB->get_records('course');
     foreach ($courses as $course) {
+        // ignore hidden and ended courses
+        if (!$course->visible ||
+            ($course->enddate > 0 && $course->enddate < time())) {
+            continue;
+        }
         if ($course->idnumber > 0) {
             $context = context_course::instance($course->id);
             if (is_enrolled($context, $userid, '', true)) {
