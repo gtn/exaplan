@@ -32,7 +32,7 @@ switch ($targetTable) {
         $contentTitle = '<h3>Modulteile bearbeiten<br/><h4>für <strong>'.$moduleSetTitle.'</strong></h4></h3>';
         $reltable = "block_exaplanmoduleparts";
         $recordsCondition = ['modulesetid' => $moduleSetId];
-        $cellTitles = ['Titel', 'Dauer (1=halbtags; 2=ganztags)'];
+        $cellTitles = ['Titel', 'Dauer (1=ganztags; 2=halbtags)'];
         $inputs = [
             'title' => [],
 //            'modulesetid' => ['type' => 'hidden'], // TODO: selectbox?
