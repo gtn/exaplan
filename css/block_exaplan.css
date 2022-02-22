@@ -494,8 +494,8 @@ body {
 #exaplan .item-header-title {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 20px;
-    letter-spacing: 2px;
-    word-spacing: 2px;
+    /*letter-spacing: 2px;
+    word-spacing: 2px;*/
     color: #2E2E2E;
     NO-padding: 10px 7px 0px 75px;
     margin-bottom: 0;
@@ -990,7 +990,16 @@ tr[data-listid="mainList"] td {
 	color: #000;
 	margin-bottom: 1rem;
 	background-color: #f5f3f3;
+	background-color: #c5c4c3;
 	padding: .5rem;
+}
+
+#exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a {
+	background-color: #c5c4c3;
+}
+
+#exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem .exaplan-jahrgang-title a {
+	background-color: #dcdbdb;
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a:hover,
@@ -1023,3 +1032,69 @@ tr[data-listid="mainList"] td {
 }
 
 #exaplan .hidechar {opacity:0}
+
+#exaplan .result-item-header-user .result-item-header-cnt > div.icon {
+	display: none;
+}
+/*
+#exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem {
+	margin-left: 0;
+}
+
+#exaplan .exaplan-result-item {
+	margin-left: 0;
+}
+
+#exaplan .result-item-header-user .result-item-header-cnt .item-header-title {
+	padding-left: .5rem;
+}*/
+
+#exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem {
+	margin-left: 1.0rem;
+}
+
+#exaplan .exaplan-result-item {
+	margin-left: 1.0rem;
+}
+
+#exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a, #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem .exaplan-jahrgang-title a {
+	padding: .5rem 1rem;
+}
+
+#exaplan .result-item-header-user .result-item-header-cnt .item-header-title {
+	padding-left: 1rem;
+}
+
+#exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem .exaplan-jahrgang-title a h3 {
+	font-size: 1.24rem;
+	font-weight: 500;
+}
+
+#exaplan .item-header-title {
+	font-size: 1.24rem;
+	font-weight: 500;
+}
+
+#exaplan .result-item-header-user .result-item-header-cnt .item-header-title {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+#exaplan .item-header-title b {
+	font-weight: inherit;
+}
+
+#exaplan .result-item-header {
+	min-height: 40px;
+}
+
+#exaplan .result-item-header-user .result-item-header-cnt {
+	min-height: 40px;
+}
+
+#exaplan .btn-desired {
+	background-color: #f7cb96;
+}
+
+#exaplan .result-item-header-cnt {
+	background-color: #f4f3f3;
+}
