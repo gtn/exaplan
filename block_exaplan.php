@@ -94,7 +94,7 @@ class block_exaplan extends block_base {
                 $content .= '<div class="exaplan-standort-groupitem">';
                 $content .= '<div class="exaplan-standort-title">';
                 $content .= '<a href="#'.$groupStandortId.'" class="collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="'.$groupStandortId.'">';
-                $content .= '<h3>'.$groupTitle.'</h3><i class="fa fa-chevron-down"></i>';
+                $content .= '<h3>Standort: '.$groupTitle.'</h3><i class="fa fa-chevron-down"></i>';
                 $content .= '</div>';
                 $content .= '</a>';
                 $content .= '<div class="collapse exaplan-standort-usersdata" id="'.$groupStandortId.'">';
@@ -104,7 +104,7 @@ class block_exaplan extends block_base {
                     $content .= '<div class="exaplan-jahrgang-groupitem">';
                     $content .= '<div class="exaplan-jahrgang-title">';
                     $content .= '<a href="#'.$groupJahrgangId.'" class="collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="'.$groupJahrgangId.'">';
-                    $content .= '<h3>'.$groupJahrgangTitle.'</h3><i class="fa fa-chevron-down"></i>';
+                    $content .= '<h3>Jahrgang: '.$groupJahrgangTitle.'</h3><i class="fa fa-chevron-down"></i>';
                     $content .= '</div>';
                     $content .= '</a>';
                     $content .= '<div class="collapse exaplan-jahrgang-usersdata" id="'.$groupJahrgangId.'">';
