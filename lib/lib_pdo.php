@@ -200,8 +200,10 @@ function getAllModules()
               FROM mdl_block_exaplanmodulesets ms
                 LEFT JOIN mdl_course c ON c.idnumber = ms.courseidnumber
               WHERE c.visible = 1
-                AND (c.enddate = 0 OR  (c.enddate > 0 AND c.enddate > UNIX_TIMESTAMP()))                 
+                AND (c.enddate = 0 OR  (c.enddate > 0 AND c.enddate > UNIX_TIMESTAMP()))
+              ORDER BY ms.courseidnumber             
           ';
+
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
     $statement->setFetchMode(PDO::FETCH_ASSOC);
@@ -219,9 +221,8 @@ function getAllModules()
         $moduleset->parts = $statement->fetchAll();
         $modulesets[] = $moduleset;
     }
-
+    
     return $modulesets;
-
 }
 
 function getModulepartByModulepartid($modulepartid)
@@ -261,7 +262,7 @@ function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_FIXED)
     $modulesets = array();
     $pdo = getPdoConnect();
 
-    $courses = $DB->get_records('course');
+    $courses = $DB->get_records('course', [], 'idnumber');
     foreach ($courses as $course) {
         // ignore hidden and ended courses
         if (!$course->visible ||
