@@ -1,5 +1,5 @@
-.exaplan-date-desired {background: #f8931f; }   
-    
+.exaplan-date-desired {background: #f8931f; }
+
 #region-main-box section.block_exaplan .card-title {display:none !important;}
 
 .exaplan-selectable-date:hover {
@@ -58,13 +58,13 @@ a.exaplan-date-current-modulepart {
 #exaplan a.exaplan-admin-modulepart-button.exaplan-date-desired:hover {
     border-color: white;
     color: black;
-    
+
 }
 #exaplan .btn-danger a.exaplan-admin-modulepart-button.exaplan-date-no-desired-admin{
-	background-color:rgb(247, 147, 30);
+    background-color:rgb(247, 147, 30);
 }
 #exaplan .btn-danger a.exaplan-admin-modulepart-button.exaplan-date-no-desired-admin:hover{
-	background-color:rgb(247, 147, 30);
+    background-color:rgb(247, 147, 30);
 }
 
 
@@ -461,12 +461,12 @@ body {
     -ms-flex-pack: justify !important;
 
     justify-content: space-between !important;
-    aalign-items:  center; 
+    aalign-items:  center;
     position: relative;*/
 }
 
 #exaplan .result-item-header-user .result-item-header-cnt {
-	display: -ms-flexbox !important;
+    display: -ms-flexbox !important;
     display: flex;
     -ms-flex-direction: row !important;
     flex-direction: row;
@@ -474,20 +474,20 @@ body {
 
     justify-content: space-between !important;
     min-height: 50px;
-   -ms-flex-align: center !important;
-   align-items: center !important;
+    -ms-flex-align: center !important;
+    align-items: center !important;
 }
 
 #exaplan .result-item-header-user .result-item-header-cnt > div.icon {
-	width: 50px;
-	height: 50px;
-	position: absolute;
-	left: -20px;
+    width: 50px;
+    height: 50px;
+    position: absolute;
+    left: -20px;
 }
 
 #exaplan .result-item-header-user .result-item-header-cnt .item-header-title {
-	flex-grow: 1;
-	padding-left: 50px;
+    flex-grow: 1;
+    padding-left: 50px;
 }
 
 
@@ -556,25 +556,25 @@ body {
     background: #ffc98e;
 }
 #exaplan .btn-anfragen{
-	background: #ffc98e;
+    background: #ffc98e;
 }
 
 #exaplan .btn-anfragen.btnactive{
-	background-color:#f8931f;
+    background-color:#f8931f;
 }
 #exaplan .btn-zukunft{
-	background: #8dd2f0;
+    background: #8dd2f0;
 }
 
 #exaplan .btn-zukunft.btnactive{
-	background-color:#29ABE2;
+    background-color:#29ABE2;
 }
 #exaplan .btn-past{
-	background: rgb(220,219,219);
+    background: rgb(220,219,219);
 }
 
 #exaplan .btn-past.btnactive{
-	background-color:#bbbbbb;
+    background-color:#bbbbbb;
 }
 
 
@@ -608,16 +608,16 @@ body {
     background-color: #ddd;
     min-height: 50px;
     position: relative;
-    
+
     display: -ms-flexbox !important;
-	display: flex !important;
-	-ms-flex-direction: row !important;
-	flex-direction: row;
-	-ms-flex-align: center !important;
-	align-items: center !important;
-	
-	-ms-flex-pack: justify !important;
-	justify-content: space-between !important;
+    display: flex !important;
+    -ms-flex-direction: row !important;
+    flex-direction: row;
+    -ms-flex-align: center !important;
+    align-items: center !important;
+
+    -ms-flex-pack: justify !important;
+    justify-content: space-between !important;
 }
 
 #exaplan .exaplan-result-item {
@@ -662,7 +662,7 @@ body {
 #exaplan .php {width: 100%; background-color: #E02061;}
 
 #exaplan .btn {
-	padding: .08rem .55rem;
+    padding: .08rem .55rem;
 }
 #exaplan table.tbl_modulparts th{padding: 0 .25rem;}
 #exaplan table.tbl_modulparts td{padding: 0 .25rem;}
@@ -677,11 +677,11 @@ body {
 }
 
 #exaplan .moduleListTable > tbody > tr {
-	border-bottom: 1px solid #eaeaea;
+    border-bottom: 1px solid #eaeaea;
 }
 
 #exaplan table.tbl_modulparts tr {
-	border-bottom: 0 !important;
+    border-bottom: 0 !important;
 }
 
 #exaplan .moduleListTable {
@@ -694,7 +694,7 @@ body {
 }
 
 #exaplan .moduleListTable .btn {
-	margin-bottom: .2rem;
+    margin-bottom: .2rem;
 }
 
 #exaplan .exaplan-date-button-item {
@@ -715,15 +715,15 @@ body {
 }
 
 #exaplan .BlockFooter {
-	margin-bottom: .5rem;
+    margin-bottom: .5rem;
 }
 
 #exaplan .btn.btn-to-dashboard3 {
-	min-width: 220px;
+    min-width: 220px;
 }
 
 #exaplan .BlockFooter .btn {
-	min-width: 220px;
+    min-width: 220px;
 }
 
 #exaplan .btn-fixed.exaplan-existing-date {
@@ -889,93 +889,93 @@ tr[data-listid="mainList"] td {
 }
 
 #exaplan .result-item-header .dashboard-settings .icon {
-	margin-right: 0;
+    margin-right: 0;
 }
 
 .tavo-calendar__header {
-	background-color: rgb(192,20,48,1);
+    background-color: rgb(192,20,48,1);
 }
 
 #exaplan .exaplan-adminModulepartView label input {
-	margin-right: 4px;
+    margin-right: 4px;
 }
 
 #exaplan .btn.btn-red {
-	background-color: rgb(192,20,48,1);
+    background-color: rgb(192,20,48,1);
 }
 
 #exaplan .btn.btn-light-grey {
-	background-color: rgb(197,196,195,1);
+    background-color: rgb(197,196,195,1);
 }
 
 #exaplan .btn.btn-green {
-	background-color: rgb(58,181,74,1);
+    background-color: rgb(58,181,74,1);
 }
 
 #exaplan .btn.btn-light-blue {
-	background-color: rgb(42,171,226,1);
+    background-color: rgb(42,171,226,1);
 }
 
 #exaplan .btn.btn-orange, #exaplan .bg-orange {
-	background-color: rgb(246,146,29,1);
+    background-color: rgb(246,146,29,1);
 }
 
 #exaplan .btn.btn-red.btn-off {
-	background-color: rgb(192,20,48,.5);
+    background-color: rgb(192,20,48,.5);
 }
 
 #exaplan .btn.btn-light-grey.btn-off {
-	background-color: rgb(197,196,195,.5);
+    background-color: rgb(197,196,195,.5);
 }
 
 #exaplan .btn.btn-green.btn-off {
-	background-color: rgb(58,181,74,.5);
+    background-color: rgb(58,181,74,.5);
 }
 
 #exaplan .btn.btn-light-blue.btn-off {
-	background-color: rgb(42,171,226,.5);
+    background-color: rgb(42,171,226,.5);
 }
 
 #exaplan .btn.btn-orange.btn-off {
-	background-color: rgb(246,146,29,.5);
+    background-color: rgb(246,146,29,.5);
 }
 
 #exaplan .btn.bg-light-red {
-	background-color: rgb(192,20,48,.2);
+    background-color: rgb(192,20,48,.2);
 }
 
 #exaplan .btn.bg-light-grey {
-	background-color: rgb(197,196,195,.2);
+    background-color: rgb(197,196,195,.2);
 }
 
 #exaplan .btn.bg-light-orange {
-	background-color: rgb(246,146,29,.2);
+    background-color: rgb(246,146,29,.2);
 }
 
 #exaplan table.exaplan-adminModulepartView td.fixedDatesList {
-	padding: .3rem 1rem;
+    padding: .3rem 1rem;
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-standort-groups-service {
-	margin-bottom: 1rem;
+    margin-bottom: 1rem;
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-standort-groups-service .exaplan-standort-groups-allcollapse {
-	font-weight: bold;
-	text-decoration: none;
-	border-style: none;
-	border-radius: 4px;
-	padding-left: 20px;
-	padding-right: 20px;
-	font-size: 0.7rem;
-	line-height: 1.2rem;
-	background-color: rgb(192,20,48,1);
-	color: #fff;
-	padding: .15rem .55rem;
+    font-weight: bold;
+    text-decoration: none;
+    border-style: none;
+    border-radius: 4px;
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: 0.7rem;
+    line-height: 1.2rem;
+    background-color: rgb(192,20,48,1);
+    color: #fff;
+    padding: .15rem .55rem;
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-standort-groups-service .exaplan-standort-groups-allcollapse[data-collapsed="1"] {
-	background-color: rgb(192,20,48,.2);
+    background-color: rgb(192,20,48,.2);
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem {
@@ -984,47 +984,47 @@ tr[data-listid="mainList"] td {
 
 #exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a,
 #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem .exaplan-jahrgang-title a {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	color: #000;
-	margin-bottom: 1rem;
-	background-color: #f5f3f3;
-	background-color: #c5c4c3;
-	padding: .5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #000;
+    margin-bottom: 1rem;
+    background-color: #f5f3f3;
+    background-color: #c5c4c3;
+    padding: .5rem;
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a {
-	background-color: #c5c4c3;
+    background-color: #c5c4c3;
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem .exaplan-jahrgang-title a {
-	background-color: #dcdbdb;
+    background-color: #dcdbdb;
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a:hover,
 #exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a:focus,
 #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem .exaplan-jahrgang-title a:hover,
 #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem .exaplan-jahrgang-title a:focus {
-	text-decoration: none !important;
+    text-decoration: none !important;
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a i.fa,
 #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem .exaplan-jahrgang-title a i.fa {
-	margin-right: 1rem;
-	/*font-size: */
+    margin-right: 1rem;
+    /*font-size: */
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a.collapsed i.fa,
 #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem .exaplan-jahrgang-title a.collapsed i.fa {
-	transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a h3,
 #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem .exaplan-jahrgang-title a h3 {
-	margin-bottom: 0;
-	font-size: 1.24rem;
-	font-weight: 500;
+    margin-bottom: 0;
+    font-size: 1.24rem;
+    font-weight: 500;
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem .exaplan-jahrgang-title a h3 {
@@ -1034,7 +1034,7 @@ tr[data-listid="mainList"] td {
 #exaplan .hidechar {opacity:0}
 
 #exaplan .result-item-header-user .result-item-header-cnt > div.icon {
-	display: none;
+    display: none;
 }
 /*
 #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem {
@@ -1050,51 +1050,129 @@ tr[data-listid="mainList"] td {
 }*/
 
 #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem {
-	margin-left: 1.0rem;
+    margin-left: 1.0rem;
 }
 
 #exaplan .exaplan-result-item {
-	margin-left: 1.0rem;
+    margin-left: 1.0rem;
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a, #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem .exaplan-jahrgang-title a {
-	padding: .5rem 1rem;
+    padding: .5rem 1rem;
 }
 
 #exaplan .result-item-header-user .result-item-header-cnt .item-header-title {
-	padding-left: 1rem;
+    padding-left: 1rem;
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem .exaplan-jahrgang-title a h3 {
-	font-size: 1.24rem;
-	font-weight: 500;
+    font-size: 1.24rem;
+    font-weight: 500;
 }
 
 #exaplan .item-header-title {
-	font-size: 1.24rem;
-	font-weight: 500;
+    font-size: 1.24rem;
+    font-weight: 500;
 }
 
 #exaplan .result-item-header-user .result-item-header-cnt .item-header-title {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
 #exaplan .item-header-title b {
-	font-weight: inherit;
+    font-weight: inherit;
 }
 
 #exaplan .result-item-header {
-	min-height: 40px;
+    min-height: 40px;
 }
 
 #exaplan .result-item-header-user .result-item-header-cnt {
-	min-height: 40px;
+    min-height: 40px;
 }
 
 #exaplan .btn-desired {
-	background-color: #f7cb96;
+    background-color: #f7cb96;
 }
 
 #exaplan .result-item-header-cnt {
-	background-color: #f4f3f3;
+    background-color: #f4f3f3;
 }
+
+#exaplan .mainTable > tbody.mainTable_body > tr {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#exaplan .mainTable > tbody.mainTable_body > tr > td.tc_moduleListTable {
+
+}
+
+#exaplan .mainTable > tbody.mainTable_body > tr > td.tc_withCalendarAndDate {
+    gmax-width: 280px !important;
+    g width: 280px !important;
+}
+
+
+
+#exaplan table.moduleListTable .moduleListTable_col1 {
+    max-width: 160px !important;
+    width: 160px !important;
+}
+
+.div_modulparts {
+    display: -ms-flexbox !important;
+    display: flex;
+    -ms-flex-direction: row !important;
+    flex-direction: row;
+    -ms-flex-wrap: wrap !important;
+    flex-wrap: wrap;
+    -ms-flex-pack: start !important;
+    justify-content: flex-start !important;
+}
+
+.div_modulparts .div_modulpart {
+    margin-right: 3px;
+    width: 80px;
+    display: -ms-flexbox !important;
+    display: flex;
+    -ms-flex-direction: column !important;
+    flex-direction: column;
+    -ms-flex-align: center !important;
+    align-items: center;
+}
+
+.div_modulparts .div_modulpart .btn {
+    min-width: 79px;
+}
+
+#exaplan .moduleListTable {
+    margin-left: 17px;
+}
+
+/*
+#exaplan .mainTable tbody .moduleListTable thead > tr > th:first-child,
+#exaplan .mainTable tbody .moduleListTable tbody > tr > td:first-child {
+	max-width: 160px !important;
+	width: 160px !important;
+	min-width: 160px !important;
+}
+
+#exaplan .mainTable tbody .moduleListTable thead > tr > th:nth-of-type(2),
+#exaplan .mainTable tbody .moduleListTable tbody > tr > td:nth-of-type(2) {
+	max-width: 200px !important;
+	width: 200px !important;
+	min-width: 200px !important;
+}
+
+#exaplan .mainTable tbody .moduleListTable table {
+	max-width: 200px !important;
+	width: 200px !important;
+	min-width: 200px !important;
+}
+
+#exaplan .mainTable {
+
+}
+*/

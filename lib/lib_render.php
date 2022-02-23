@@ -58,14 +58,14 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
 </div></th>';
     $content .= '</tr>';
     $content .= '</thead>';
-    $content .= '<tbody>';
+    $content .= '<tbody class="mainTable_body">';
     $content .= '<tr>';
-    $content .= '<td valign="top">';
+    $content .= '<td valign="top" class="tc_moduleListTable">';
 
     $content .= '<table class="moduleListTable" border="0">';
     $content .= '<thead>';
     $content .= '<tr>';
-    $content .= '<th>Meine Module</th>';
+    $content .= '<th class="moduleListTable_col1">Meine Module</th>';
     $content .= '<th>Termine</th>';
     $content .= '<th></th>';
 
@@ -74,21 +74,21 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
     $content .= '<tbody>';
 
     foreach ($modulesets as $moduleKey => $moduleset){
-        $content .= '<tr> <td valign="top">'.$moduleset->set["title"].'</td>';
+        $content .= '<tr> <td valign="top" class="moduleListTable_col1">'.$moduleset->set["title"].'</td>';
         $content .= '<td valign="top">';
-        $content .= '<table  class="tbl_modulparts">';
-        $content .= '<thead>';
-        $content .= '<tr>';
-        foreach($moduleset->parts as $part) {
-            $content .= '<td>'.$part["title"].'</td>';
-        }
-        $content .= '</tr>';
-        $content .= '</thead>';
-        $content .= '<tbody>';
+        $content .= '<div  class="div_modulparts">';
+        // $content .= '<thead>';
+        // $content .= '<tr>';
+        // foreach($moduleset->parts as $part) {
+        //    $content .= '<div class="div_modulpart"><div class="div_modulpart_title">'.$part["title"].'</div>';
+        // }
+        // $content .= '</tr>';
+        // $content .= '</thead>';
+        // $content .= '<tbody>';
         foreach ($moduleset->parts as $part) {
             $absentHas = false;
             if ($isadmin == 1) {
-                $content .= '<td>';
+                $content .= '<div class="div_modulpart"><div class="div_modulpart_title">'.$part["title"].'</div><div class="div_modulpart_btn">';
                 // for admins
                 $desiredDates = getDesiredDates(null, $part['id']);
 
@@ -105,12 +105,12 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                                 data-modulepartId="'.$part['id'].'"
                                 class="btn exaplan-admin-modulepart-button '.$buttonClass.'"
                             > '.$title.' </a>';
-                $content .= '</td>';
+                $content .= '</div></div>';
             } else {
                 if (!$part['date']  // no any date yet
                     || !in_array($part['date'][0]['state'], [BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED]) // only desired dates
                 ) {
-                    $content .= '<td>';
+                    $content .= '<div class="div_modulpart"><div class="div_modulpart_title">'.$part["title"].'</div><div class="div_modulpart_btn">';
                     // desired dates
                     $disabled = '';
                     if (getDesiredDates($pUser['id'], $part['id'], null, null, null, 'future')) {
@@ -145,13 +145,13 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                                     data-modulepartId="'.$part['id'].'"
                                     '.($modulepartid == $part["id"] ? 'data-modulepartselected="1"' : '').'
                                 '.$disabled.'>'.$buttonTitle.'</a>';
-                    $content .= '</td>';
+                    $content .= '</div></div>';
                 } else {
                     // fixed date exists
                     $datesForUser = getFixedDatesAdvanced($pUser['id'], $part['id']);
 
                     foreach ($datesForUser as $dateTemp) {
-                        $content .= '<td>';
+                        $content .= '<div class="div_modulpart"><div class="div_modulpart_title">'.$part["title"].'</div><div class="div_modulpart_btn">';
                         $buttonClass = '';
                         if ($dateId == $dateTemp['id'] && $modulepartid == $part["id"]) {
                             $buttonClass .= ' exaplan-date-current-modulepart ';
@@ -167,13 +167,13 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                                     data-modulepartId="' . $part['id'] . '">
                                  ' . date('d.m.Y', $dateTemp['date']) .
                             '</a>';
-                        $content .= '</td>';
+                        $content .= '</div></div>';
                     }
                 }
             }
             // add possibility to add new desired dates if the student has absent fixed date
             if ($absentHas) {
-                $content .= '<td>';
+                $content .= '<div class="div_modulpart"><div class="div_modulpart_title">'.$part["title"].'</div><div class="div_modulpart_btn">';
                 $dateUrl = $CFG->wwwroot.'/blocks/exaplan/calendar.php?mpid='.$part["id"].'&userid='.$userid.'&pagehash='.block_exaplan_hash_current_userid($userid);
                 $content .= '<a href="'.$dateUrl.'" 
                                     role="button" 
@@ -181,11 +181,12 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                                     data-modulepartId="'.$part['id'].'"
                                     '.($modulepartid == $part["id"] ? 'data-modulepartselected="1"' : '').'
                                 > <button type="button" class="btn btn-danger">neu planen</button> </a>';
-                $content .= '</td>';
+                $content .= '<div/></div>';
             }
         }
-        $content .= '</tbody>';
-        $content .= '</table>';
+
+        // $content .= '</tbody>';
+        $content .= '</div>';
         $content .= '</td>';
         $content .= '</tr>';
     }
@@ -197,18 +198,18 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
     $content .= '</td>';
 
     if ($withCalendar) {
-        $content .= '<td valign="top" >';
+        $content .= '<td valign="top" class="tc_withCalendar" >';
         $content .= block_exaplan_calendars_view($userid, 2, true, $modulepartid);
         $content .= '</td>';
     }
     if ($withDateDetails) {
-        $content .= '<td valign="top" >';
+        $content .= '<td valign="top" class="tc_withDateDetails" >';
         $content .= studentEventDetailsView($userid, $modulepartid, $dateId);
         $content .= '</td>';
     }
 
     if (!$withCalendar && !$withDateDetails) {
-        $content .= '<td valign="top">';
+        $content .= '<td valign="top" class="tc_withCalendarAndDate">';
         $content .= printStudentExistingFixedDates($pUser['id']);
         $content .= '</td>';
     }
