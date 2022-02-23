@@ -161,6 +161,10 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                             $absentHas = true;
                             $buttonClass .= ' exaplan-date-absent ';
                         }
+
+                        if ($dateTemp['date'] < strtotime("today", time())) { // if this fixed date is in the past
+                            $buttonClass .= ' date_past ';
+                        }
                         $content .= '<a href="' . $CFG->wwwroot . '/blocks/exaplan/dateDetails.php?mpid=' . $part["id"] . '&userid=' . $userid . '&dateid=' . $dateTemp['id'] . '&pagehash=' . block_exaplan_hash_current_userid($userid) . '"
                                     class="btn exaplan-date-fixed exaplan-selectable-date ' . $buttonClass . '" 
                                     data-dateId="' . $dateTemp['id'] . '" 

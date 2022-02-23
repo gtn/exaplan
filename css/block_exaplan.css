@@ -640,6 +640,12 @@ body {
     color: #ffffff !important;
 }
 
+/*fixed date in thead past*/
+#exaplan .moduleListTable a.exaplan-date-fixed.date_past {
+    background-color: rgb(220,219,219) !important;
+}
+
+
 /* skill bar------------------------------------------------------------------------*/
 
 * {box-sizing:border-box}
