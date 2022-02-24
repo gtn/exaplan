@@ -75,7 +75,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
 
     foreach ($modulesets as $moduleKey => $moduleset){
         $content .= '<tr> <td valign="top" class="moduleListTable_col1">'.$moduleset->set["title"].'</td>';
-        $content .= '<td valign="top">';
+        $content .= '<td valign="top" class="moduleListTable_col2">';
         $content .= '<div  class="div_modulparts">';
         // $content .= '<thead>';
         // $content .= '<tr>';
