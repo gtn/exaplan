@@ -360,9 +360,12 @@ table.exaplan-date-details-table td.dataContent {
 .register-existing-dates .exaplan-register-toDate {
     padding-top: 0px;
     padding-bottom: 0px;
-    background-color: red;
+    background-color: rgb(192, 20, 48);
     color: white;
     border-radius: 5px;
+}
+.register-existing-dates .exaplan-existing-date{
+	background-color: #005300;
 }
 .register-existing-dates .exaplan-register-toDate:hover {
     background-color: rgb(255, 0, 0, 0.5);
