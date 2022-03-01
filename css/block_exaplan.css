@@ -364,9 +364,11 @@ table.exaplan-date-details-table td.dataContent {
     color: white;
     border-radius: 5px;
 }
+
 .register-existing-dates .exaplan-existing-date{
 	background-color: #005300;
 }
+
 .register-existing-dates .exaplan-register-toDate:hover {
     background-color: rgb(255, 0, 0, 0.5);
 }
@@ -1007,10 +1009,12 @@ tr[data-listid="mainList"] td {
 
 #exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a {
 	background-color: #c5c4c3;
+	background-color: #d0d2d3;
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-jahrgang-groupitem .exaplan-jahrgang-title a {
 	background-color: #dcdbdb;
+	background-color: #dee0e0;
 }
 
 #exaplan .exaplan-standort-groups-container .exaplan-standort-groupitem .exaplan-standort-title a:hover,
@@ -1108,6 +1112,7 @@ tr[data-listid="mainList"] td {
 
 #exaplan .result-item-header-cnt {
 	background-color: #f4f3f3;
+	background-color: #e8e9e9;
 }
 
 #exaplan .mainTableAdmin .result-item-header-cnt {
@@ -1196,3 +1201,11 @@ tr[data-listid="mainList"] td {
 
 }
 */
+
+.mainTable_body {
+	border: 1px solid #e8e9e9;
+}
+
+#exaplan .mainTable thead th {
+	padding-bottom: 0;
+}
