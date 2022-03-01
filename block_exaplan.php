@@ -93,11 +93,11 @@ class block_exaplan extends block_base {
                 // custom collapsible html
                 $content .= '<div class="exaplan-standort-groupitem">';
                 $content .= '<div class="exaplan-standort-title">';
-                $content .= '<a href="#'.$groupStandortId.'" class="collapsed" data-toggle="collapse" aria-expanded="false" aria-controls="'.$groupStandortId.'">';
+                $content .= '<a href="#'.$groupStandortId.'" class="" data-toggle="collapse" aria-expanded="true" aria-controls="'.$groupStandortId.'">';
                 $content .= '<h3>Standort: '.$groupTitle.'</h3><i class="fa fa-chevron-down"></i>';
                 $content .= '</div>';
                 $content .= '</a>';
-                $content .= '<div class="collapse exaplan-standort-usersdata" id="'.$groupStandortId.'">';
+                $content .= '<div class="collapse exaplan-standort-usersdata show" id="'.$groupStandortId.'">';
                 foreach ($subGroupsJahrgangData as $groupJahrgangTitle => $students) {
 //                    $content .= $studentDataContent;
                     $groupJahrgangId = 'groupitem_'.$groupNumber.'_'.$groupJahrgangNumber;
