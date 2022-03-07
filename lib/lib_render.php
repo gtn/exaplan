@@ -24,7 +24,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
         $pUser = [];
         $tnname = '';
     } else{
-        $modulesets = getModulesOfUser($userid);
+        $modulesets = getModulesOfUser($userid,BLOCK_EXAPLAN_DATE_FIXED,BLOCK_EXAPLAN_DATE_BLOCKED);
         $pUser = getPuser($userid);
         $tnname = '<b>'.$pUser["firstname"].' '.$pUser["lastname"].'</b>';
     }
