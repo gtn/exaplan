@@ -479,7 +479,7 @@ function block_exaplan_get_calendar_data($userid)
     ];
 
 
-    $userModules = getModulesOfUser($USER->id, 1);
+    $userModules = getModulesOfUser($USER->id, BLOCK_EXAPLAN_DATE_DESIRED);
     $dateCounts = [];
     $selectedDates = [];
     foreach ($userModules as $module) {

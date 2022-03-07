@@ -253,10 +253,13 @@ function getModulesetByModulesetid($modulesetid){
     return $moduleset;
 }
 
-function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_FIXED,$state2 = BLOCK_EXAPLAN_DATE_FIXED)
+function getModulesOfUser($userid, $states = [BLOCK_EXAPLAN_DATE_FIXED])
 {
     global $DB, $COURSE;
 
+    if (!is_array($states)) {
+        $states = [$states];
+    }
 
     $modulesets = array();
     $pdo = getPdoConnect();
@@ -296,15 +299,14 @@ function getModulesOfUser($userid, $state = BLOCK_EXAPLAN_DATE_FIXED,$state2 = B
                     $params = array(
                         ':modulepartid' => $part['id'],
                         ':puserid' => getPuser($userid)['id'],
-                        ':state' => $state,
-						':state2' => $state2,
                     );
+                    $statesWhere = array_map(function($s) {return ' d.state = '.intval($s).' '; }, $states);
                     $statement = $pdo->prepare("SELECT d.*, udmm.absent
                                                   FROM mdl_block_exaplandates d
                                                     JOIN mdl_block_exaplanpuser_date_mm udmm ON d.id = udmm.dateid
                                                   WHERE d.modulepartid = :modulepartid
                                                         AND udmm.puserid = :puserid
-                                                        AND (d.state = :state OR d.state = :state2)
+                                                        AND ( ".implode(' OR ', $statesWhere)." )
                                                   ORDER BY d.state DESC ");
                     $statement->execute($params);
                     $statement->setFetchMode(PDO::FETCH_ASSOC);

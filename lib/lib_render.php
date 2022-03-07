@@ -24,7 +24,7 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
         $pUser = [];
         $tnname = '';
     } else{
-        $modulesets = getModulesOfUser($userid,BLOCK_EXAPLAN_DATE_FIXED,BLOCK_EXAPLAN_DATE_BLOCKED);
+        $modulesets = getModulesOfUser($userid, [BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED]);
         $pUser = getPuser($userid);
         $tnname = '<b>'.$pUser["firstname"].' '.$pUser["lastname"].'</b>';
     }
@@ -108,12 +108,16 @@ function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = fal
                 $content .= '</div></div>';
             } else {
                 if (!$part['date']  // no any date yet
-                    || !in_array($part['date'][0]['state'], [BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED]) // only desired dates
+                    || !in_array($part['date'][0]['state'], [BLOCK_EXAPLAN_DATE_FIXED]) // desired and blocked dates
                 ) {
                     $content .= '<div class="div_modulpart"><div class="div_modulpart_title">'.$part["title"].'</div><div class="div_modulpart_btn">';
                     // desired dates
                     $disabled = '';
-                    if (getDesiredDates($pUser['id'], $part['id'], null, null, null, 'future')) {
+
+
+                    if (getDesiredDates($pUser['id'], $part['id'], null, null, null, 'future') // has desired dates in the future
+                        || ($part['date'] && $part['date'][0]['state'] == BLOCK_EXAPLAN_DATE_BLOCKED) // for blocked date
+                    ) {
                         $buttonTitle = 'in Planung';
                         $buttonClass = ' exaplan-date-desired ';
                         $innerButtonClass = ' btn btn-desired btn-student ';
@@ -1288,42 +1292,50 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
         return $content;
     };
 
-    // moodleid info
-    $moodleData = getMoodleDataByMoodleid($dateData['moodleid'],'','Öffentlich');
-    $content .= $tableRow('Ort:', @$moodleData['companyname']);
+    if ($dateData['state'] == BLOCK_EXAPLAN_DATE_BLOCKED) {
+        // info about blocked date
+        $content .= '<tr><td colspan="2"><br><p>dieser Termin ist gerade in Planung -  die Termindetails stehen noch nicht fest</p></td></tr>';
+    } else {
+        // date details
+        // moodleid info
+        $moodleData = getMoodleDataByMoodleid($dateData['moodleid'],'','Öffentlich');
+        $content .= $tableRow('Ort:', @$moodleData['companyname']);
 
-    // region
-    //$content .= $tableRow('Region:', getRegionTitle(@$dateData['region']));
+        // region
+        //$content .= $tableRow('Region:', getRegionTitle(@$dateData['region']));
 
-    // is online
-    $content .= $tableRow('Art:', getIsOnlineTitle($dateData['isonline']));
+        // is online
+        $content .= $tableRow('Art:', getIsOnlineTitle($dateData['isonline']));
 
-    // location
-    $content .= $tableRow('Ort:', $dateData['location']);
+        // location
+        $content .= $tableRow('Ort:', $dateData['location']);
 
-    // time start
-    $content .= $tableRow('Uhrzeit:', date('H:i', $dateData['starttime']));
+        // time start
+        $content .= $tableRow('Uhrzeit:', date('H:i', $dateData['starttime']));
 
-    // duration
-    $content .= $tableRow('Ende:', date('H:i', $dateData['duration']));
+        // duration
+        $content .= $tableRow('Ende:', date('H:i', $dateData['duration']));
 
-    // trainer
-    $trainer = getTableData('mdl_block_exaplanpusers', $dateData['trainerpuserid']);
-    $content .= $tableRow('Trainer:', @$trainer['firstname'].' '.@$trainer['lastname']);
+        // trainer
+        $trainer = getTableData('mdl_block_exaplanpusers', $dateData['trainerpuserid']);
+        $content .= $tableRow('Trainer:', @$trainer['firstname'].' '.@$trainer['lastname']);
 
-    // link to online room
-    if ($dateData['isonline'] && $dateData['onlineroom']) {
-        $link = $dateData['onlineroom'];
-        $rowContent = checkOnlineRoomTypeByLink($link).'&nbsp;|&nbsp;<a href="'.$link.'" class="exaplan-onlineroom-link" target="_blank">Startseite&nbsp;'.$OUTPUT->pix_icon("e/insert_edit_video", checkOnlineRoomTypeByLink($link)).'</a>';
-        $content .= $tableRow('Raum:', $rowContent);
+        // link to online room
+        if ($dateData['isonline'] && $dateData['onlineroom']) {
+            $link = $dateData['onlineroom'];
+            $rowContent = checkOnlineRoomTypeByLink($link).'&nbsp;|&nbsp;<a href="'.$link.'" class="exaplan-onlineroom-link" target="_blank">Startseite&nbsp;'.$OUTPUT->pix_icon("e/insert_edit_video", checkOnlineRoomTypeByLink($link)).'</a>';
+            $content .= $tableRow('Raum:', $rowContent);
+        }
+
+        // description
+        if ($dateData['comment']) {
+            $content .= '<tr>';
+            $content .= '<td colspan="2"><strong>Notiz:</strong><br>'.$dateData['comment'].'</td>';
+            $content .= '</tr>';
+        }
     }
 
-    // description
-    if ($dateData['comment']) {
-        $content .= '<tr>';
-        $content .= '<td colspan="2"><strong>Notiz:</strong><br>'.$dateData['comment'].'</td>';
-        $content .= '</tr>';
-    }
+
 
     $content .= '</table>';
 
