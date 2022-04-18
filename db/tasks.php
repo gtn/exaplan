@@ -24,4 +24,13 @@ $tasks = array(
         'month' => '*',
         'dayofweek' => '*',
 	),
+	array(
+		'classname' => 'block_exaplan\task\puserupdating',
+        'blocking' => 0,
+        'minute' => '15',
+        'hour' => '1',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+	),
 );

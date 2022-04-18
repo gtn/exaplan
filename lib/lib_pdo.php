@@ -1089,3 +1089,63 @@ function getModulePartsForModuleSet($modulesetId) {
 
     return $result;
 }
+
+function updatePUserData()
+{
+    global $DB;
+    $pdo = getPdoConnect();
+    $moodleid = get_config('exaplan', 'moodle_id');
+
+    $params = array(
+        ':moodleid' => $moodleid
+    );
+
+    $statement = $pdo->prepare("
+        SELECT pu.id as p_userid, pu.userid as userid
+          FROM mdl_block_exaplanpusers as pu 
+        WHERE pu.moodleid = :moodleid
+     ");
+
+    $statement->execute($params);
+
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
+    $pUsers = $statement->fetchAll();
+
+    $defaultFields = block_exaplan_get_list_of_imported_uer_fields();
+    $infoFields = block_exaplan_get_list_of_profile_fields(true);
+
+    // update pUser data
+    foreach ($pUsers as $pUser) {
+        $params = [];
+        $sets = [];
+
+        $user = $DB->get_record('user', ['id' => $pUser['userid']], '*', IGNORE_MISSING);
+
+        if ($user) {
+            $params[':id'] = $pUser['p_userid'];
+            $params['region'] = block_exaplan_get_user_regioncohort($pUser['userid']);
+
+            // get default field values
+            foreach ($defaultFields as $fieldName) {
+                $params[':'.$fieldName] = $user->{$fieldName};
+                $sets[$fieldName] = ' '.$fieldName.' = :'.$fieldName;
+            }
+            // get values from user_info_fields
+            foreach ($infoFields as $infoFieldKey) {
+                $infoValue = block_exaplan_get_custom_profile_field_value($pUser['userid'], $infoFieldKey);
+                $params[':'.$infoFieldKey] = $infoValue;
+                $sets[$infoFieldKey] = ' '.$infoFieldKey.' = :'.$infoFieldKey;
+            }
+
+            // UPDATE
+            $statement = $pdo->prepare("
+                UPDATE mdl_block_exaplanpusers
+                  SET ".implode(', ', $sets)."
+                  WHERE id = :id;
+            ");
+            $statement->execute($params);
+
+        }
+
+    }
+}

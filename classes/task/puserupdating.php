@@ -25,13 +25,14 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once __DIR__.'/../../inc.php';
 
-class plannotifications extends \core\task\scheduled_task {
+class puserupdating extends \core\task\scheduled_task {
+
     public function get_name() {
-        return "Create notifications from Exaplan";
+        return "Update Exaplan p-User data";
     }
 
     public function execute() {
-        echo "<pre>debug:<strong>plannotifications.php:34</strong>\r\n"; print_r('sdfsdf'); echo '</pre>'; exit; // !!!!!!!!!! delete it
-        updateNotifications();
+        updatePUserData();
     }
+
 }
