@@ -84,6 +84,19 @@ function xmldb_block_exaplan_upgrade($oldversion) {
 
         upgrade_block_savepoint(true, 2022012706, 'exaplan');
     }
+
+    if ($oldversion < 2022041801) {
+        $table = new xmldb_table('block_exaplanpusers');
+        $fields = ['phone1', 'phone2'];
+        foreach ($fields as $fieldName) {
+            $field = new xmldb_field($fieldName, XMLDB_TYPE_CHAR, '20', null, null, null);
+            if (!$dbman->field_exists($table, $field)) {
+                $dbman->add_field($table, $field);
+            }
+        }
+
+        upgrade_block_savepoint(true, 2022041801, 'exaplan');
+    }
     
     return $result;
 }

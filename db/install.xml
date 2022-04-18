@@ -105,6 +105,8 @@
                 <FIELD NAME="lastname" TYPE="char" LENGTH="200" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="email" TYPE="char" LENGTH="200" NOTNULL="true" SEQUENCE="false"/>
                 <FIELD NAME="region" TYPE="char" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="phone1" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
+                <FIELD NAME="phone2" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

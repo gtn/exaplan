@@ -15,7 +15,7 @@
  * Creats the overview of dates for a User
  * @return string
  */
-function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = false, $dateId = 0, $withDateDetails = false){
+function printUser($userid, $isadmin = 0, $modulepartid = 0, $withCalendar = false, $dateId = 0, $withDateDetails = false) {
     global $CFG;
 
 

@@ -122,6 +122,13 @@ class block_exaplan extends block_base {
             }
             $content .= '</div>';
 
+            // exacomp dashboard
+            /*require_once ($CFG->dirroot . '/blocks/exacomp/renderer.php');
+            $exacompOutput = new \block_exacomp_renderer($PAGE, false);
+            echo get_string('choosestudent', 'block_exacomp');
+            echo $output->studentselector($coursestudents, ($student) ? $student->id : @$groupidForSelector, 2, $groups);*/
+
+
 
         } else if(!$modulepartid || $isadmin) {
             // only moduleparts

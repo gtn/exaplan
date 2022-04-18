@@ -853,6 +853,14 @@ function block_exaplan_get_list_of_profile_fields($justFieldKeys = false) {
     return $fields;
 }
 
+/**
+ * returns fields from mdl_user table, which is needed to import/update in mdl_block_exaplanpusers table
+ * @return array
+ */
+function block_exaplan_get_list_of_imported_uer_fields() {
+    return ['firstname', 'lastname', 'email', 'phone1', 'phone2'];
+}
+
 // only for current moodle installation!
 function block_exaplan_update_profile_fields() {
     global $DB;

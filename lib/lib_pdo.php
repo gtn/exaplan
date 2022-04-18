@@ -127,16 +127,18 @@ function getPuser($userid = 0)
 function getOrCreatePuser($userid = 0)
 {
     global $USER, $DB;
+
+    $defaultFields = block_exaplan_get_list_of_imported_uer_fields();
     if ($userid == 0) {
         $userid = $USER->id;
-        $firstname = $USER->firstname;
-        $lastname = $USER->lastname;
-        $email = $USER->email;
+        foreach ($defaultFields as $fieldName) {
+            ${'userData_'.$fieldName} = $USER->{$fieldName};
+        }
     } elseif ($userid > 0) {
         $user = $DB->get_record('user', ['id' => $userid], '*', IGNORE_MISSING);
-        $firstname = $user->firstname;
-        $lastname = $user->lastname;
-        $email = $user->email;
+        foreach ($defaultFields as $fieldName) {
+            ${'userData_'.$fieldName} = $user->{$fieldName};
+        }
     } else {
         return false;
     }
@@ -150,7 +152,6 @@ function getOrCreatePuser($userid = 0)
         ':moodleid' => get_config('exaplan', 'moodle_id'),
     );
 
-
     $statement = $pdo->prepare("SELECT * FROM mdl_block_exaplanpusers WHERE userid = :userid AND moodleid = :moodleid");
     $statement->execute($params);
     $user = $statement->fetchAll();
@@ -159,11 +160,11 @@ function getOrCreatePuser($userid = 0)
         $params = array(
             ':userid' => $userid,
             ':moodleid' => get_config('exaplan', 'moodle_id'),
-            ':firstname' => $firstname,
-            ':lastname' => $lastname,
-            ':email' => $email,
             ':region' => $region,
         );
+        foreach ($defaultFields as $fieldName) {
+            $params[':'.$fieldName] = ${'userData_'.$fieldName};
+        }
 
         // add values from user_info_fields
         $infoFields = block_exaplan_get_list_of_profile_fields(true);
