@@ -31,7 +31,6 @@ class plannotifications extends \core\task\scheduled_task {
     }
 
     public function execute() {
-        echo "<pre>debug:<strong>plannotifications.php:34</strong>\r\n"; print_r('sdfsdf'); echo '</pre>'; exit; // !!!!!!!!!! delete it
         updateNotifications();
     }
 }
