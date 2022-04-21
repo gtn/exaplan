@@ -97,6 +97,19 @@ function xmldb_block_exaplan_upgrade($oldversion) {
 
         upgrade_block_savepoint(true, 2022041801, 'exaplan');
     }
-    
+
+    if ($oldversion < 2022042100) {
+        $table = new xmldb_table('block_exaplannotifications');
+        $field = new xmldb_field('smstext', XMLDB_TYPE_CHAR, '250', null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        $field = new xmldb_field('smssent', XMLDB_TYPE_INTEGER, '11', null, null, null);
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+        upgrade_block_savepoint(true, 2022042100, 'exaplan');
+    }
+
     return $result;
 }

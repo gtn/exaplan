@@ -628,6 +628,102 @@ function block_exaplan_send_moodle_notification($notificationtype, $userfrom, $u
 }
 
 /**
+ * send SMS
+ * @param string|array $phones
+ * @param string $smsText
+ * @param string $provider
+ * @return bool
+ */
+function block_exaplan_send_sms($phones, $smsText, $provider = 'apifonica') {
+    if (!is_array($phones)) {
+        $phones = [$phones];
+    }
+    $result = false;
+    foreach ($phones as $phone) {
+        if ($phone) {
+            // for different possible sms providers:
+            switch ($provider) {
+                case 'apifonica':
+                    $phone = preg_replace('/[^0-9]/', '', $phone); // phone format (only numbers)
+                    if ($phone) {
+                        $newResult = block_exaplan_send_sms_apifonica($phone, $smsText);
+                        if ($newResult) { // at lease single success - full result is success
+                            $result = true;
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+    return $result;
+}
+
+/**
+ * call apifonica api functions to send SMS
+ * @param string $phone
+ * @param string $message
+ * @return bool
+ * @throws dml_exception
+ */
+function block_exaplan_send_sms_apifonica($phone, $message) {
+
+    $from = trim(get_config('exaplan', 'apifonica_sms_absender_name'));
+    $appSid = trim(get_config('exaplan', 'apifonica_sms_app_sid'));
+    $accountSID = trim(get_config('exaplan', 'apifonica_sms_account_sid'));
+    $password = trim(get_config('exaplan', 'apifonica_sms_auth_token'));
+    // check configurations
+    if (!$from || !$appSid || !$accountSID || !$password) {
+        return false; // not configured
+    }
+
+    $body = array(
+        'from' => $from,
+        'to' => $phone,
+        'text' => $message,
+        'msg_app_sid' => $appSid,
+        'channel' => 'sms', // default
+        'type' => 'text',
+    );
+
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_URL, 'https://api.apifonica.com/v2/accounts/'.$accountSID.'/messages');
+    curl_setopt ($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt ($curl, CURLOPT_FOLLOWLOCATION, 1);
+    // Set user and password
+    curl_setopt ($curl, CURLOPT_USERPWD, $accountSID.':'.$password);
+    // Do not check SSL
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+    // Add header
+    curl_setopt($curl, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
+    // Set POST
+    curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($body));
+
+    $result = curl_exec($curl);
+
+    if ($result) {
+        $result = json_decode($result, true);
+    } else {
+        $result = array(
+            'error_text' => curl_error($curl),
+            'error_code' => curl_errno($curl),
+            'status_code' => 600,
+        );
+    }
+
+    if ($result['status_code'] == '201') {
+        return true; // SUCCESS!
+    } else {
+        // DELETE it after developing: look this output in cron output flow
+        echo "<pre>debug:<strong>lib.php:698</strong>\r\n"; print_r($accountSID); echo '</pre>'; // !!!!!!!!!! delete it
+        echo "<pre>debug:<strong>lib.php:698</strong>\r\n"; print_r($result); echo '</pre>'; exit; // !!!!!!!!!! delete it
+    }
+
+    return false; // non success!
+
+}
+
+/**
  * @param int $modulepartId
  * @param string $date
  * @param int $timeslot
@@ -700,7 +796,16 @@ function block_exaplan_get_user_regioncohort($userid)
     }
 }
 
-function block_exaplan_create_plannotification($puseridfrom = null, $puseridto = null, $notificationtext = "")
+/**
+ * create a record for notifications/sms - will be handled with cron task later
+ * @param int $puseridfrom
+ * @param int $puseridto
+ * @param string $notificationtext
+ * @param string $smstext
+ * @return bool|int
+ * @throws dml_exception
+ */
+function block_exaplan_create_plannotification($puseridfrom = null, $puseridto = null, $notificationtext = "", $smstext = "")
 {
     global $DB;
 
@@ -709,6 +814,11 @@ function block_exaplan_create_plannotification($puseridfrom = null, $puseridto =
     $plannotification->puseridto = $puseridto;
     $plannotification->notificationtext = $notificationtext;
     $plannotification->moodlenotificationcreated = 0;
+    // to send SMS message:
+    if ($smstext) {
+        $plannotification->smstext = $smstext;
+        $plannotification->smssent = 0;
+    }
 
     return $DB->insert_record(BLOCK_EXAPLAN_DB_PLANNOTIFICATIONS, $plannotification);
 }

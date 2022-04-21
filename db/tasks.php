@@ -25,6 +25,15 @@ $tasks = array(
         'dayofweek' => '*',
 	),
 	array(
+		'classname' => 'block_exaplan\task\smsdistribution',
+        'blocking' => 0,
+        'minute' => '*',
+        'hour' => '*',
+        'day' => '*',
+        'month' => '*',
+        'dayofweek' => '*',
+	),
+	array(
 		'classname' => 'block_exaplan\task\puserupdating',
         'blocking' => 0,
         'minute' => '15',

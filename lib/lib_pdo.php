@@ -616,8 +616,9 @@ function addPUserToDate($dateid, $puserid, $absent = 0, $creatorpuserid=null, $d
     if ($creatorpuserid && $date && $moduleset && $modulepart && $sendNotification) {
         $pUserData = getTableData('mdl_block_exaplanpusers', $puserid);
         $dateData = getTableData('mdl_block_exaplandates', $dateid);
-        $text = 'Lieber '.$pUserData['firstname'].', du wurdest im Kurs '.getFixedDateTitle($dateid).' eingetragen: Dein Kurs findet am '.date('Y-m-d', $dateData['date']).' '.date('H:i', $dateData['starttime']).' statt';
-        block_exaplan_create_plannotification($creatorpuserid, $puserid, $text);
+        $notificationText = 'Lieber '.$pUserData['firstname'].', du wurdest im Kurs '.getFixedDateTitle($dateid).' eingetragen: Dein Kurs findet am '.date('Y-m-d', $dateData['date']).' '.date('H:i', $dateData['starttime']).' statt';
+        $smsText = 'du wurdest im Kurs '.getFixedDateTitle($dateid).' eingetragen ('.date('Y-m-d', $dateData['date']).' '.date('H:i', $dateData['starttime']).')';
+        block_exaplan_create_plannotification($creatorpuserid, $puserid, $notificationText, $smsText);
     }
 
 
@@ -698,6 +699,57 @@ function updateNotifications()
     }
 }
 
+/**
+ * bulk sending of sms 'you added to an event'
+ */
+function sms_distribution() {
+    $pdo = getPdoConnect();
+    $params = array(
+        ':moodleid' => get_config('exaplan', 'moodle_id')
+    );
+    
+    // pu.id is the puserid used for the notification in the centralmoodle
+    // pu.userid is the userid in the foreignmoodle
+    $sql = "
+        SELECT pu.userid as userto, n.smstext, n.id, pu.firstname as pufirstname, pu.lastname as pulastname, pu.phone1 as phone1, pu.phone2 as phone2
+          FROM mdl_block_exaplannotifications as n
+            JOIN mdl_block_exaplanpusers as pu ON pu.id = n.puseridto
+          WHERE n.smssent = 0
+            AND pu.moodleid = :moodleid
+            AND (pu.phone1 != '' OR pu.phone2 != '') ";
+    $statement = $pdo->prepare($sql);
+    $statement->setFetchMode(PDO::FETCH_ASSOC);
+    $statement->execute($params);
+
+    $pUsersToSend = $statement->fetchAll();
+
+    foreach ($pUsersToSend as $smsEntry) {
+        $sendresult = 0;
+        if ($smsEntry['phone1'] || $smsEntry['phone2']) {
+            $phones = [$smsEntry['phone1'], $smsEntry['phone2']];
+            $smsText = $smsEntry['smstext'];
+            if (block_exaplan_send_sms($phones, $smsText)) {
+                $sendresult = time(); // fix tstamp into DB
+            }
+        } else {
+            $sendresult = -1; // does not need to send (no defined phones)
+        }
+
+        // update mdl_block_exaplannotifications
+        if ($sendresult !== 0) {
+            $statement = $pdo->prepare("
+                UPDATE mdl_block_exaplannotifications
+                  SET smssent = :sendresult
+                WHERE id = :id;
+            ");
+            $statement->execute(array(
+                ':id' => $smsEntry['id'],
+                ':sendresult' => $sendresult
+            ));
+        }
+    }
+
+}
 
 
 /**
