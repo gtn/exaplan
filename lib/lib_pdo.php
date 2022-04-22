@@ -711,7 +711,7 @@ function sms_distribution() {
     // pu.id is the puserid used for the notification in the centralmoodle
     // pu.userid is the userid in the foreignmoodle
     $sql = "
-        SELECT pu.userid as userto, n.smstext, n.id, pu.firstname as pufirstname, pu.lastname as pulastname, pu.phone1 as phone1, pu.phone2 as phone2
+        SELECT pu.userid as userto, pu.moodleid as pMoodleId, n.smstext, n.id, pu.firstname as pufirstname, pu.lastname as pulastname, pu.phone1 as phone1, pu.phone2 as phone2
           FROM mdl_block_exaplannotifications as n
             JOIN mdl_block_exaplanpusers as pu ON pu.id = n.puseridto
           WHERE n.smssent = 0
@@ -724,12 +724,28 @@ function sms_distribution() {
     $pUsersToSend = $statement->fetchAll();
 
     foreach ($pUsersToSend as $smsEntry) {
-        $sendresult = 0;
+        $sendresult = 0; // 0 - need to be send in next scheduled task starting; -1 - disable this SMS; timestmp - SMS sended
         if ($smsEntry['phone1'] || $smsEntry['phone2']) {
             $phones = [$smsEntry['phone1'], $smsEntry['phone2']];
             $smsText = $smsEntry['smstext'];
             if (block_exaplan_send_sms($phones, $smsText)) {
-               $sendresult = time(); // fix tstamp into DB
+                $sendresult = time(); // fix tstamp into DB
+            } else {
+                $sendresult = -1; // mark the sms as 'does not need to send' if first attempt to send it was not success at all!
+                // send a message to moodle admin
+                $adminMessage = 'The user has defined phone numbers, but we can not send SMS on both of them<br>
+                        User\'s data:<br>
+                            - Moodle ID: '.$smsEntry['pMoodleId'].' ('.getMoodleDataByMoodleid($smsEntry['pMoodleId'], '', 'Öffentlich')['companyname'].') <br>
+                            - user\'s ID on foreign Moodle <br>
+                            - name: '.implode(' ', [$smsEntry['pufirstname'], $smsEntry['pulastname']]).' <br>
+                            - phones: '.implode(', ', [$smsEntry['phone1'], $smsEntry['phone2']]).' <br>
+                ';
+                // userFrom is 1, because Moodle API does not show notifications from the same user
+                // userTo is 2 - it is always admin. TODO: is this ok?
+                block_exaplan_send_moodle_notification("lostSMS", 1, 2, "Exabis Planning Tool: SMS was not sent", $adminMessage, null, null, false, 0, null, FORMAT_PLAIN);
+                // add the same information to cron log
+                mtrace($adminMessage);
+
             }
         } else {
             $sendresult = -1; // does not need to send (no defined phones)
@@ -1109,9 +1125,10 @@ function getFixedDateState($dateId) {
 /**
  * @param int $moodleid moodleId - not id!
  * @param string $field
+ * @param bool $returnifempty
  * @return array
  */
-function getMoodleDataByMoodleid($moodleid, $field = '',$returnifempty=null) {
+function getMoodleDataByMoodleid($moodleid, $field = '', $returnifempty = null) {
     $pdo = getPdoConnect();
 
     $sql = "SELECT * FROM mdl_block_exaplanmoodles WHERE moodleid = :moodleid";
@@ -1127,7 +1144,7 @@ function getMoodleDataByMoodleid($moodleid, $field = '',$returnifempty=null) {
         return $result;
     }
 
-    return array('companyname'=>$returnifempty);
+    return array('companyname' => $returnifempty);
 }
 
 function getModulePartsForModuleSet($modulesetId) {

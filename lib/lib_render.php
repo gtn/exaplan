@@ -1298,7 +1298,7 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
     } else {
         // date details
         // moodleid info
-        $moodleData = getMoodleDataByMoodleid($dateData['moodleid'],'','Öffentlich');
+        $moodleData = getMoodleDataByMoodleid($dateData['moodleid'], '', 'Öffentlich');
         $content .= $tableRow('Ort:', @$moodleData['companyname']);
 
         // region

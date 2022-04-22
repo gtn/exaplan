@@ -600,7 +600,7 @@ function block_exaplan_get_data_for_calendar($puserid = null, $dataType = 'desir
 }
 
 
-function block_exaplan_send_moodle_notification($notificationtype, $userfrom, $userto, $subject, $message, $context, $contexturl = null, $dakoramessage = false, $courseid = 0, $customdata = null)
+function block_exaplan_send_moodle_notification($notificationtype, $userfrom, $userto, $subject, $message, $context, $contexturl = null, $dakoramessage = false, $courseid = 0, $customdata = null, $messageformat = FORMAT_HTML)
 {
     global $CFG, $DB;
 
@@ -614,7 +614,7 @@ function block_exaplan_send_moodle_notification($notificationtype, $userfrom, $u
     $eventdata->fullmessage = $message;
     $eventdata->name = $notificationtype;
     $eventdata->subject = $subject;
-    $eventdata->fullmessageformat = FORMAT_HTML;
+    $eventdata->fullmessageformat = $messageformat;
     $eventdata->fullmessagehtml = $message;
     $eventdata->smallmessage = $subject;
     $eventdata->component = 'block_exaplan';
@@ -700,6 +700,10 @@ function block_exaplan_send_sms_apifonica($phone, $message) {
     curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($body));
 
     $result = curl_exec($curl);
+
+    // DISABLE IT after development !!!!!!
+    $tempFileLog = "\r\n\r\n".date('d.m.Y H:i').":\r\n".'phone: '.$phone."\r\n".print_r($result, true);
+    file_put_contents(__DIR__.'/apifonica.log', $tempFileLog, FILE_APPEND);
 
     if ($result) {
         $result = json_decode($result, true);

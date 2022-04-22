@@ -18,4 +18,7 @@ $messageproviders = array (
     // Notify student that a date has been fixed
     'datefixed' => array (
     ),
+    // Notify admin that SMS can not be sent
+    'lostSMS' => array (
+    ),
 );
