@@ -617,7 +617,7 @@ function addPUserToDate($dateid, $puserid, $absent = 0, $creatorpuserid=null, $d
         $pUserData = getTableData('mdl_block_exaplanpusers', $puserid);
         $dateData = getTableData('mdl_block_exaplandates', $dateid);
         $notificationText = 'Lieber '.$pUserData['firstname'].', du wurdest im Kurs '.getFixedDateTitle($dateid).' eingetragen: Dein Kurs findet am '.date('Y-m-d', $dateData['date']).' '.date('H:i', $dateData['starttime']).' statt';
-        $smsText = 'du wurdest im Kurs '.getFixedDateTitle($dateid).' eingetragen ('.date('Y-m-d', $dateData['date']).' '.date('H:i', $dateData['starttime']).')';
+        $smsText = 'Teilnahme für '.substr(getFixedDateTitle($dateid), 0, 30).' gesichert!';
         block_exaplan_create_plannotification($creatorpuserid, $puserid, $notificationText, $smsText);
     }
 
@@ -705,7 +705,7 @@ function updateNotifications()
 function sms_distribution() {
     $pdo = getPdoConnect();
     $params = array(
-        ':moodleid' => get_config('exaplan', 'moodle_id')
+//        ':moodleid' => get_config('exaplan', 'moodle_id')
     );
     
     // pu.id is the puserid used for the notification in the centralmoodle
@@ -715,7 +715,7 @@ function sms_distribution() {
           FROM mdl_block_exaplannotifications as n
             JOIN mdl_block_exaplanpusers as pu ON pu.id = n.puseridto
           WHERE n.smssent = 0
-            AND pu.moodleid = :moodleid
+--            AND pu.moodleid = :moodleid
             AND (pu.phone1 != '' OR pu.phone2 != '') ";
     $statement = $pdo->prepare($sql);
     $statement->setFetchMode(PDO::FETCH_ASSOC);
@@ -729,7 +729,7 @@ function sms_distribution() {
             $phones = [$smsEntry['phone1'], $smsEntry['phone2']];
             $smsText = $smsEntry['smstext'];
             if (block_exaplan_send_sms($phones, $smsText)) {
-                $sendresult = time(); // fix tstamp into DB
+               $sendresult = time(); // fix tstamp into DB
             }
         } else {
             $sendresult = -1; // does not need to send (no defined phones)

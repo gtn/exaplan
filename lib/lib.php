@@ -712,11 +712,12 @@ function block_exaplan_send_sms_apifonica($phone, $message) {
     }
 
     if ($result['status_code'] == '201') {
+//        echo "<pre>debug:<strong>lib.php:715</strong>\r\n"; print_r($result); echo '</pre>'; // !!!!!!!!!! delete it
         return true; // SUCCESS!
     } else {
         // DELETE it after developing: look this output in cron output flow
-        echo "<pre>debug:<strong>lib.php:698</strong>\r\n"; print_r($accountSID); echo '</pre>'; // !!!!!!!!!! delete it
-        echo "<pre>debug:<strong>lib.php:698</strong>\r\n"; print_r($result); echo '</pre>'; exit; // !!!!!!!!!! delete it
+//        echo "<pre>debug:<strong>lib.php:698</strong>\r\n"; print_r($accountSID); echo '</pre>'; // !!!!!!!!!! delete it
+//        echo "<pre>debug:<strong>lib.php:698</strong>\r\n"; print_r($result); echo '</pre>'; exit; // !!!!!!!!!! delete it
     }
 
     return false; // non success!
