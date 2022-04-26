@@ -733,16 +733,15 @@ function sms_distribution() {
             } else {
                 $sendresult = -1; // mark the sms as 'does not need to send' if first attempt to send it was not success at all!
                 // send a message to moodle admin
-                $adminMessage = 'The user has defined phone numbers, but we can not send SMS on both of them<br>
-                        User\'s data:<br>
+                $adminMessage = 'Folgender Benutzer hat eine Telefonnummer angegeben, die SMS Benachrichtigung kann aber nicht gesendet werden<br>
+                        Benutzerdaten:<br>
                             - Moodle ID: '.$smsEntry['pMoodleId'].' ('.getMoodleDataByMoodleid($smsEntry['pMoodleId'], '', 'Öffentlich')['companyname'].') <br>
-                            - user\'s ID on foreign Moodle <br>
-                            - name: '.implode(' ', [$smsEntry['pufirstname'], $smsEntry['pulastname']]).' <br>
-                            - phones: '.implode(', ', [$smsEntry['phone1'], $smsEntry['phone2']]).' <br>
+                            - Name: '.implode(' ', [$smsEntry['pufirstname'], $smsEntry['pulastname']]).' <br>
+                            - Telefonnummer: '.implode(', ', [$smsEntry['phone1'], $smsEntry['phone2']]).' <br>
                 ';
                 // userFrom is 1, because Moodle API does not show notifications from the same user
                 // userTo is 2 - it is always admin. TODO: is this ok?
-                block_exaplan_send_moodle_notification("lostSMS", 1, 2, "Exabis Planning Tool: SMS was not sent", $adminMessage, null, null, false, 0, null, FORMAT_PLAIN);
+                block_exaplan_send_moodle_notification("lostSMS", 1, 2, "Moodle Planungstool: SMS wurde nicht gesendet", $adminMessage, null, null, false, 0, null, FORMAT_PLAIN);
                 // add the same information to cron log
                 mtrace($adminMessage);
 
