@@ -894,7 +894,24 @@ function getDateStateCodeByIndex($index) {
     ];
     return @$states[$index];
 }
+function getFixedDateData ($dateId) {
+    $FixedDateData = new stdClass();
+    $dateData = getTableData('mdl_block_exaplandates', $dateId);
+	$modulePart = getModulepartByModulepartid($dateData['modulepartid']);
+    $moduleSet = getModulesetByModulesetid($modulePart['modulesetid']);
+	$dateData->titleshort="";
+    if ($moduleSet['title']) {
+        $dateData->titleshort .= $moduleSet['title'];
+    }
+    if ($modulePart['title']) {
+        $dateData->titleshort .= ' - '.$modulePart['title'];
+    }
+	
+   $dateData->title = date('Y-m-d', $dateData['date']).': '.$dateData->titleshort;
+   $dateData->edate = date('Y-m-d', $dateData['date']);
 
+    return $dateData->title;
+}
 // combine diff data to get fixed date title
 function getFixedDateTitle($dateId) {
     $title = '';

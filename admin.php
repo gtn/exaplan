@@ -220,15 +220,21 @@ switch ($action) {
                 foreach ($registeredUsers as $registeredStudent) {
                     $pUserData = getTableData('mdl_block_exaplanpusers', $registeredStudent['puserid']);
                     $trainerData = getTableData('mdl_block_exaplanpusers', $dateData['trainerpuserid']);
-                    $text = 'Lieber ' . $pUserData['firstname'] . ', der Kurs ' . getFixedDateTitle($dateId) . ' hat sich geändert, hier sind die neuen Kursdaten: ' . "\r\n" .
-                        'DF Ort: ' . getTableData('mdl_block_exaplanmoodles', $dateData['moodleid'], 'companyname') . "\r\n" .
-                        'Region: ' . getRegionTitle($dateData['region']) . "\r\n" .
-                        'DF Art: ' . getIsOnlineTitle($dateData['isonline']) . "\r\n" .
-                        'Trainer: ' . $trainerData['firstname'] . ' ' . $trainerData['lastname'] . "\r\n" .
-                        'Location: ' . $dateData['location'] . "\r\n" .
-                        'Uhrzeit: ' . date('H:i', $dateData['starttime']) . "\r\n" .
+					$FixedDateData=getFixedDateData($dateId);
+					//$text = 'Lieber ' . $pUserData['firstname'] . ', der Kurs ' . getFixedDateTitle($dateId) . ' hat sich geändert, hier sind die neuen Kursdaten: ' . "\r\n" .
+					$text = 'Liebe/r ' . $pUserData['firstname'] . ', du wurdest im Kurs ' . getFixedDateTitle($dateId) . '  eingetragen. ". \r\n ."Aktuelle Detailinformationen:'. "\r\n" . 
+                    
+                        //'DF Ort: ' . getTableData('mdl_block_exaplanmoodles', $dateData['moodleid'], 'companyname') . "\r\n" .
+						'Kurs: ' . $FixedDateData->titleshort . "\r\n" .
+						'Datum: ' . $FixedDateData->edate . "\r\n" .
+                        //'Region: ' . getRegionTitle($dateData['region']) . "\r\n" .
+                        'Durchführungsart: ' . getIsOnlineTitle($dateData['isonline']) . "\r\n" .
+						'Start: ' . date('H:i', $dateData['starttime']) . "\r\n" .
                         'Ende: ' . date('H:i', $dateData['duration']) . "\r\n" .
-                        'Notiz: ' . $dateData['comment'] . "\r\n";
+						'Veranstaltungsort: ' . $dateData['location'] . "\r\n" .
+						'Link zum Onlinemeeting: ' . $dateData['onlineroom'] . "\r\n" .
+                        'Dein/e Trainer*in ist: ' . $trainerData['firstname'] . ' ' . $trainerData['lastname'] . "\r\n" .
+						'Sonstige Bemerkung: ' . $dateData['comment'] . "\r\n";
                     block_exaplan_create_plannotification($pUserId, $registeredStudent['puserid'], $text);
                 }
             }

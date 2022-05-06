@@ -360,7 +360,7 @@ function block_exaplan_calendars_header_view($modulepartId = 0) {
                 .($date['duration'] ? 'Ende: '.date('H:i', $date['duration']).'<br>' : '')
                 .($date['moodleid'] ? 'Ort: '.getMoodleDataByMoodleid($date['moodleid'], 'companyname').'<br>' : '')
                 .getRegionTitle($date['region']).' - '.getIsOnlineTitle($date['isonline']).'<br>'
-                .($date['location'] ? 'Location: '.$date['location'].'<br>' : '')
+                .($date['location'] ? 'Veranstaltungsort: '.$date['location'].'<br>' : '')
                 .($trainer ? 'Skillswork-Trainer: '.@$trainer['firstname'].' '.@$trainer['lastname'].'<br>' : '');
             $tooltips .= '</span>';
             $content .= '<td align="right"><a href="#" class="btn btn-sm exaplan-existing-date tooltipster" data-tooltip-content="#tooltipster_content'.$date['id'].'">';
@@ -1067,7 +1067,7 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
     // location
     $content .= '<tr>';
     $content .= '<td colspan="2">';
-    $content .= '<label for="location_'.$instanceKey.'">Location:</label>';
+    $content .= '<label for="location_'.$instanceKey.'">Veranstaltungsort:</label>';
     $content .= '<input type="text" name="location" value="'.@$dateRec['location'].'" class="form-control" id="location_'.$instanceKey.'" /></td>';
     $content .= '</td>';
     // time
@@ -1087,7 +1087,7 @@ function formAdminDateFixing($modulepartId, $date, $timeslot = null, $defaultReg
     // link to online room
     $content .= '<tr>';
     $content .= '<td colspan="6">';
-    $content .= '<label for="onlineroom_'.$instanceKey.'">Raum (BBB oder Teams):</label>';
+    $content .= '<label for="onlineroom_'.$instanceKey.'">Link zum Onlinemeeting: (BBB oder Teams):</label>';
     $content .= '<input type="text" name="onlineroom" value="'.@$dateRec['onlineroom'].'" class="form-control" id="onlineroom_'.$instanceKey.'" /></td>';
     $content .= '</td>';
 
@@ -1324,7 +1324,7 @@ function studentEventDetailsView($userId, $modulepartId, $dateId) {
         if ($dateData['isonline'] && $dateData['onlineroom']) {
             $link = $dateData['onlineroom'];
             $rowContent = checkOnlineRoomTypeByLink($link).'&nbsp;|&nbsp;<a href="'.$link.'" class="exaplan-onlineroom-link" target="_blank">Startseite&nbsp;'.$OUTPUT->pix_icon("e/insert_edit_video", checkOnlineRoomTypeByLink($link)).'</a>';
-            $content .= $tableRow('Raum:', $rowContent);
+            $content .= $tableRow('Link zum Onlinemeeting:', $rowContent);
         }
 
         // description
