@@ -25,7 +25,7 @@ defined('MOODLE_INTERNAL') || die();
 const BLOCK_EXAPLAN_DB_MODULESETS = 'block_exaplanmodulesets';
 const BLOCK_EXAPLAN_DB_MODULEPARTS = 'block_exaplanmoduleparts';
 const BLOCK_EXAPLAN_DB_DATES = 'block_exaplandates';
-const BLOCK_EXAPLAN_DB_PLANNOTIFICATIONS = 'block_EXAPLANNOTIFICATIONS';
+const BLOCK_EXAPLAN_DB_PLANNOTIFICATIONS = 'block_exaplannotifications';
 
 /**
  * DATE STATES

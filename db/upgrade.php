@@ -111,5 +111,14 @@ function xmldb_block_exaplan_upgrade($oldversion) {
         upgrade_block_savepoint(true, 2022042100, 'exaplan');
     }
 
+    if ($oldversion < 2022050100) {
+        $table = new xmldb_table('block_exaplannotifications');
+        $field = new xmldb_field('smstext', XMLDB_TYPE_TEXT, null, null, null, null);
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->change_field_type($table, $field);
+        }
+        upgrade_block_savepoint(true, 2022050100, 'exaplan');
+    }
+
     return $result;
 }

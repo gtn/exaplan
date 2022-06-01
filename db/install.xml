@@ -150,8 +150,7 @@
                        COMMENT="The actual notification content that should be created."/>
                 <FIELD NAME="moodlenotificationcreated" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false"
                        COMMENT="0=no, 1=yes If it is 1, then the notification has been created already."/>
-                <FIELD NAME="smstext" TYPE="char" LENGTH="1333" NOTNULL="true" SEQUENCE="false"
-                       COMMENT="SMS text that should be sent."/>
+                <FIELD NAME="smstext" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="SMS text that should be sent."/>
                 <FIELD NAME="smssent" TYPE="int" LENGTH="11" NOTNULL="true" SEQUENCE="false"
                        COMMENT="0 = did not send yet; -1 = does not need to send; >0 =  timestamp of sent"/>
             </FIELDS>
