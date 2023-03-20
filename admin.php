@@ -96,9 +96,14 @@ switch ($action) {
                         foreach ($students as $student) {
                             removePUserFromDate($dateId, $student, $modulepartid);
                             // send messages
-                            $pUserData = getTableData('mdl_block_exaplanpusers', $student);
-                            $text = 'Lieber '.$pUserData['firstname'].', du wurdest im Kurs '.getFixedDateTitle($dateId).' ausgetragen. Bitte mach jetzt folgendes:';
-                            block_exaplan_create_plannotification($pUserId, $student, $text);
+                            $dateData = getFixedDateData($dateId);
+                            $dateTs = $dateData['date'];
+                            // if not in past
+                            if ($dateTS > time()) {
+                                $pUserData = getTableData('mdl_block_exaplanpusers', $student);
+                                $text = 'Lieber ' . $pUserData['firstname'] . ', du wurdest im Kurs ' . getFixedDateTitle($dateId) . ' ausgetragen. Bitte mach jetzt folgendes:';
+                                block_exaplan_create_plannotification($pUserId, $student, $text);
+                            }
                         }
                     }
                     break;
@@ -164,12 +169,15 @@ switch ($action) {
                 if ($dateId) {
                     $dateState = getFixedDateState($dateId);
                     if (in_array($dateState, [BLOCK_EXAPLAN_DATE_FIXED, BLOCK_EXAPLAN_DATE_BLOCKED])) {
+                        $dateData = getFixedDateData($dateId);
+                        $dateTs = $dateData['date'];
                         // unlink students
                         $registeredUsers = getFixedPUsersForDate($dateId);
                         $registeredUsersIds = array_map(function ($u) {return $u['puserid']; }, $registeredUsers);
                         foreach ($registeredUsersIds as $studentId) {
                             removePUserFromDate($dateId, $studentId, $modulepartid);
-                            if ($dateState == BLOCK_EXAPLAN_DATE_FIXED) {
+                            // if not in past
+                            if ($dateTS > time() && $dateState == BLOCK_EXAPLAN_DATE_FIXED) {
                                 // send messages
                                 $pUserData = getTableData('mdl_block_exaplanpusers', $studentId);
                                 $text = 'Lieber ' . $pUserData['firstname'] . ', leider wurde der Kurs ' . getFixedDateTitle($dateId) . ' abgesagt. Deine Planung ist noch da, bitte plane den Rest neu.';
@@ -216,26 +224,30 @@ switch ($action) {
                     }
                 }*/
                 $dateData = getTableData('mdl_block_exaplandates', $dateId);
-                // send messages to students
-                foreach ($registeredUsers as $registeredStudent) {
-                    $pUserData = getTableData('mdl_block_exaplanpusers', $registeredStudent['puserid']);
-                    $trainerData = getTableData('mdl_block_exaplanpusers', $dateData['trainerpuserid']);
-					$FixedDateData=getFixedDateData($dateId);
-					//$text = 'Lieber ' . $pUserData['firstname'] . ', der Kurs ' . getFixedDateTitle($dateId) . ' hat sich geändert, hier sind die neuen Kursdaten: ' . "\r\n" .
-					$text = 'Liebe/r ' . $pUserData['firstname'] . ', du wurdest im Kurs ' . getFixedDateTitle($dateId) . '  eingetragen. ". \r\n ."Aktuelle Detailinformationen:'. "\r\n" . 
-                    
-                        //'DF Ort: ' . getTableData('mdl_block_exaplanmoodles', $dateData['moodleid'], 'companyname') . "\r\n" .
-						'Kurs: ' . $FixedDateData->titleshort . "\r\n" .
-						'Datum: ' . $FixedDateData->edate . "\r\n" .
-                        //'Region: ' . getRegionTitle($dateData['region']) . "\r\n" .
-                        'Durchführungsart: ' . getIsOnlineTitle($dateData['isonline']) . "\r\n" .
-						'Start: ' . date('H:i', $dateData['starttime']) . "\r\n" .
-                        'Ende: ' . date('H:i', $dateData['duration']) . "\r\n" .
-						'Veranstaltungsort: ' . $dateData['location'] . "\r\n" .
-						'Link zum Onlinemeeting: ' . $dateData['onlineroom'] . "\r\n" .
-                        'Dein/e Trainer*in ist: ' . $trainerData['firstname'] . ' ' . $trainerData['lastname'] . "\r\n" .
-						'Sonstige Bemerkung: ' . $dateData['comment'] . "\r\n";
-                    block_exaplan_create_plannotification($pUserId, $registeredStudent['puserid'], $text);
+                $dateData = getFixedDateData($dateId);
+                $dateTs = $dateData['date'];
+                // send messages to students - if not in past
+                if ($dateTs > time()) {
+                    foreach ($registeredUsers as $registeredStudent) {
+                        $pUserData = getTableData('mdl_block_exaplanpusers', $registeredStudent['puserid']);
+                        $trainerData = getTableData('mdl_block_exaplanpusers', $dateData['trainerpuserid']);
+                        $FixedDateData = getFixedDateData($dateId);
+                        //$text = 'Lieber ' . $pUserData['firstname'] . ', der Kurs ' . getFixedDateTitle($dateId) . ' hat sich geändert, hier sind die neuen Kursdaten: ' . "\r\n" .
+                        $text = 'Liebe/r ' . $pUserData['firstname'] . ', du wurdest im Kurs ' . getFixedDateTitle($dateId) . '  eingetragen. ". \r\n ."Aktuelle Detailinformationen:' . "\r\n" .
+
+                            //'DF Ort: ' . getTableData('mdl_block_exaplanmoodles', $dateData['moodleid'], 'companyname') . "\r\n" .
+                            'Kurs: ' . $FixedDateData['titleshort'] . "\r\n" .
+                            'Datum: ' . $FixedDateData['edate'] . "\r\n" .
+                            //'Region: ' . getRegionTitle($dateData['region']) . "\r\n" .
+                            'Durchführungsart: ' . getIsOnlineTitle($dateData['isonline']) . "\r\n" .
+                            'Start: ' . date('H:i', $dateData['starttime']) . "\r\n" .
+                            'Ende: ' . date('H:i', $dateData['duration']) . "\r\n" .
+                            'Veranstaltungsort: ' . $dateData['location'] . "\r\n" .
+                            'Link zum Onlinemeeting: ' . $dateData['onlineroom'] . "\r\n" .
+                            'Dein/e Trainer*in ist: ' . $trainerData['firstname'] . ' ' . $trainerData['lastname'] . "\r\n" .
+                            'Sonstige Bemerkung: ' . $dateData['comment'] . "\r\n";
+                        block_exaplan_create_plannotification($pUserId, $registeredStudent['puserid'], $text);
+                    }
                 }
             }
             /*if ($state == BLOCK_EXAPLAN_DATE_CONFIRMED) {

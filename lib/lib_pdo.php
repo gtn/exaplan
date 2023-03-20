@@ -436,8 +436,6 @@ function setPrefferedDate($updateExisting, $dateId = 0, $modulepartid, $puserid,
     $sql = "INSERT INTO mdl_block_exaplandates
                         (modulepartid, date, timeslot, state, creatorpuserid, creatortimestamp, modifiedpuserid, modifiedtimestamp, location, trainerpuserid, starttime, comment, region, moodleid, isonline, duration, onlineroom)
                   VALUES (:modulepartid, :date, :timeslot, :state, :creatorpuserid, :creatortimestamp, :modifiedpuserid, :modifiedtimestamp, :location, :trainerpuserid, :starttime, :comment, :region, :moodleid, :isonline, :duration, :onlineroom);";
-//    echo "<pre>debug:<strong>lib_pdo.php:297</strong>\r\n"; print_r($params); echo '</pre>'; // !!!!!!!!!! delete it
-//    echo $sql; exit;
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
     $dateid = $pdo->lastInsertId();
@@ -611,9 +609,11 @@ function addPUserToDate($dateid, $puserid, $absent = 0, $creatorpuserid=null, $d
     $statement = $pdo->prepare("INSERT INTO mdl_block_exaplanpuser_date_mm (dateid, puserid, creatorpuserid, absent) VALUES (:dateid, :puserid, :creatorpuserid, :absent);");
     $statement->execute($params);
     $id = $pdo->lastInsertId();
-
     // create notification for users
-    if ($creatorpuserid && $date && $moduleset && $modulepart && $sendNotification) {
+    $dateData = getFixedDateData($dateid);
+    $dateTs = $dateData['date'];
+    // also - if not in past
+    if ($dateTs > time() && $creatorpuserid && $date && $moduleset && $modulepart && $sendNotification) {
         $pUserData = getTableData('mdl_block_exaplanpusers', $puserid);
         $dateData = getTableData('mdl_block_exaplandates', $dateid);
         $notificationText = 'Lieber '.$pUserData['firstname'].', du wurdest im Kurs '.getFixedDateTitle($dateid).' eingetragen: Dein Kurs findet am '.date('Y-m-d', $dateData['date']).' '.date('H:i', $dateData['starttime']).' statt';
@@ -962,8 +962,6 @@ function getFixedDatesAdvanced($puserid = null, $modulepartid = null, $date = nu
                                   ";
 
     }
-//    echo "<pre>debug:<strong>lib_pdo.php:779</strong>\r\n"; print_r($modulepartid); echo '</pre>'; // !!!!!!!!!! delete it
-//    echo "<pre>debug:<strong>lib_pdo.php:771</strong>\r\n"; print_r($sql); echo '</pre>'; ; // !!!!!!!!!! delete it
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
     $statement->setFetchMode(PDO::FETCH_ASSOC);

@@ -228,7 +228,7 @@ TavoCalendar.prototype.markSelectedModulePart = function(modulepartId, calendarD
             calendarData.selectedDates.forEach((date) => {
                 if (stepDate == date.date && typeof date.moduleparts != 'undefined' && date.moduleparts.indexOf(modulepartId) != -1) {
                     // mark this day
-                    console.log('gtnTavoCalendar.js:93');console.log('day ' + moment_copy.format(format) + ' marked');// !!!!!!!!!! delete it
+                    // console.log('gtnTavoCalendar.js:93');console.log('day ' + moment_copy.format(format) + ' marked');// !!!!!!!!!! delete it
                     dayWrapper.addClass('usedForModulepart');
                     // TODO: different marks? 'fixed / desired'
                 }

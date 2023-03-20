@@ -716,12 +716,9 @@ function block_exaplan_send_sms_apifonica($phone, $message) {
     }
 
     if ($result['status_code'] == '201') {
-//        echo "<pre>debug:<strong>lib.php:715</strong>\r\n"; print_r($result); echo '</pre>'; // !!!!!!!!!! delete it
         return true; // SUCCESS!
     } else {
         // DELETE it after developing: look this output in cron output flow
-//        echo "<pre>debug:<strong>lib.php:698</strong>\r\n"; print_r($accountSID); echo '</pre>'; // !!!!!!!!!! delete it
-//        echo "<pre>debug:<strong>lib.php:698</strong>\r\n"; print_r($result); echo '</pre>'; exit; // !!!!!!!!!! delete it
     }
 
     return false; // non success!
@@ -895,22 +892,21 @@ function getDateStateCodeByIndex($index) {
     return @$states[$index];
 }
 function getFixedDateData ($dateId) {
-    $FixedDateData = new stdClass();
     $dateData = getTableData('mdl_block_exaplandates', $dateId);
 	$modulePart = getModulepartByModulepartid($dateData['modulepartid']);
     $moduleSet = getModulesetByModulesetid($modulePart['modulesetid']);
-	$dateData->titleshort="";
+	$dateData['titleshort'] = "";
     if ($moduleSet['title']) {
-        $dateData->titleshort .= $moduleSet['title'];
+        $dateData['titleshort'] .= $moduleSet['title'];
     }
     if ($modulePart['title']) {
-        $dateData->titleshort .= ' - '.$modulePart['title'];
+        $dateData['titleshort'] .= ' - '.$modulePart['title'];
     }
 	
-   $dateData->title = date('Y-m-d', $dateData['date']).': '.$dateData->titleshort;
-   $dateData->edate = date('Y-m-d', $dateData['date']);
+    $dateData['title'] = date('Y-m-d', $dateData['date']).': '.$dateData['titleshort'];
+    $dateData['edate'] = date('Y-m-d', $dateData['date']);
 
-    return $dateData->title;
+    return $dateData;
 }
 // combine diff data to get fixed date title
 function getFixedDateTitle($dateId) {
